@@ -1,7 +1,7 @@
 <a name="readme-top"></a>
 
 <div align="center">
-  <img src="src/assets/images/logo_original.png" alt="Logo" width="80">
+  <img src="src/assets/images/logo_original.png" alt="Logo" width="200">
 
   <h3 align="center">스토어 솔직</h3>
 
@@ -45,12 +45,12 @@
 
 <br />
 
-![hr][src/assets/images/hr.png]
+<img src="src/assets/images/hr.png" alt="hr">
 <br />
 
 ## 프로젝트 소개
 
-[![Store Soljik][src/assets/images/main_screenshot.png]](https://github.com/momo1108/StoreSoljik)
+<img src="src/assets/images/main_screenshot.png" alt="hr">
 
 세상에는 수많은 종류의 커머스들이 존재합니다. 그러나, 리뷰에 관해서는 신뢰성이 보장되지 않는다는 공통점이 존재합니다. 이 프로젝트는 그러한 불만을 해소하기 위해 만들어졌습니다.
 
@@ -66,7 +66,7 @@
 <br />
 <br />
 
-![hr][src/assets/images/hr.png]
+<img src="src/assets/images/hr.png" alt="hr">
 <br />
 
 ## 프로젝트 기술 스택
@@ -159,7 +159,7 @@
 
 <br />
 
-![hr][src/assets/images/hr.png]
+<img src="src/assets/images/hr.png" alt="hr">
 <br />
 
 ## 브랜치 전략
@@ -171,7 +171,7 @@
 
 <br />
 
-![hr][src/assets/images/hr.png]
+<img src="src/assets/images/hr.png" alt="hr">
 <br />
 
 ## 프로젝트 폴더 구조
@@ -245,7 +245,7 @@ styled componets 에 사용할 글로벌 스타일이나 테마를 저장합니�
 
 <br />
 
-![hr][src/assets/images/hr.png]
+<img src="src/assets/images/hr.png" alt="hr">
 <br />
 
 ## 코드 컨벤션
@@ -302,7 +302,7 @@ import * as S from 'Product.Styled'
 
 <br />
 
-![hr][src/assets/images/hr.png]
+<img src="src/assets/images/hr.png" alt="hr">
 <br />
 
 ## 커밋 컨벤션
@@ -320,7 +320,7 @@ import * as S from 'Product.Styled'
 
 <br />
 
-![hr][src/assets/images/hr.png]
+<img src="src/assets/images/hr.png" alt="hr">
 <br />
 
 ## Eslint
@@ -351,7 +351,7 @@ import * as S from 'Product.Styled'
 
 <br />
 
-![hr][src/assets/images/hr.png]
+<img src="src/assets/images/hr.png" alt="hr">
 <br />
 
 <!-- MARKDOWN LINKS & IMAGES -->
