@@ -23,29 +23,31 @@
   <ol>
     <li>
       <a href="#프로젝트-소개">프로젝트 소개</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
     </li>
     <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
+      <a href="#프로젝트-기술-스택">프로젝트 기술 스택</a>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
+    <li>
+      <a href="#브랜치-전략">브랜치 전략</a>
+    </li>
+    <li>
+      <a href="#프로젝트-폴더-구조">프로젝트 폴더 구조</a>
+    </li>
+    <li>
+      <a href="#커밋-컨벤션">커밋 컨벤션</a>
+    </li>
+    <li>
+      <a href="#eslint">Eslint</a>
+    </li>
+    <li>
+      <a href="#prettier">Prettier</a>
+    </li>
   </ol>
 </details>
 
 <br />
 
-<img src="src/assets/images/hr.png" alt="hr">
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
 ## 프로젝트 소개
@@ -66,7 +68,7 @@
 <br />
 <br />
 
-<img src="src/assets/images/hr.png" alt="hr">
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
 ## 프로젝트 기술 스택
@@ -159,7 +161,7 @@
 
 <br />
 
-<img src="src/assets/images/hr.png" alt="hr">
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
 ## 브랜치 전략
@@ -171,7 +173,7 @@
 
 <br />
 
-<img src="src/assets/images/hr.png" alt="hr">
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
 ## 프로젝트 폴더 구조
@@ -245,7 +247,7 @@ styled componets 에 사용할 글로벌 스타일이나 테마를 저장합니�
 
 <br />
 
-<img src="src/assets/images/hr.png" alt="hr">
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
 ## 코드 컨벤션
@@ -302,7 +304,7 @@ import * as S from 'Product.Styled'
 
 <br />
 
-<img src="src/assets/images/hr.png" alt="hr">
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
 ## 커밋 컨벤션
@@ -320,7 +322,7 @@ import * as S from 'Product.Styled'
 
 <br />
 
-<img src="src/assets/images/hr.png" alt="hr">
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
 ## Eslint
@@ -349,10 +351,6 @@ import * as S from 'Product.Styled'
 ```
 
 
-<br />
-
-<img src="src/assets/images/hr.png" alt="hr">
-<br />
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
