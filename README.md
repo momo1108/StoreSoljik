@@ -171,6 +171,8 @@
 2. `develop` : 배포되기 전 확인 작업을 위한 브랜치입니다.
 3. `feature` : 개발을 위한 브랜치로, 기능 단위로 생성하여 사용하는 브랜치입니다.
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 <br />
 
 <picture><img src="src/assets/images/hr.png" alt="hr"></picture>
@@ -245,6 +247,7 @@ styled componets 에 사용할 글로벌 스타일이나 테마를 저장합니�
 
 </details>
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br />
 
 <picture><img src="src/assets/images/hr.png" alt="hr"></picture>
@@ -307,6 +310,8 @@ import * as S from 'Product.Styled'
 <picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
 ## 커밋 컨벤션
 커밋은 가능한 하나의 문제 단위로 쪼개서 작성하여 알아보기 쉽게 합니다. 커밋의 목적별로 Prefix 를 사용하며, 종류는 다음과 같습니다.
 
@@ -320,6 +325,7 @@ import * as S from 'Product.Styled'
 |**assets:**|이미지, 폰트 업데이트|assets: 로그인 페이지 배경 이미지 업데이트|
 |**test:**|테스트 코드 관련|test: Product CRUD API 테스트|
 
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br />
 
 <picture><img src="src/assets/images/hr.png" alt="hr"></picture>
@@ -339,6 +345,23 @@ import * as S from 'Product.Styled'
 }
 ```
 
+### 의존성
+```json
+{
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^7.13.1",
+    "@typescript-eslint/parser": "^7.13.1",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.1.3",
+    "eslint-plugin-react": "^7.34.3",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "eslint-plugin-react-refresh": "^0.4.7",
+    "prettier": "^3.3.2",
+  }
+}
+```
+
 ## Prettier
 기본 설정 + 홑따옴표 사용
 
@@ -350,6 +373,18 @@ import * as S from 'Product.Styled'
 }
 ```
 
+## 관련 VSCode 설정
+```json
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "always"
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true
+}
+```
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- MARKDOWN LINKS & IMAGES -->
