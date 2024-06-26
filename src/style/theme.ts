@@ -1,13 +1,26 @@
-const fontSize = {
-  '3xs': '0.3rem',
-  '2xs': '0.4rem',
+type FontSizes =
+  | 'xxxs'
+  | 'xxs'
+  | 'xs'
+  | 'sm'
+  | 'base'
+  | 'md'
+  | 'lg'
+  | 'xl'
+  | 'xxl'
+  | 'xxxl';
+
+const fontSize: Record<FontSizes, string> = {
+  xxxs: '0.3rem',
+  xxs: '0.4rem',
   xs: '0.5rem',
   sm: '0.75rem',
   base: '1rem',
   md: '1.25rem',
   lg: '1.5rem',
   xl: '1.75rem',
-  '2xl': '2rem',
+  xxl: '2rem',
+  xxxl: '2.5rem',
 };
 
 const light = {
@@ -53,6 +66,7 @@ const dark = {
   '--border': 'hsl(217.2 32.6% 17.5%);',
   '--input': 'hsl(217.2 32.6% 17.5%);',
   '--ring': 'hsl(224.3 76.3% 48%);',
+  '--radius': '0.5rem;',
 };
 
 const theme = {
