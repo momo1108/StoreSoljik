@@ -18,8 +18,8 @@ export const breakpoints: Record<Breakpoints, string> = {
   xsmall: '@media (max-width: 479px)',
   small: '@media (max-width: 639px)',
   medium: '@media (max-width: 1047px)',
-  large: '@media (max-width: 1440px)',
-  xlarge: '@media (min-width: 1441px)',
+  large: '@media (max-width: 1439px)',
+  xlarge: '@media (min-width: 1440px)',
 };
 
 const media = Object.entries(breakpoints).reduce((acc, [key, value]) => {
