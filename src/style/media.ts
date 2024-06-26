@@ -5,9 +5,17 @@ import {
   type Interpolation,
 } from 'styled-components';
 
-export type Breakpoints = 'small' | 'medium' | 'large' | 'xlarge';
+export type Breakpoints =
+  | 'xxsmall'
+  | 'xsmall'
+  | 'small'
+  | 'medium'
+  | 'large'
+  | 'xlarge';
 
 export const breakpoints: Record<Breakpoints, string> = {
+  xxsmall: '@media (max-width: 319px)',
+  xsmall: '@media (max-width: 479px)',
   small: '@media (max-width: 639px)',
   medium: '@media (max-width: 1047px)',
   large: '@media (max-width: 1440px)',
