@@ -1,4 +1,7 @@
 import { createGlobalStyle } from 'styled-components';
+import PretendardRegularWoff2 from '@/assets/fonts/woff2-subset/Pretendard-Regular.subset.woff2';
+import PretendardRegularWoff from '@/assets/fonts/woff-subset/Pretendard-Regular.subset.woff';
+import PretendardRegularOtf from '@/assets/fonts/otf/Pretendard-Regular.otf';
 
 const GlobalStyle = createGlobalStyle`
 /* http://meyerweb.com/eric/tools/css/reset/ 
@@ -6,6 +9,17 @@ const GlobalStyle = createGlobalStyle`
    License: none (public domain)
 */
 
+/* font 설정 */
+@font-face {
+	font-family: 'Pretendard';
+  font-weight: 400;
+	src: local('Pretendard-Regular'), 
+      url(${PretendardRegularWoff2}) format('woff2'), 
+      url(${PretendardRegularWoff}) format('woff'), 
+      url(${PretendardRegularOtf}) format('otf'),
+}
+
+/* reset css */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
 a, abbr, acronym, address, big, cite, code,
@@ -23,7 +37,7 @@ time, mark, audio, video {
 	padding: 0;
 	border: 0;
 	font-size: 100%;
-	font: inherit;
+	font-family: 'Pretendard';
 	vertical-align: baseline;
 }
 /* HTML5 display-role reset for older browsers */
