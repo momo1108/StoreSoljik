@@ -1,15 +1,17 @@
 import media from '@/style/media';
 import styled from 'styled-components';
 
-export const Header = styled.header`
+export const StyledHeader = styled.header`
   background: ${(props) => props.theme.color.background};
   border-bottom: 1px solid ${(props) => props.theme.color.border};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 
 export const HeaderInnerContainer = styled.div`
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
 
   ${media.xlarge`width: 1100px;`}
   ${media.large`width: 900px;`}
