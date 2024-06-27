@@ -1,4 +1,4 @@
-import * as S from './Header.Style';
+import * as S from './Body.Style';
 
 export default function Header() {
   return (

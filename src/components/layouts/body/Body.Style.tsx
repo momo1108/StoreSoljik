@@ -1,7 +1,7 @@
 import media from '@/style/media';
 import styled from 'styled-components';
 
-export const Header = styled.header`
+export const Header = styled.body`
   background: ${(props) => props.theme.color.background};
   border-bottom: 1px solid ${(props) => props.theme.color.border};
 `;
