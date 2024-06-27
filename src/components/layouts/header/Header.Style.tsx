@@ -59,12 +59,9 @@ export const HeaderSearchBox = styled.div`
 
 export const HeaderMenuBox = styled.div`
   background: #ccc;
-  ${media.xlarge`width: 100px;`}
-  ${media.large`width: 100px;`}
-  ${media.medium`width: 100px;`}
-  ${media.small`width: 80px;`}
-  ${media.xsmall`width: 60px;`}
-  ${media.xxsmall`width: 60px;`}
+  display: flex;
+  align-items: center;
+  flex-basis: fit-content;
 `;
 
 export const HeaderNavBox = styled.div`
