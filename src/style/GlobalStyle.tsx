@@ -8,17 +8,6 @@ const GlobalStyle = createGlobalStyle`
    v2.0 | 20110126
    License: none (public domain)
 */
-
-/* font 설정 */
-@font-face {
-	font-family: 'Pretendard';
-  font-weight: 400;
-	src: local('Pretendard-Regular'), 
-      url(${PretendardRegularWoff2}) format('woff2'), 
-      url(${PretendardRegularWoff}) format('woff'), 
-      url(${PretendardRegularOtf}) format('otf'),
-}
-
 /* reset css */
 html, body, div, span, applet, object, iframe,
 h1, h2, h3, h4, h5, h6, p, blockquote, pre,
@@ -62,6 +51,27 @@ q:before, q:after {
 table {
 	border-collapse: collapse;
 	border-spacing: 0;
+}
+
+
+/* font 설정 */
+@font-face {
+	font-family: 'Pretendard';
+  font-weight: 400;
+	src: local('Pretendard-Regular'), 
+      url(${PretendardRegularWoff2}) format('woff2'), 
+      url(${PretendardRegularWoff}) format('woff'), 
+      url(${PretendardRegularOtf}) format('otf'),
+}
+
+/* 레이아웃 설정 */
+html, body, div#root {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+div#root {
+  flex-direction: column;
 }
 `;
 

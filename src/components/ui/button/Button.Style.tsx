@@ -2,9 +2,10 @@ import media from '@/style/media';
 import styled from 'styled-components';
 
 export type ButtonProps = {
-  $isSignedIn?: boolean;
   $showPreIcon?: boolean;
   $showPostIcon?: boolean;
+  onClick?: () => void;
+  children?: React.ReactNode;
 };
 
 export const StyledButton = styled.button<ButtonProps>`
