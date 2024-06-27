@@ -285,16 +285,18 @@ styled componets 에 사용할 글로벌 스타일이나 테마를 저장합니�
 |Delete|delete|deleteProduct()|
 
 ### Styled-Components
-이름은 파스칼 케이스로 작성하며, 컴포넌트의 최상위 태그명을 따라 postfix 를 붙여서 네이밍을 한다. 레이아웃의 경우, 태그명을 그대로 따라간다.
+이름은 파스칼 케이스로 작성하며, 컴포넌트의 최상위 태그명을 따라 postfix 를 붙여서 네이밍을 한다.
+
+레이아웃이나 UI 컴포넌트 중 html 태그에 기반한 컴포넌트를 작성할 경우, 최상위 태그의 이름에 `Styled` 라는 prefix 를 붙여서 실제 사용할 컴포넌트와 구분한다.(ex. `StyledHeader`, `StyledButton`)
 
 |최상위 태그|Postfix|예시|
 |:-:|:-:|:-:|
 |div|Box|ProductItemBox|
 |ul, ol|List|ProductItemList|
 |li|Item|ProductItem|
-|header||Header|
-|main||Main|
-|footer||Footer|
+|header||StyledHeader|
+|main||StyledMain|
+|footer||StyledFooter|
 
 Styled-Components 를 사용할 땐 S dot 네이밍을 사용한다.
 
