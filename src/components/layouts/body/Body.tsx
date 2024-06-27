@@ -1,6 +1,6 @@
 import * as S from './Body.Style';
 
-export default function Header() {
+export default function Body() {
   return (
     <S.Header>
       <S.HeaderInnerContainer>
