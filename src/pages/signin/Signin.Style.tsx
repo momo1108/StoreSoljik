@@ -1,3 +1,5 @@
+import Input from '@/components/form/input/Input';
+import Button from '@/components/ui/button/Button';
 import media from '@/style/media';
 import styled from 'styled-components';
 
@@ -16,25 +18,67 @@ export const SigninContainer = styled.div`
 `;
 
 export const SigninFormContainer = styled.div`
-  background: #eee;
   display: flex;
   flex-direction: column;
   gap: 22px;
-  width: 440px;
-  padding: 60px 40px;
+  box-sizing: border-box;
+  width: 500px;
+  padding: 40px 50px;
 
-  * {
+  & > h2,
+  & > h3,
+  & > p {
     text-align: center;
   }
 
-  h2 {
+  & > h2 {
     font-size: 60px;
   }
+  & > h3 {
+    font-size: 28px;
+  }
 
-  p {
+  & > p {
     font-size: 20px;
     line-height: 32px;
   }
+
+  & > hr {
+    width: 100%;
+    height: 1px;
+    background: ${(props) => props.theme.color.border};
+    border: none;
+  }
+`;
+
+export const SigninInput = styled(Input)`
+  width: 100%;
+  & > p {
+    padding: 0 2px;
+    font-size: 16px;
+    font-weight: bold;
+  }
+  & > input {
+    height: 48px;
+    padding: 0 8px;
+    font-size: 18px;
+    font-family: Pretendard;
+    border: 2px solid ${(props) => props.theme.color.border};
+    border-radius: ${(props) => props.theme.color.radius};
+  }
+`;
+
+export const SignButton = styled(Button)`
+  width: 100%;
+  height: 48px;
+  font-size: 18px;
+  font-weight: 600;
+`;
+
+export const SigninIconBox = styled.div`
+  display: flex;
+  justify-content: center;
+  gap: 8px;
 `;
 
 export const SigninImageBox = styled.div`

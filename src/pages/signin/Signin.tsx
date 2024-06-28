@@ -15,6 +15,13 @@ const Signup = () => {
               <br />
               다양한 상품들이 세일중입니다.
             </p>
+            <S.SigninInput title='아이디' />
+            <S.SigninInput title='패스워드' />
+            <S.SignButton type='primary'>로그인</S.SignButton>
+            <S.SignButton type='primary'>회원가입</S.SignButton>
+            <hr />
+            <h3>소셜 로그인</h3>
+            <S.SigninIconBox>gd</S.SigninIconBox>
           </S.SigninFormContainer>
           <S.SigninImageBox>
             <img src='/src/assets/images/signup.png' alt='' />
