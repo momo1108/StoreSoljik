@@ -4,10 +4,10 @@ import media from '@/style/media';
 import styled from 'styled-components';
 
 // medium 부터 이미지 출력
-export const SigninContainer = styled.div`
+export const SignupContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 
   ${media.xlarge`width: 1240px;`}
   ${media.large`width: 900px;`}
@@ -17,30 +17,40 @@ export const SigninContainer = styled.div`
   ${media.xxsmall`width: 95%;`};
 `;
 
-export const SigninFormContainer = styled.form`
+export const SignupFormContainer = styled.form`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 22px;
   box-sizing: border-box;
-  width: 500px;
+  width: 800px;
   padding: 40px 50px;
 
   & > h2,
-  & > h3,
   & > p {
     text-align: center;
   }
 
   & > h2 {
-    font-size: 60px;
-  }
-  & > h3 {
-    font-size: 28px;
+    font-size: 50px;
   }
 
   & > p {
     font-size: 20px;
     line-height: 32px;
+  }
+`;
+
+export const SignupInputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  box-sizing: border-box;
+  width: 400px;
+
+  & > h3 {
+    text-align: center;
+    font-size: 28px;
   }
 
   & > hr {
@@ -51,7 +61,7 @@ export const SigninFormContainer = styled.form`
   }
 `;
 
-export const SigninInput = styled(Input)`
+export const SignupInput = styled(Input)`
   width: 100%;
   & > p {
     padding: 0 2px;

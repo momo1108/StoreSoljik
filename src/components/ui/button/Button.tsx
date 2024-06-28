@@ -3,11 +3,16 @@ import * as S from './Button.Style';
 const Button: React.FC<S.ButtonProps> = ({
   onClick = () => {},
   children = '',
-  type = 'normal',
+  type = 'button',
+  disabled = false,
   className = '',
+  styleType = 'normal',
 }) => {
   return (
-    <S.StyledButton {...{ onClick, type, className }}>
+    <S.StyledButton
+      {...{ onClick, type, disabled, className }}
+      $styleType={styleType}
+    >
       {children}
     </S.StyledButton>
   );

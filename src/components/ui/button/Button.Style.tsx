@@ -5,28 +5,35 @@ import styled from 'styled-components';
 export type ButtonProps = ClassName & {
   onClick?: () => void;
   children?: React.ReactNode;
-  type?: 'normal' | 'primary';
+  type?: 'button' | 'reset' | 'submit';
+  disabled?: boolean;
+  styleType?: 'normal' | 'primary';
+  $styleType?: 'normal' | 'primary';
 };
 
 export const StyledButton = styled.button<ButtonProps>`
   cursor: pointer;
   outline: none;
   color: ${(props) =>
-    props.type === 'primary' ? props.theme.color.primaryForeground : 'inherit'};
+    props.$styleType === 'primary'
+      ? props.theme.color.primaryForeground
+      : 'inherit'};
 
   background: ${(props) =>
-    props.type === 'primary' ? props.theme.color.primary : '#0000'};
+    props.$styleType === 'primary' ? props.theme.color.primary : '#0000'};
   border: 2px solid
     ${(props) =>
-      props.type === 'primary'
+      props.$styleType === 'primary'
         ? props.theme.color.primary
         : props.theme.color.border};
   &:hover {
     background: ${(props) =>
-      props.type === 'primary' ? props.theme.color.primaryHover : '#0000'};
+      props.$styleType === 'primary'
+        ? props.theme.color.primaryHover
+        : '#09090909'};
     border: 2px solid
       ${(props) =>
-        props.type === 'primary'
+        props.$styleType === 'primary'
           ? props.theme.color.primaryHover
           : props.theme.color.border};
   }

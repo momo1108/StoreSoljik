@@ -12,4 +12,10 @@ export const InputContainer = styled.div`
   ${media.small`width: 320px;`}
   ${media.xsmall`width: 320px;`}
   ${media.xxsmall`width: 320px;`}
+
+  p.description {
+    color: ${(props) => props.theme.color.description};
+    font-size: 14px;
+    font-weight: 400;
+  }
 `;

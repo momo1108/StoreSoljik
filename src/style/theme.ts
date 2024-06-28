@@ -27,6 +27,7 @@ export type Themes = 'light' | 'dark';
 
 const light = {
   type: 'light',
+  description: '#AAA',
   background: 'hsl(0 0% 100%)',
   foreground: 'hsl(222.2 84% 4.9%)',
   card: 'hsl(0 0% 100%)',
@@ -45,6 +46,7 @@ const light = {
   destructive: 'hsl(0 84.2% 60.2%)',
   destructiveForeground: 'hsl(210 40% 98%)',
   border: 'hsl(214.3 31.8% 91.4%)',
+  headerBorder: '#1A202C',
   input: 'hsl(214.3 31.8% 91.4%)',
   ring: 'hsl(221.2 83.2% 53.3%)',
   radius: '0.5rem',
@@ -52,6 +54,7 @@ const light = {
 
 const dark = {
   type: 'dark',
+  description: '#AAA',
   background: 'hsl(222.2 84% 4.9%)',
   foreground: 'hsl(210 40% 98%)',
   card: 'hsl(222.2 84% 4.9%)',
@@ -70,6 +73,7 @@ const dark = {
   destructive: 'hsl(0 62.8% 30.6%)',
   destructiveForeground: 'hsl(210 40% 98%)',
   border: 'hsl(217.2 32.6% 17.5%)',
+  headerBorder: '#9AA0AC',
   input: 'hsl(217.2 32.6% 17.5%)',
   ring: 'hsl(224.3 76.3% 48%)',
   radius: '0.5rem',
