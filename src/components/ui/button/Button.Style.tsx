@@ -1,15 +1,6 @@
 import media from '@/style/media';
-import { ClassName } from '@/types/GlobalType';
 import styled from 'styled-components';
-
-export type ButtonProps = ClassName & {
-  onClick?: () => void;
-  children?: React.ReactNode;
-  type?: 'button' | 'reset' | 'submit';
-  disabled?: boolean;
-  styleType?: 'normal' | 'primary';
-  $styleType?: 'normal' | 'primary';
-};
+import { ButtonProps } from './Button';
 
 export const StyledButton = styled.button<ButtonProps>`
   cursor: pointer;

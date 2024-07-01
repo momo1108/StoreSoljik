@@ -32,11 +32,11 @@ export const SignupFormContainer = styled.form`
   }
 
   & > h2 {
-    font-size: 50px;
+    font-size: ${(props) => props.theme.fontSize.xxl};
   }
 
   & > p {
-    font-size: 20px;
+    font-size: ${(props) => props.theme.fontSize.lg};
     line-height: 32px;
   }
 `;
@@ -50,7 +50,7 @@ export const SignupInputContainer = styled.div`
 
   & > h3 {
     text-align: center;
-    font-size: 28px;
+    font-size: ${(props) => props.theme.fontSize.xl};
   }
 
   & > hr {
@@ -65,23 +65,20 @@ export const SignupInput = styled(Input)`
   width: 100%;
   & > p {
     padding: 0 2px;
-    font-size: 16px;
+    font-size: ${(props) => props.theme.fontSize.md};
     font-weight: bold;
   }
   & > input {
     height: 48px;
     padding: 0 8px;
-    font-size: 18px;
-    font-family: Pretendard;
-    border: 2px solid ${(props) => props.theme.color.border};
-    border-radius: ${(props) => props.theme.color.radius};
+    font-size: ${(props) => props.theme.fontSize.md};
   }
 `;
 
 export const SignButton = styled(Button)`
   width: 100%;
   height: 48px;
-  font-size: 18px;
+  font-size: ${(props) => props.theme.fontSize.md};
   font-weight: 600;
 `;
 

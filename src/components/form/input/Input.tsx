@@ -1,30 +1,26 @@
 import { ClassName } from '@/types/GlobalType';
 import * as S from './Input.Style';
 import { UseFormRegisterReturn } from 'react-hook-form';
+import { InputHTMLAttributes } from 'react';
 
-type InputProps = ClassName & {
-  title?: string;
-  isTitleVisible?: boolean;
-  description?: string;
-  inputType?: 'email' | 'text' | 'number' | 'password';
-  autoComplete?: 'on' | 'off';
-  placeholder?: string;
-  reactHookForm?: UseFormRegisterReturn<string>;
-  /**
-   * styled-component 로 스타일 오버라이딩 하기위한 클래스네임 지정
-   * https://styled-components.com/docs/advanced#styling-normal-react-components
-   */
-};
+type InputProps = ClassName &
+  InputHTMLAttributes<HTMLInputElement> & {
+    title?: string;
+    isTitleVisible?: boolean;
+    description?: string;
+    reactHookForm?: UseFormRegisterReturn<string>;
+  };
 
 const Input: React.FC<InputProps> = ({
   title = 'title',
   isTitleVisible = true,
   description = '',
-  inputType = 'text',
-  autoComplete = 'on',
+  type = 'text',
   placeholder = '',
+  autoComplete = 'on',
   className = '',
   reactHookForm,
+  'aria-errormessage': errorMessage,
 }) => {
   return (
     <S.InputContainer className={className}>
@@ -35,12 +31,14 @@ const Input: React.FC<InputProps> = ({
         {title}
       </p>
       <input
-        type={inputType}
-        autoComplete={autoComplete}
+        type={type}
         placeholder={placeholder ? placeholder : `${title}을 입력하세요`}
+        autoComplete={autoComplete}
         {...reactHookForm}
+        data-invalid={!!errorMessage}
       />
       {description ? <p className='description'>{description}</p> : <></>}
+      {errorMessage ? <p className='errorMessage'>{errorMessage}</p> : <></>}
     </S.InputContainer>
   );
 };

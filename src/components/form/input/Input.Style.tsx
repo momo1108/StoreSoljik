@@ -15,7 +15,24 @@ export const InputContainer = styled.div`
 
   p.description {
     color: ${(props) => props.theme.color.description};
-    font-size: 14px;
+    font-size: ${(props) => props.theme.fontSize.sm};
     font-weight: 400;
+  }
+  p.errorMessage {
+    color: ${(props) => props.theme.color.invalid};
+    font-size: ${(props) => props.theme.fontSize.sm};
+  }
+
+  & > input {
+    outline: none;
+    border: 2px solid ${(props) => props.theme.color.border};
+    border-radius: ${(props) => props.theme.color.radius};
+
+    &:focus and &[data-invalid='false'] {
+      border-color: ${(props) => props.theme.color.valid};
+    }
+    &[data-invalid='true'] {
+      border-color: ${(props) => props.theme.color.invalid};
+    }
   }
 `;

@@ -1,3 +1,4 @@
+import Checkbox from '@/components/form/checkbox/Checkbox';
 import Input from '@/components/form/input/Input';
 import Button from '@/components/ui/button/Button';
 import media from '@/style/media';
@@ -32,14 +33,14 @@ export const SigninFormContainer = styled.form`
   }
 
   & > h2 {
-    font-size: 60px;
+    font-size: ${(props) => props.theme.fontSize.xxxl};
   }
   & > h3 {
-    font-size: 28px;
+    font-size: ${(props) => props.theme.fontSize.xl};
   }
 
   & > p {
-    font-size: 20px;
+    font-size: ${(props) => props.theme.fontSize.lg};
     line-height: 32px;
   }
 
@@ -55,23 +56,27 @@ export const SigninInput = styled(Input)`
   width: 100%;
   & > p {
     padding: 0 2px;
-    font-size: 16px;
+    font-size: ${(props) => props.theme.fontSize.base};
     font-weight: bold;
   }
   & > input {
     height: 48px;
     padding: 0 8px;
-    font-size: 18px;
+    font-size: ${(props) => props.theme.fontSize.md};
     font-family: Pretendard;
     border: 2px solid ${(props) => props.theme.color.border};
     border-radius: ${(props) => props.theme.color.radius};
   }
 `;
 
+export const SigninCheckbox = styled(Checkbox)`
+  border: 1px solid green;
+`;
+
 export const SignButton = styled(Button)`
   width: 100%;
   height: 48px;
-  font-size: 18px;
+  font-size: ${(props) => props.theme.fontSize.md};
   font-weight: 600;
 `;
 
