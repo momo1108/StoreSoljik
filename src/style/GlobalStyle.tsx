@@ -120,6 +120,11 @@ html, body, div#root {
 div#root {
   flex-direction: column;
 }
+
+/* input placeholder 색상 */
+input::placeholder {
+  color: #ababab;
+}
 `;
 
 export default GlobalStyle;

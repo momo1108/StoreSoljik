@@ -11,22 +11,25 @@ type FontSizes =
   | 'xxxl';
 
 const fontSize: Record<FontSizes, string> = {
-  xxxs: '0.3rem',
-  xxs: '0.4rem',
-  xs: '0.5rem',
-  sm: '0.75rem',
+  xxxs: '0.5rem',
+  xxs: '0.6rem',
+  xs: '0.7rem',
+  sm: '0.85rem',
   base: '1rem',
-  md: '1.25rem',
-  lg: '1.5rem',
+  md: '1.13rem',
+  lg: '1.25rem',
   xl: '1.75rem',
-  xxl: '2rem',
-  xxxl: '2.5rem',
+  xxl: '3.125rem',
+  xxxl: '3.75rem',
 };
 
 export type Themes = 'light' | 'dark';
 
 const light = {
   type: 'light',
+  description: '#AAA',
+  valid: '#47E573',
+  invalid: '#E54747',
   background: 'hsl(0 0% 100%)',
   foreground: 'hsl(222.2 84% 4.9%)',
   card: 'hsl(0 0% 100%)',
@@ -45,6 +48,7 @@ const light = {
   destructive: 'hsl(0 84.2% 60.2%)',
   destructiveForeground: 'hsl(210 40% 98%)',
   border: 'hsl(214.3 31.8% 91.4%)',
+  headerBorder: '#1A202C',
   input: 'hsl(214.3 31.8% 91.4%)',
   ring: 'hsl(221.2 83.2% 53.3%)',
   radius: '0.5rem',
@@ -52,6 +56,9 @@ const light = {
 
 const dark = {
   type: 'dark',
+  description: '#AAA',
+  valid: '#47E573',
+  invalid: '#E54747',
   background: 'hsl(222.2 84% 4.9%)',
   foreground: 'hsl(210 40% 98%)',
   card: 'hsl(222.2 84% 4.9%)',
@@ -70,6 +77,7 @@ const dark = {
   destructive: 'hsl(0 62.8% 30.6%)',
   destructiveForeground: 'hsl(210 40% 98%)',
   border: 'hsl(217.2 32.6% 17.5%)',
+  headerBorder: '#9AA0AC',
   input: 'hsl(217.2 32.6% 17.5%)',
   ring: 'hsl(224.3 76.3% 48%)',
   radius: '0.5rem',

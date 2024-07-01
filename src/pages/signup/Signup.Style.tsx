@@ -1,14 +1,13 @@
-import Checkbox from '@/components/form/checkbox/Checkbox';
 import Input from '@/components/form/input/Input';
 import Button from '@/components/ui/button/Button';
 import media from '@/style/media';
 import styled from 'styled-components';
 
 // medium 부터 이미지 출력
-export const SigninContainer = styled.div`
+export const SignupContainer = styled.div`
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
 
   ${media.xlarge`width: 1240px;`}
   ${media.large`width: 900px;`}
@@ -18,30 +17,40 @@ export const SigninContainer = styled.div`
   ${media.xxsmall`width: 95%;`};
 `;
 
-export const SigninFormContainer = styled.form`
+export const SignupFormContainer = styled.form`
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 22px;
   box-sizing: border-box;
-  width: 500px;
+  width: 800px;
   padding: 40px 50px;
 
   & > h2,
-  & > h3,
   & > p {
     text-align: center;
   }
 
   & > h2 {
-    font-size: ${(props) => props.theme.fontSize.xxxl};
-  }
-  & > h3 {
-    font-size: ${(props) => props.theme.fontSize.xl};
+    font-size: ${(props) => props.theme.fontSize.xxl};
   }
 
   & > p {
     font-size: ${(props) => props.theme.fontSize.lg};
     line-height: 32px;
+  }
+`;
+
+export const SignupInputContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+  box-sizing: border-box;
+  width: 400px;
+
+  & > h3 {
+    text-align: center;
+    font-size: ${(props) => props.theme.fontSize.xl};
   }
 
   & > hr {
@@ -52,25 +61,18 @@ export const SigninFormContainer = styled.form`
   }
 `;
 
-export const SigninInput = styled(Input)`
+export const SignupInput = styled(Input)`
   width: 100%;
   & > p {
     padding: 0 2px;
-    font-size: ${(props) => props.theme.fontSize.base};
+    font-size: ${(props) => props.theme.fontSize.md};
     font-weight: bold;
   }
   & > input {
     height: 48px;
     padding: 0 8px;
     font-size: ${(props) => props.theme.fontSize.md};
-    font-family: Pretendard;
-    border: 2px solid ${(props) => props.theme.color.border};
-    border-radius: ${(props) => props.theme.color.radius};
   }
-`;
-
-export const SigninCheckbox = styled(Checkbox)`
-  border: 1px solid green;
 `;
 
 export const SignButton = styled(Button)`

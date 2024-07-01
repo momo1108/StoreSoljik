@@ -1,9 +1,9 @@
 import { Route, Routes } from 'react-router-dom';
-import AuthProtectedRoute from './AuthProtectedRoute';
+import ProtectedRouteForUser from './ProtectedRouteForUser';
 import Home from '@/pages/home/Home';
 import Signin from '@/pages/signin/Signin';
 import Signup from '@/pages/signup/Signup';
-import SellerProtectedRoute from './SellerProtectedRoute';
+import ProtectedRouteForSeller from './ProtectedRouteForSeller';
 import Category from '@/pages/category/Category';
 import History from '@/pages/history/History';
 import Purchase from '@/pages/purchase/Purchase';
@@ -18,11 +18,11 @@ const MainRouter = () => {
       <Route path='/signin' element={<Signin />} />
       <Route path='/signup' element={<Signup />} />
       <Route path='/category' element={<Category />} />
-      <Route element={<AuthProtectedRoute />}>
+      <Route element={<ProtectedRouteForUser />}>
         <Route path='/history' element={<History />} />
         <Route path='/purchase' element={<Purchase />} />
       </Route>
-      <Route element={<SellerProtectedRoute />}>
+      <Route element={<ProtectedRouteForSeller />}>
         <Route path='/items' element={<Items />} />
         <Route path='/management' element={<Management />} />
         <Route path='/registration' element={<Registration />} />

@@ -3,7 +3,7 @@ import styled from 'styled-components';
 
 export const StyledHeader = styled.header`
   background: ${(props) => props.theme.color.background};
-  border-bottom: 1px solid ${(props) => props.theme.color.border};
+  border-bottom: 2px solid ${(props) => props.theme.color.headerBorder};
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -34,9 +34,9 @@ export const HeaderTopBox = styled.div`
 export const HeaderTopBoxForSigning = styled.div`
   display: flex;
   justify-content: center;
-  ${media.xlarge`height: 60px;`}
-  ${media.large`height: 60px;`}
-  ${media.medium`height: 60px;`}
+  ${media.xlarge`height: 80px;`}
+  ${media.large`height: 80px;`}
+  ${media.medium`height: 80px;`}
   ${media.small`height: 50px;`}
 `;
 
@@ -45,12 +45,12 @@ export const HeaderLogoBox = styled.div<{ $src: string }>`
   background-repeat: no-repeat;
   background-size: contain;
   background-position: center;
-  ${media.xlarge`width: 150px;`}
-  ${media.large`width: 150px;`}
-  ${media.medium`width: 130px;`}
-  ${media.small`width: 110px;`}
-  ${media.xsmall`width: 100px;`}
-  ${media.xxsmall`width: 90px;`}
+  ${media.xlarge`width: 180px;`}
+  ${media.large`width: 180px;`}
+  ${media.medium`width: 160px;`}
+  ${media.small`width: 130px;`}
+  ${media.xsmall`width: 110px;`}
+  ${media.xxsmall`width: 100px;`}
 `;
 
 export const HeaderSearchBox = styled.div`
