@@ -2,7 +2,13 @@ import media from '@/style/media';
 import styled from 'styled-components';
 import { ButtonProps } from './Button';
 
-export const StyledButton = styled.button<ButtonProps>`
+export const StyledButton = styled.button<
+  ButtonProps & { $styleType: 'normal' | 'primary' }
+>`
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+  align-items: center;
   cursor: pointer;
   outline: none;
   color: ${(props) =>
@@ -29,7 +35,8 @@ export const StyledButton = styled.button<ButtonProps>`
           : props.theme.color.border};
   }
   border-radius: ${(props) => props.theme.color.radius};
-  font-weight: 800;
+  font-size: ${(props) => props.theme.fontSize.base};
+  font-weight: bold;
 
   ${media.xlarge`padding: 10px 20px;`}
   ${media.large`padding: 10px 20px;`}
