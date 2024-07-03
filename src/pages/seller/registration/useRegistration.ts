@@ -1,13 +1,6 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useNavigate } from 'react-router-dom';
-import {
-  browserLocalPersistence,
-  browserSessionPersistence,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
-import { auth } from '@/firebase';
-import { FirebaseError } from 'firebase/app';
-import { useAuth } from '@/hooks/useAuth';
+// import { useNavigate } from 'react-router-dom';
+// import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
 
 type RegistrationFormDataType = {
@@ -21,8 +14,8 @@ type RegistrationFormDataType = {
 };
 
 const useRegistration = () => {
-  const navigate = useNavigate();
-  const { userInfo } = useAuth();
+  // const navigate = useNavigate();
+  // const { userInfo } = useAuth();
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
   const {

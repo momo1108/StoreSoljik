@@ -1,4 +1,4 @@
-import media from '@/style/media';
+// import media from '@/style/media';
 import styled from 'styled-components';
 
 export const InputContainer = styled.div`
