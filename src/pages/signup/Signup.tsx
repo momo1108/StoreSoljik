@@ -3,17 +3,12 @@ import Header from '@/components/layouts/header/Header';
 import * as S from './Signup.Style';
 import VerticalRadio from '@/components/form/radio/VerticalRadio';
 import useSignup from './useSignup';
+import Spinner from '@/components/ui/spinner/Spinner';
+import Input from '@/components/form/input/Input';
 
-export type SignupFormData = {
-  email: string;
-  password: string; // DB 에는 저장하지 않는 필드(인증은 Authentication 으로만 진행)
-  accountType: '구매자' | '판매자';
-  nickname: string;
-};
-
-const Signup = () => {
+const Signup: React.FC = () => {
   const {
-    navigate,
+    redirectToSignin,
     handleSubmit,
     submitLogic,
     isSubmitting,
@@ -27,7 +22,7 @@ const Signup = () => {
 
   return (
     <>
-      <Header isSigning={true}></Header>
+      <Header userType={'guest'}></Header>
       <Main>
         <S.SignupContainer>
           <S.SignupFormContainer
@@ -48,7 +43,7 @@ const Signup = () => {
                   errors.accountType && errors.accountType.message
                 }
               />
-              <S.SignupInput
+              <Input
                 title='아이디(이메일)'
                 type='email'
                 placeholder='myemail@email.com'
@@ -56,7 +51,7 @@ const Signup = () => {
                 aria-errormessage={errors.email && errors.email.message}
               />
 
-              <S.SignupInput
+              <Input
                 title='패스워드'
                 description='소문자/대문자/숫자/특수문자 중 2가지 이상을 사용합니다.'
                 type='password'
@@ -65,13 +60,21 @@ const Signup = () => {
                 aria-errormessage={errors.password && errors.password.message}
               />
 
-              <S.SignupInput
+              <Input
                 title='닉네임(2~10글자)'
                 description='닉네임은 한글/영어/숫자 입력만 가능합니다.'
                 type='text'
                 reactHookForm={registerNickname}
                 aria-errormessage={errors.nickname && errors.nickname.message}
               />
+
+              {isSubmitting ? (
+                <Spinner spinnerSize={20}>
+                  <p>회원가입 중 입니다.</p>
+                </Spinner>
+              ) : (
+                <></>
+              )}
 
               <S.SignButton
                 styleType='primary'
@@ -82,7 +85,7 @@ const Signup = () => {
               </S.SignButton>
               <S.SignButton
                 styleType='normal'
-                onClick={() => navigate('/signin')}
+                onClick={redirectToSignin}
                 disabled={isSubmitting}
               >
                 로그인으로 돌아가기

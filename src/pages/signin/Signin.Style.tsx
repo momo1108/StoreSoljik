@@ -33,7 +33,7 @@ export const SigninFormContainer = styled.form`
   }
 
   & > h2 {
-    font-size: ${(props) => props.theme.fontSize.xxxl};
+    font-size: ${(props) => props.theme.fontSize.xxxxl};
   }
   & > h3 {
     font-size: ${(props) => props.theme.fontSize.xl};
@@ -52,26 +52,7 @@ export const SigninFormContainer = styled.form`
   }
 `;
 
-export const SigninInput = styled(Input)`
-  width: 100%;
-  & > p {
-    padding: 0 2px;
-    font-size: ${(props) => props.theme.fontSize.base};
-    font-weight: bold;
-  }
-  & > input {
-    height: 48px;
-    padding: 0 8px;
-    font-size: ${(props) => props.theme.fontSize.md};
-    font-family: Pretendard;
-    border: 2px solid ${(props) => props.theme.color.border};
-    border-radius: ${(props) => props.theme.color.radius};
-  }
-`;
-
-export const SigninCheckbox = styled(Checkbox)`
-  border: 1px solid green;
-`;
+export const SigninCheckbox = styled(Checkbox)``;
 
 export const SignButton = styled(Button)`
   width: 100%;
