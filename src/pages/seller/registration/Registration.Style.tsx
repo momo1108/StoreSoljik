@@ -1,6 +1,6 @@
 import Main from '@/components/layouts/main/Main';
 import Button from '@/components/ui/button/Button';
-import media from '@/style/media';
+// import media from '@/style/media';
 import styled from 'styled-components';
 
 export const RegistrationMain = styled(Main)`

@@ -1,5 +1,4 @@
 import * as S from './Header.Style';
-import { useAuth } from '@/hooks/useAuth';
 import HeaderContentForGuest from './content/guest/HeaderContentForGuest';
 import HeaderContentForBuyer from './content/buyer/HeaderContentForBuyer';
 import HeaderContentForSeller from './content/seller/HeaderContentForSeller';
