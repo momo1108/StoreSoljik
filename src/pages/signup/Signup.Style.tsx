@@ -32,7 +32,7 @@ export const SignupFormContainer = styled.form`
   }
 
   & > h2 {
-    font-size: ${(props) => props.theme.fontSize.xxl};
+    font-size: ${(props) => props.theme.fontSize.xxxl};
   }
 
   & > p {
@@ -58,20 +58,6 @@ export const SignupInputContainer = styled.div`
     height: 1px;
     background: ${(props) => props.theme.color.border};
     border: none;
-  }
-`;
-
-export const SignupInput = styled(Input)`
-  width: 100%;
-  & > p {
-    padding: 0 2px;
-    font-size: ${(props) => props.theme.fontSize.md};
-    font-weight: bold;
-  }
-  & > input {
-    height: 48px;
-    padding: 0 8px;
-    font-size: ${(props) => props.theme.fontSize.md};
   }
 `;
 

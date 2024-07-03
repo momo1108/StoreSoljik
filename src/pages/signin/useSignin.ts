@@ -1,23 +1,34 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { SigninFormData } from './Signin';
 import {
   browserLocalPersistence,
   browserSessionPersistence,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '@/firebase';
+import { FirebaseError } from 'firebase/app';
+import { MouseEventHandler } from 'react';
+
+type SigninFormDataType = {
+  email: string;
+  password: string;
+  isMaintainChecked: boolean;
+};
 
 const useSignin = () => {
   const navigate = useNavigate();
+
+  const redirectToSignup: MouseEventHandler<HTMLButtonElement> = () => {
+    navigate('/signup');
+  };
+
   const {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
-  } = useForm<SigninFormData>();
+  } = useForm<SigninFormDataType>();
 
-  const submitLogic: SubmitHandler<SigninFormData> = async (data) => {
-    console.log(data);
+  const submitLogic: SubmitHandler<SigninFormDataType> = async (data) => {
     try {
       if (data.isMaintainChecked) {
         await auth.setPersistence(browserLocalPersistence);
@@ -26,12 +37,19 @@ const useSignin = () => {
       }
 
       await signInWithEmailAndPassword(auth, data.email, data.password);
-
-      navigate('/');
-    } catch (error) {
-      console.log(error);
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        if (error.code == 'auth/invalid-credential') {
+          alert('잘못된 ID 혹은 비밀번호입니다.');
+        } else {
+          alert(error);
+        }
+      } else {
+        alert(error);
+      }
     }
   };
+
   const registerEmail = register('email', {
     required: '아이디는 필수 입력입니다.',
     pattern: {
@@ -47,7 +65,7 @@ const useSignin = () => {
   const registerMaintainCheckbox = register('isMaintainChecked');
 
   return {
-    navigate,
+    redirectToSignup,
     handleSubmit,
     submitLogic,
     isSubmitting,

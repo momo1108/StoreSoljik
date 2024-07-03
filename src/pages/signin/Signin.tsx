@@ -2,20 +2,12 @@ import Main from '@/components/layouts/main/Main';
 import Header from '@/components/layouts/header/Header';
 import * as S from './Signin.Style';
 import useSignin from './useSignin';
-import { useAuth } from '@/hooks/useAuth';
+import Spinner from '@/components/ui/spinner/Spinner';
+import Input from '@/components/form/input/Input';
 
-export type SigninFormData = {
-  email: string;
-  password: string;
-  isMaintainChecked: boolean;
-};
-
-const Signin = () => {
-  console.log('signin');
-  const { userInfo } = useAuth();
-  console.log(userInfo);
+const Signin: React.FC = () => {
   const {
-    navigate,
+    redirectToSignup,
     handleSubmit,
     submitLogic,
     isSubmitting,
@@ -26,7 +18,7 @@ const Signin = () => {
   } = useSignin();
   return (
     <>
-      <Header isSigning={true}></Header>
+      <Header userType={'guest'} />
       <Main>
         <S.SigninContainer>
           <S.SigninFormContainer
@@ -40,7 +32,7 @@ const Signin = () => {
               다양한 상품들이 세일중입니다.
             </p>
             <div>
-              <S.SigninInput
+              <Input
                 title='아이디(이메일)'
                 type='email'
                 placeholder='myemail@email.com'
@@ -48,19 +40,30 @@ const Signin = () => {
                 aria-errormessage={errors.email && errors.email.message}
               />
             </div>
-            <S.SigninInput
+
+            <Input
               title='패스워드'
               type='password'
               autoComplete='off'
               reactHookForm={registerPassword}
               aria-errormessage={errors.password && errors.password.message}
             />
+
             <S.SigninCheckbox
               id='mcb'
               name='mcb'
               description='로그인 유지'
               reactHookForm={registerMaintainCheckbox}
             />
+
+            {isSubmitting ? (
+              <Spinner spinnerSize={20}>
+                <p>로그인 중 입니다.</p>
+              </Spinner>
+            ) : (
+              <></>
+            )}
+
             <S.SignButton
               styleType='primary'
               type='submit'
@@ -70,7 +73,7 @@ const Signin = () => {
             </S.SignButton>
             <S.SignButton
               styleType='primary'
-              onClick={() => navigate('/signup')}
+              onClick={redirectToSignup}
               disabled={isSubmitting}
             >
               회원가입

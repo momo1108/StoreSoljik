@@ -1,32 +1,43 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { SignupFormData } from './Signup';
 import {
   User,
   createUserWithEmailAndPassword,
+  deleteUser,
   updateProfile,
 } from 'firebase/auth';
 import { UserSchema, auth, db } from '@/firebase';
-import { doc, setDoc } from 'firebase/firestore';
+import { FirestoreError, doc, setDoc } from 'firebase/firestore';
+import { FirebaseError } from 'firebase/app';
+import { MouseEventHandler } from 'react';
+
+type SignupFormDataType = {
+  email: string;
+  password: string; // DB 에는 저장하지 않는 필드(인증은 Authentication 으로만 진행)
+  accountType: '구매자' | '판매자';
+  nickname: string;
+};
 
 const useSignup = () => {
   const navigate = useNavigate();
+
+  const redirectToSignin: MouseEventHandler<HTMLButtonElement> = () => {
+    navigate('/signin');
+  };
+
   const {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
-  } = useForm<SignupFormData>();
-  const submitLogic: SubmitHandler<SignupFormData> = async (data) => {
+  } = useForm<SignupFormDataType>();
+
+  const submitLogic: SubmitHandler<SignupFormDataType> = async (data) => {
     try {
       const userCreateResult = await createUserWithEmailAndPassword(
         auth,
         data.email,
         data.password,
       );
-
-      await updateProfile(auth.currentUser as User, {
-        displayName: `${data.nickname}#${data.accountType}`,
-      });
 
       const timeOffset = new Date().getTimezoneOffset() * 60000;
       const isoTime = new Date(Date.now() - timeOffset).toISOString();
@@ -41,9 +52,23 @@ const useSignup = () => {
 
       await setDoc(doc(db, 'user', documentData.uid), documentData);
 
-      navigate('/signin');
-    } catch (error) {
-      console.log(error);
+      await updateProfile(auth.currentUser as User, {
+        displayName: `${data.nickname}#${data.accountType}`,
+      });
+
+      alert('회원 가입 완료');
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        if (error.code == 'auth/email-already-in-use') {
+          alert('이미 가입된 이메일입니다.');
+        } else {
+          alert(error);
+        }
+      } else if (error instanceof FirestoreError) {
+        if (auth.currentUser) await deleteUser(auth.currentUser);
+      } else {
+        alert(error);
+      }
     }
   };
 
@@ -100,7 +125,7 @@ const useSignup = () => {
   ];
 
   return {
-    navigate,
+    redirectToSignin,
     handleSubmit,
     submitLogic,
     isSubmitting,
