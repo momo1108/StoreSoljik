@@ -1,14 +1,14 @@
 import Header from '@/components/layouts/header/Header';
 import Main from '@/components/layouts/main/Main';
-import * as S from './Registration.Style';
+import * as S from './Home.Style';
 
-const Registration: React.FC = () => {
+const Home: React.FC = () => {
   return (
     <>
-      <Header userType={'seller'}></Header>
+      <Header userType='buyer' />
       <Main>hello</Main>
     </>
   );
 };
 
-export default Registration;
+export default Home;
