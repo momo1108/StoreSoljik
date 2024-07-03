@@ -8,7 +8,8 @@ type FontSizes =
   | 'lg'
   | 'xl'
   | 'xxl'
-  | 'xxxl';
+  | 'xxxl'
+  | 'xxxxl';
 
 const fontSize: Record<FontSizes, string> = {
   xxxs: '0.5rem',
@@ -19,8 +20,9 @@ const fontSize: Record<FontSizes, string> = {
   md: '1.13rem',
   lg: '1.25rem',
   xl: '1.75rem',
-  xxl: '3.125rem',
-  xxxl: '3.75rem',
+  xxl: '2.5rem',
+  xxxl: '3.125rem',
+  xxxxl: '3.75rem',
 };
 
 export type Themes = 'light' | 'dark';
@@ -37,7 +39,7 @@ const light = {
   popover: 'hsl(0 0% 100%)',
   popoverForeground: 'hsl(222.2 84% 4.9%)',
   primary: '#2D3648',
-  primaryHover: '#212938',
+  primaryHover: '#19203e',
   primaryForeground: 'hsl(210 40% 98%)',
   secondary: 'hsl(210 40% 96.1%)',
   secondaryForeground: 'hsl(222.2 47.4% 11.2%)',
