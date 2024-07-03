@@ -52,21 +52,3 @@ export const HeaderLogoBox = styled.div<{ $src: string }>`
   ${media.xsmall`width: 110px;`}
   ${media.xxsmall`width: 100px;`}
 `;
-
-export const HeaderSearchBox = styled.div`
-  display: flex;
-  flex: 1 1 auto;
-  background: #ccc;
-`;
-
-export const HeaderMenuBox = styled.div`
-  background: #ccc;
-  display: flex;
-  align-items: center;
-  flex-basis: fit-content;
-`;
-
-export const HeaderNavBox = styled.div`
-  display: flex;
-  background: #ccc;
-`;
