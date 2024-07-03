@@ -23,16 +23,16 @@ function App() {
 
   // ThemeProvider 의 type 을 오버라이드해서 theme 에 들어갈 타입을 지정하면 사용하기 편하지 않을까?
   return (
-    <AuthProvider>
-      <ThemeProvider
-        theme={{ fontSize: theme.fontSize, color: themeColor, themeSwitcher }}
-      >
-        <GlobalStyle />
-        <BrowserRouter>
+    <ThemeProvider
+      theme={{ fontSize: theme.fontSize, color: themeColor, themeSwitcher }}
+    >
+      <GlobalStyle />
+      <BrowserRouter>
+        <AuthProvider>
           <MainRouter />
-        </BrowserRouter>
-      </ThemeProvider>
-    </AuthProvider>
+        </AuthProvider>
+      </BrowserRouter>
+    </ThemeProvider>
   );
 }
 
