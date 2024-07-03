@@ -5,7 +5,6 @@ import { InputHTMLAttributes } from 'react';
 
 type InputProps = ClassName &
   InputHTMLAttributes<HTMLInputElement> & {
-    title?: string;
     isTitleVisible?: boolean;
     description?: string;
     reactHookForm?: UseFormRegisterReturn<string>;
