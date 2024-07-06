@@ -1,9 +1,9 @@
 import styled from 'styled-components';
 
-export const SpinnerBox = styled.div`
+export const SpinnerBox = styled.div<{ $size: number }>`
   display: flex;
   align-items: center;
-  font-size: ${(props) => props.theme.fontSize.sm};
+  font-size: ${(props) => props.$size}px;
   font-weight: bold;
   gap: 8px;
 `;
