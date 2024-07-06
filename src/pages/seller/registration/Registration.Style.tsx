@@ -1,5 +1,7 @@
 import Main from '@/components/layouts/main/Main';
 import Button from '@/components/ui/button/Button';
+import { H2 } from '@/components/ui/header/Header.Style';
+import Spinner from '@/components/ui/spinner/Spinner';
 // import media from '@/style/media';
 import styled from 'styled-components';
 
@@ -27,11 +29,21 @@ export const RegistrationTitleBox = styled.div`
   box-sizing: border-box;
 `;
 
-export const RegistrationTitleHeader = styled.h2`
+export const RegistrationTitleHeader = styled(H2)`
   display: flex;
   align-items: center;
-  font-size: ${(props) => props.theme.fontSize.xxl};
   gap: 12px;
+`;
+
+export const RegistrationSubmitBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+export const RegistrationSpinner = styled(Spinner)`
+  font-size: ${(props) => props.theme.fontSize.md};
+  color: ${(props) => props.theme.color.primary};
 `;
 
 export const RegistrationSubmitButton = styled(Button)<{ $iconSize: number }>`
@@ -63,7 +75,7 @@ export const RegistrationContentBox = styled.div`
   width: 1140px;
   flex-grow: 1;
   grid-template-columns: 40% 1fr;
-  gap: 10px;
+  gap: 25px;
   h3 {
     font-size: ${(props) => props.theme.fontSize.xl};
   }
@@ -80,8 +92,9 @@ export const RegistrationContentItemBox = styled.div`
   flex-direction: column;
   gap: 20px;
   padding: 25px 40px 35px 40px;
-  background: #f6f6f6;
+  background: #fafafa;
   border-radius: 20px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
 `;
 
 export const RegistrationContentImageBox = styled(RegistrationContentItemBox)`

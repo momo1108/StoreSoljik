@@ -26,14 +26,23 @@ const Registration: React.FC = () => {
               <IoStorefrontSharp />
               판매 상품 등록
             </S.RegistrationTitleHeader>
-            <S.RegistrationSubmitButton
-              disabled={isSubmitting}
-              type='submit'
-              $iconSize={18}
-            >
-              <FiPlus />
-              등록하기
-            </S.RegistrationSubmitButton>
+            <S.RegistrationSubmitBox>
+              {isSubmitting ? (
+                <S.RegistrationSpinner spinnerSize={20}>
+                  상품을 등록중입니다
+                </S.RegistrationSpinner>
+              ) : (
+                <></>
+              )}
+              <S.RegistrationSubmitButton
+                disabled={isSubmitting}
+                type='submit'
+                $iconSize={18}
+              >
+                <FiPlus />
+                등록하기
+              </S.RegistrationSubmitButton>
+            </S.RegistrationSubmitBox>
           </S.RegistrationTitleBox>
 
           <S.WarningMessageP>
@@ -60,7 +69,7 @@ const Registration: React.FC = () => {
                       />
                     ))
                   ) : (
-                    <span>이미지를 업로드해주세요.</span>
+                    <span>선택된 이미지가 없습니다.</span>
                   )}
                 </S.RegistrationContentImagePreviewBox>
                 <input
