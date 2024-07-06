@@ -11,6 +11,7 @@ import Registration from '@/pages/seller/registration/Registration';
 import ProtectedRouteForSigning from './ProtectedRouteForSigning';
 import ProtectedRouteForBuyer from './ProtectedRouteForBuyer';
 import ProtectedRouteForSeller from './ProtectedRouteForSeller';
+import Update from '@/pages/seller/update/Update';
 
 const MainRouter = () => {
   return (
@@ -30,6 +31,7 @@ const MainRouter = () => {
         <Route path='/items' element={<Items />} />
         <Route path='/management' element={<Management />} />
         <Route path='/registration' element={<Registration />} />
+        <Route path='/update' element={<Update />} />
       </Route>
     </Routes>
   );
