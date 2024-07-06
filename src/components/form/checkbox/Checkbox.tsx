@@ -5,23 +5,28 @@ import { UseFormRegisterReturn } from 'react-hook-form';
 
 type CheckboxProps = ClassName &
   InputHTMLAttributes<HTMLInputElement> & {
-    id: string; // 필수 입력을 위해 따로 표기
-    name: string; // 필수 입력을 위해 따로 표기
     description?: string;
     reactHookForm?: UseFormRegisterReturn<string>;
   };
 
 const Checkbox: React.FC<CheckboxProps> = ({
-  id,
-  name,
+  id = '',
+  name = '',
   description = '',
   className = '',
+  onChange = () => {},
   reactHookForm,
 }) => {
   return (
     <S.CheckboxContainer className={className}>
       <S.CheckboxDiv>
-        <input id={id} name={name} type='checkbox' {...reactHookForm} />
+        <input
+          id={id}
+          name={name}
+          type='checkbox'
+          onChange={onChange}
+          {...reactHookForm}
+        />
         {description ? (
           <label className='description' htmlFor={id}>
             {description}
