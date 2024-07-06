@@ -5,6 +5,8 @@ import { ThemeProvider } from 'styled-components';
 import GlobalStyle from './style/GlobalStyle.tsx';
 import theme from './style/theme.ts';
 import { AuthProvider } from './hooks/useAuth.tsx';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 function App() {
   /**
@@ -21,6 +23,11 @@ function App() {
     else setThemeColor(theme.light);
   }, [themeColor, setThemeColor]);
 
+  /**
+   * react-query 클라이언트 인스턴스 생성
+   */
+  const queryClient = new QueryClient();
+
   // ThemeProvider 의 type 을 오버라이드해서 theme 에 들어갈 타입을 지정하면 사용하기 편하지 않을까?
   return (
     <ThemeProvider
@@ -29,7 +36,10 @@ function App() {
       <GlobalStyle />
       <BrowserRouter>
         <AuthProvider>
-          <MainRouter />
+          <QueryClientProvider client={queryClient}>
+            <MainRouter />
+            <ReactQueryDevtools initialIsOpen={false} />
+          </QueryClientProvider>
         </AuthProvider>
       </BrowserRouter>
     </ThemeProvider>

@@ -1,13 +1,14 @@
 import Header from '@/components/layouts/header/Header';
-import * as S from './Registration.Style';
+import * as S from './Update.Style';
 import { FiPlus } from 'react-icons/fi';
 import { IoStorefrontSharp } from 'react-icons/io5';
 import Main from '@/components/layouts/main/Main';
-import useRegistration from './useRegistration';
+import useUpdate from './useUpdate';
 import Input from '@/components/form/input/Input';
 import TextArea from '@/components/form/textarea/TextArea';
+import Checkbox from '@/components/form/checkbox/Checkbox';
 
-const Registration: React.FC = () => {
+const Update: React.FC = () => {
   const {
     handleSubmit,
     submitLogic,
@@ -15,7 +16,9 @@ const Registration: React.FC = () => {
     errors,
     registerObject,
     imagePreviewUrls,
-  } = useRegistration();
+    isUpdatingImage,
+    handleCheckboxUpdate,
+  } = useUpdate();
   return (
     <>
       <Header userType={'seller'}></Header>
@@ -24,12 +27,12 @@ const Registration: React.FC = () => {
           <S.RegistrationTitleBox>
             <S.RegistrationTitleHeader>
               <IoStorefrontSharp />
-              판매 상품 등록
+              판매 상품 수정
             </S.RegistrationTitleHeader>
             <S.RegistrationSubmitBox>
               {isSubmitting ? (
                 <S.RegistrationSpinner spinnerSize={20}>
-                  상품을 등록중입니다
+                  수정 사항을 저장합니다
                 </S.RegistrationSpinner>
               ) : (
                 <></>
@@ -40,7 +43,7 @@ const Registration: React.FC = () => {
                 $iconSize={18}
               >
                 <FiPlus />
-                등록하기
+                저장하기
               </S.RegistrationSubmitButton>
             </S.RegistrationSubmitBox>
           </S.RegistrationTitleBox>
@@ -60,6 +63,11 @@ const Registration: React.FC = () => {
                 ) : (
                   <></>
                 )}
+                <Checkbox
+                  id='imgUpdateCheckbox'
+                  description='이미지를 수정합니다.'
+                  onChange={handleCheckboxUpdate}
+                />
                 <S.RegistrationContentImagePreviewBox>
                   {imagePreviewUrls && imagePreviewUrls[0] ? (
                     imagePreviewUrls.map((imgUrl, index) => (
@@ -72,14 +80,18 @@ const Registration: React.FC = () => {
                     <span>선택된 이미지가 없습니다.</span>
                   )}
                 </S.RegistrationContentImagePreviewBox>
-                <input
-                  {...registerObject.productImages}
-                  disabled={isSubmitting}
-                  type='file'
-                  id=''
-                  accept='image/*'
-                  multiple
-                />
+                {isUpdatingImage ? (
+                  <input
+                    {...registerObject.productImages}
+                    disabled={isSubmitting}
+                    type='file'
+                    id=''
+                    accept='image/*'
+                    multiple
+                  />
+                ) : (
+                  <></>
+                )}
               </S.RegistrationContentImageBox>
               <S.RegistrationContentItemBox>
                 <h3>카테고리 설정</h3>
@@ -140,4 +152,4 @@ const Registration: React.FC = () => {
   );
 };
 
-export default Registration;
+export default Update;

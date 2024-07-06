@@ -62,12 +62,12 @@ const useProvideAuth = () => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState(true);
-  const signedIn = useRef(false);
+  const isSignedIn = useRef<boolean>(false);
 
   const logout = () => {
     if (confirm('로그아웃 하시겠습니까?')) {
       signOut(auth);
-      signedIn.current = false;
+      isSignedIn.current = false;
     }
   };
 
@@ -93,7 +93,7 @@ const useProvideAuth = () => {
           }
           setLoading(false);
           setUserInfo(userInfo);
-          signedIn.current = true;
+          isSignedIn.current = true;
           /**
            * 1. 회원가입 직후 유저 객체 세팅 후
            * 2. 회원가입 직후 유저 객체 세팅 실패. catch 에서 아이디 삭제까지 실패한 후 나중에 다시 로그인.
@@ -119,9 +119,9 @@ const useProvideAuth = () => {
         const userInfo = formatUser(user, 'User');
         setLoading(false);
         setUserInfo(userInfo);
-        signedIn.current = true;
+        isSignedIn.current = true;
       }
-    } else if (!signedIn.current) {
+    } else if (!isSignedIn.current) {
       setLoading(false);
       setUserInfo(null);
       if (!['/signin', '/signup'].includes(location.pathname)) {

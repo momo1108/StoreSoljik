@@ -1,0 +1,120 @@
+import styled from 'styled-components';
+import Button from '../../button/Button';
+
+export const CardContainer = styled.div`
+  display: flex;
+  width: 500px;
+  padding: 15px;
+  border-radius: ${(props) => props.theme.color.radius};
+  align-items: center;
+  gap: 25px;
+  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+`;
+
+export const CardImageBox = styled.div<{ $src: string }>`
+  width: 150px;
+  height: 150px;
+  flex-shrink: 0;
+  background-color: #efefef;
+  background-image: url(${(props) => props.$src});
+  background-repeat: no-repeat;
+  background-size: contain;
+  background-position: center;
+  border-radius: ${(props) => props.theme.color.radius};
+`;
+
+export const CardContentBox = styled.div`
+  display: flex;
+  flex-grow: 2;
+  flex-direction: column;
+  height: 150px;
+  gap: 10px;
+  overflow: hidden; /* 추가 */
+`;
+
+export const CardContentTitleBox = styled.div`
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+`;
+
+export const DatetimeP = styled.p`
+  display: flex;
+  flex-shrink: 0;
+  flex-direction: column;
+  align-items: end;
+  font-size: ${(props) => props.theme.fontSize.sm};
+`;
+
+export const DescriptionP = styled.p`
+  color: #777;
+  font-size: ${(props) => props.theme.fontSize.sm};
+  line-height: 1.2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 4; /* number of lines to show */
+  line-clamp: 4;
+  -webkit-box-orient: vertical;
+`;
+
+export const CardContentBottomBox = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  margin-top: auto;
+`;
+
+export const PriceQuantityDiv = styled.div`
+  display: flex;
+  align-items: end;
+  gap: 10px;
+  font-weight: bold;
+`;
+
+export const PriceP = styled.p`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+
+  span#title {
+    font-size: ${(props) => props.theme.fontSize.sm};
+  }
+  span#price {
+    font-size: ${(props) => props.theme.fontSize.lg};
+  }
+`;
+
+export const QuantityP = styled.p`
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  color: #0043c9;
+
+  span#title {
+    font-size: ${(props) => props.theme.fontSize.xs};
+  }
+  span#quantity {
+    font-size: ${(props) => props.theme.fontSize.sm};
+  }
+`;
+
+export const ButtonBox = styled.div`
+  display: flex;
+  gap: 8px;
+`;
+
+export const UpdateButton = styled(Button)`
+  padding: 5px 15px;
+`;
+
+export const DeleteButton = styled(Button)`
+  padding: 5px 15px;
+  color: ${(props) => props.theme.color.destructiveForeground};
+  background: ${(props) => props.theme.color.destructive};
+  border-color: ${(props) => props.theme.color.destructive};
+
+  &:hover {
+    background: ${(props) => props.theme.color.destructiveHover};
+    border-color: ${(props) => props.theme.color.destructiveHover};
+  }
+`;

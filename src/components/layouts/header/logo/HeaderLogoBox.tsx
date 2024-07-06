@@ -1,4 +1,5 @@
 import { MouseEventHandler } from 'react';
+import logoUrl from '@/assets/images/logo_original.png';
 import * as S from './HeaderLogoBox.Style';
 
 type HeaderLogoBoxProps = {
@@ -14,7 +15,7 @@ const HeaderLogoBox: React.FC<HeaderLogoBoxProps> = ({
     <S.HeaderLogoBox
       onClick={onClick}
       $isPointer={isPointer}
-      $src={'src/assets/images/logo_original.png'}
+      $src={logoUrl}
     ></S.HeaderLogoBox>
   );
 };
