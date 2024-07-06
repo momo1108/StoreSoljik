@@ -125,6 +125,13 @@ div#root {
 input::placeholder {
   color: #ababab;
 }
+
+/* 텍스트 오버플로우 생략 */
+.hideTextOverflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
 `;
 
 export default GlobalStyle;
