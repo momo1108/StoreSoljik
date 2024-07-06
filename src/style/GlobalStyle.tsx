@@ -1,4 +1,6 @@
 import { createGlobalStyle } from 'styled-components';
+import 'slick-carousel/slick/slick.css';
+import 'slick-carousel/slick/slick-theme.css';
 import PretendardRegularWoff2 from '@/assets/fonts/woff2-subset/Pretendard-Regular.subset.woff2';
 import PretendardRegularWoff from '@/assets/fonts/woff-subset/Pretendard-Regular.subset.woff';
 import PretendardRegularOtf from '@/assets/fonts/otf/Pretendard-Regular.otf';
