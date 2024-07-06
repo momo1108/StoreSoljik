@@ -1,0 +1,254 @@
+import { SubmitHandler, useForm } from 'react-hook-form';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
+import { FirestoreError, doc, setDoc } from 'firebase/firestore';
+import {
+  ProductData,
+  ProductFormData,
+  ProductSchema,
+  db,
+  storage,
+} from '@/firebase';
+import {
+  StorageError,
+  deleteObject,
+  listAll,
+  ref,
+  uploadBytes,
+} from 'firebase/storage';
+
+const useUpdate = () => {
+  const navigate = useNavigate();
+  const { userInfo } = useAuth();
+
+  /**
+   * 판매 상품 목록에서 전달받은 데이터 저장.
+   * 저장한 데이터로 초기 입력값을 설정(이미지 제외)
+   */
+  const { state }: { state: { data: ProductData } | null } = useLocation();
+  useEffect(() => {
+    if (state === null) {
+      navigate('/items');
+    }
+  }, []);
+  const originalProductData = state && state.data;
+  const defaultValues = originalProductData && {
+    productCategory: originalProductData.productCategory,
+    productName: originalProductData.productName,
+    productDescription: originalProductData.productDescription,
+    productPrice: originalProductData.productPrice,
+    productQuantity: originalProductData.productQuantity,
+  };
+
+  /**
+   * 이미지 업데이트 여부를 체크할 체크박스 state 와 이벤트 핸들러
+   * 원본 이미지 데이터를 불러와서 FileList 로 만드는 방법이 없어서 그냥 수정 여부를 체크하여 새로운 이미지들만 다시 업로드 하는것으로 결정
+   */
+  const [isUpdatingImage, setIsUpdatingImage] = useState<boolean>(false);
+  const handleCheckboxUpdate: ChangeEventHandler<HTMLInputElement> = (e) => {
+    setIsUpdatingImage(e.target.checked);
+  };
+
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const productImageNamesArray = useRef<string[]>([]);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors },
+    watch,
+    resetField,
+    setError,
+  } = useForm<ProductFormData>({
+    defaultValues: defaultValues ? defaultValues : {},
+  });
+
+  const watchImages: FileList = watch('images');
+
+  /**
+   * 등록된 파일이 바뀔 때마다 이미지 프리뷰를 위한 url 들을 업데이트하자.
+   * 업데이트에서는 사진 업데이트 여부를 체크하는 분기 추가.
+   */
+  useEffect(() => {
+    if (isUpdatingImage) {
+      if (watchImages && watchImages[0]) {
+        /**
+         * FileList 타입은 배열이 아니고 File 의 IterableIterator 이기 때문에 map 사용 불가.
+         * 대신 for of 를 사용하자.
+         */
+        const newImages: string[] = [];
+        productImageNamesArray.current = [];
+
+        for (const file of watchImages) {
+          newImages.push(URL.createObjectURL(file));
+          productImageNamesArray.current.push(file.name);
+        }
+
+        setImagePreviewUrls(newImages);
+      } else setImagePreviewUrls([]);
+    } else {
+      /**
+       * 수정을 안하거나 취소하면 image 의 FileList 는 초기화
+       */
+      setImagePreviewUrls(
+        originalProductData ? originalProductData.productImageUrlArray : [],
+      );
+      resetField('images');
+    }
+  }, [watchImages, isUpdatingImage]);
+
+  /**
+   * 1. 등록버튼 클릭 시 변경된 정보들과 원본을 합쳐 FireStore 의 도큐먼트를 업데이트
+   * 2. 이미지를 수정한 경우 원본 프로덕트의 id 로 Storage 의 이미지를 찾아내서 삭제하고, 새로운 이미지로 다시 업로드.
+   */
+  const submitLogic: SubmitHandler<ProductFormData> = async (data) => {
+    /**
+     * 이미지의 경우 required 를 설정해놓으면 업데이트 체크를 하지 않는 경우에도 검증과정에 걸린다.
+     * 따라서 submit 로직에서 따로 업데이트 여부와 이미지 FileList 의 길이를 체크하여 직접 에러를 발생시키기로 변경했다.
+     */
+    if (isUpdatingImage && data.images.length === 0) {
+      setError('images', {
+        type: 'required',
+        message: '이미지 등록은 필수입니다.',
+      });
+      return;
+    }
+
+    const timeOffset = new Date().getTimezoneOffset() * 60000;
+    const isoTime = new Date(Date.now() - timeOffset).toISOString();
+
+    try {
+      /**
+       * 1. FireStore 로직
+       */
+      const documentData: ProductSchema = {
+        id: originalProductData!.id,
+        sellerEmail: userInfo!.email,
+        sellerNickname: userInfo!.nickname,
+        productName: data.productName,
+        productDescription: data.productDescription,
+        productPrice: data.productPrice,
+        productQuantity: data.productQuantity,
+        productCategory: data.productCategory,
+        productImageNamesString: isUpdatingImage
+          ? productImageNamesArray.current.join('**')
+          : originalProductData!.productImageNamesString,
+        createdAt: originalProductData!.createdAt,
+        updatedAt: isoTime,
+      };
+
+      await setDoc(doc(db, 'product', originalProductData!.id), documentData);
+
+      /**
+       * 2. Storage 로직
+       */
+      if (isUpdatingImage) {
+        /**
+         * 기존 이미지들을 삭제해준다.
+         */
+        const listRef = ref(storage, originalProductData!.id);
+        const listItems = await listAll(listRef);
+        for (const itemRef of listItems.items) {
+          await deleteObject(itemRef);
+        }
+
+        for (const imageFile of data.images) {
+          const imageRef = ref(
+            storage,
+            `${originalProductData!.id}/${imageFile.name}`,
+          );
+          await uploadBytes(imageRef, imageFile);
+        }
+      }
+
+      // 완료 후 판매 상품 페이지로 이동
+      alert('판매 상품 등록이 완료됐습니다!');
+      navigate('/items');
+    } catch (error: unknown) {
+      if (error instanceof FirestoreError) {
+        alert('제품정보 업데이트에 실패했습니다. 잠시 후에 다시 시도해주세요.');
+      } else if (error instanceof StorageError) {
+        alert(
+          '제품 이미지 업데이트 과정 중간에 에러가 발생했습니다. 잠시 후에 반드시 다시 시도해주세요.',
+        );
+      }
+    }
+  };
+
+  const registerObject = {
+    /**
+     * 이미지의 경우 required 를 설정해놓으면 업데이트 체크를 하지 않는 경우에도 검증과정에 걸린다.
+     * 따라서 submit 로직에서 따로 업데이트 여부와 이미지 FileList 의 길이를 체크하여 직접 에러를 발생시키기로 변경했다.
+     */
+    productImages: register('images'),
+
+    productCategory: register('productCategory', {
+      required: '카테고리명은 필수 입력입니다.',
+      onBlur: (event) => {
+        event.target.value = event.target.value.trim();
+      },
+      validate: (value: string) =>
+        !!value.trim() || '공백이 아닌 내용을 입력해주세요.',
+      maxLength: {
+        value: 10,
+        message: '카테고리명은 10자 이내여야 합니다.',
+      },
+    }),
+
+    productName: register('productName', {
+      required: '상품명은 필수 입력입니다.',
+      onBlur: (event) => {
+        event.target.value = event.target.value.trim();
+      },
+      validate: (value: string) =>
+        !!value.trim() || '공백이 아닌 내용을 입력해주세요.',
+      maxLength: {
+        value: 30,
+        message: '상품명은 30자 이내여야 합니다.',
+      },
+    }),
+
+    productDescription: register('productDescription', {
+      required: '상품설명은 필수 입력입니다.',
+      onBlur: (event) => {
+        event.target.value = event.target.value.trim();
+      },
+      validate: (value: string) =>
+        !!value.trim() || '공백이 아닌 내용을 입력해주세요.',
+      maxLength: {
+        value: 300,
+        message: '상품설명은 300자 이내여야 합니다.',
+      },
+    }),
+
+    productPrice: register('productPrice', {
+      required: '상품가격은 필수 입력입니다.',
+      min: {
+        value: 0,
+        message: '최저 가격은 0원부터 가능합니다.',
+      },
+    }),
+
+    productQuantity: register('productQuantity', {
+      required: '재고량은 필수 입력입니다.',
+      min: {
+        value: 0,
+        message: '재고량은 0개부터 가능합니다.',
+      },
+    }),
+  };
+
+  return {
+    handleSubmit,
+    submitLogic,
+    isSubmitting,
+    errors,
+    registerObject,
+    imagePreviewUrls,
+    isUpdatingImage,
+    handleCheckboxUpdate,
+  };
+};
+
+export default useUpdate;
