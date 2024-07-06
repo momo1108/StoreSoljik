@@ -4,6 +4,7 @@ import * as S from './Signin.Style';
 import useSignin from './useSignin';
 import Spinner from '@/components/ui/spinner/Spinner';
 import Input from '@/components/form/input/Input';
+import signinImgUrl from '@/assets/images/signup.png';
 
 const Signin: React.FC = () => {
   const {
@@ -83,7 +84,7 @@ const Signin: React.FC = () => {
             <S.SigninIconBox>gd</S.SigninIconBox>
           </S.SigninFormContainer>
           <S.SigninImageBox>
-            <img src='/src/assets/images/signup.png' alt='' />
+            <img src={signinImgUrl} alt='' />
           </S.SigninImageBox>
         </S.SigninContainer>
       </Main>
