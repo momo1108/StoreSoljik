@@ -46,7 +46,7 @@ type queryFnType = ({
 
 const useItems = () => {
   const navigate = useNavigate();
-  const onClickRegistration: MouseEventHandler<HTMLButtonElement> = (e) =>
+  const onClickRegistration: MouseEventHandler<HTMLButtonElement> = () =>
     navigate('/registration');
   const [pageSize] = useState<number>(10);
 
@@ -139,7 +139,6 @@ const useItems = () => {
   const deleteItem = useMutation({
     mutationFn: deleteItemFromDB,
     onMutate: async (itemId: string) => {
-      console.log('onmutate', itemId);
       await queryClient.cancelQueries({ queryKey: ['product'] });
 
       const previousData = queryClient.getQueryData(['product']);
