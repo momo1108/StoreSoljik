@@ -36,23 +36,41 @@ export type ProductSchema = {
    */
   id: string; // unique
   sellerEmail: string;
-  accountType: '구매자' | '판매자';
-  nickname: string;
+  sellerNickname: string;
   productName: string;
   productPrice: number;
-  productQunatity: number;
+  productQuantity: number;
   productDescription: string;
   productCategory: string;
   /**
    * 배열 데이터를 JSON.stringify 메서드로 문자열 변환 후 저장
    */
-  productImage: string;
+  productImageNamesString: string;
   /**
    * new Date()에 new Date().getTimezoneOffset() * 60000 를 빼준다.(한국시간)
    * toISOString 메서드로 변환한다.
    */
   createdAt: string;
   updatedAt: string;
+};
+
+/**
+ * 기존 string 에 한꺼번에 join 된 이미지 링크들을 다운로드 링크 배열로 분리해서 저장할 타입
+ */
+export type ProductData = ProductSchema & {
+  productImageUrlArray: string[];
+};
+
+/**
+ * react-hook-form 에서 사용할 product 입력필드들
+ */
+export type ProductFormData = {
+  images: FileList; // 실제 input
+  productName: string;
+  productDescription: string;
+  productCategory: string;
+  productPrice: number;
+  productQuantity: number;
 };
 
 const app = initializeApp(firebaseConfig);
