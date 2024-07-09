@@ -1,6 +1,7 @@
 import { ClassName } from '@/types/GlobalType';
 import * as S from './NavBar.Style';
 import { Link } from 'react-router-dom';
+import { checkPathIsActive } from '@/utils/utils';
 
 type NavType = {
   name: string;
@@ -18,7 +19,7 @@ const NavBar: React.FC<NavBarProps> = ({ className = '', navData = [] }) => {
         return (
           <li key={`routeTo${nav.name}`}>
             <Link
-              className={`${location.pathname === nav.path ? 'active' : ''}`}
+              className={checkPathIsActive(nav.path) ? 'active' : ''}
               to={nav.path}
             >
               {nav.name}
