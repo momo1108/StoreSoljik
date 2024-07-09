@@ -6,8 +6,4 @@ export const NavContainer = styled.ul`
   font-size: ${(props) => props.theme.fontSize.base};
   font-weight: bold;
   gap: 8px;
-
-  li a {
-    text-decoration: none;
-  }
 `;

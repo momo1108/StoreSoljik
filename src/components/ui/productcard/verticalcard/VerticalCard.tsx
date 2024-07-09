@@ -3,6 +3,8 @@ import * as S from './VerticalCard.Style';
 import { ClassName } from '@/types/GlobalType';
 import { ProductSchema } from '@/firebase';
 import Carousel from '../../carousel/Carousel';
+import { Link } from 'react-router-dom';
+import { getIsoDate } from '@/utils/utils';
 
 type VerticalCardProps = ClassName & {
   data: ProductSchema;
@@ -10,6 +12,7 @@ type VerticalCardProps = ClassName & {
 
 const VerticalCard: React.FC<VerticalCardProps> = ({ data, className }) => {
   const {
+    id,
     productName,
     productDescription,
     productImageUrlArray,
@@ -23,7 +26,7 @@ const VerticalCard: React.FC<VerticalCardProps> = ({ data, className }) => {
         <S.CardContentTitleBox>
           <H4 className='hideTextOverflow'>{productName}</H4>
           <S.DatetimeP>
-            <span>{createdAt.slice(0, 10)}</span>
+            <span>{getIsoDate(createdAt)}</span>
           </S.DatetimeP>
         </S.CardContentTitleBox>
         <S.DescriptionP>{productDescription}</S.DescriptionP>
@@ -32,7 +35,9 @@ const VerticalCard: React.FC<VerticalCardProps> = ({ data, className }) => {
             <span id='title'>판매가</span>
             <span id='price'>{productPrice.toLocaleString()} 원</span>
           </S.PriceP>
-          <S.MoreButton styleType='primary'>더보기</S.MoreButton>
+          <Link to={`/detail/${id}`}>
+            <S.MoreButton styleType='primary'>상세보기</S.MoreButton>
+          </Link>
         </S.PriceQuantityBox>
       </S.CardContentBox>
     </S.CardContainer>

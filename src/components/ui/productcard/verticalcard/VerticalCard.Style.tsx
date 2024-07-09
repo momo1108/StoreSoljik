@@ -30,6 +30,7 @@ export const CardContentBox = styled.div`
 export const CardContentTitleBox = styled.div`
   display: flex;
   flex-direction: column;
+  gap: 4px;
 `;
 
 export const DatetimeP = styled.p`
@@ -69,4 +70,5 @@ export const PriceP = styled.p`
 
 export const MoreButton = styled(Button)`
   padding: 5px;
+  font-size: ${(props) => props.theme.fontSize.sm};
 `;
