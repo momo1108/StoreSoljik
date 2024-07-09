@@ -40,25 +40,19 @@ export type ProductSchema = {
   productName: string;
   productPrice: number;
   productQuantity: number;
+  productSalesrate: number;
   productDescription: string;
   productCategory: string;
   /**
    * 배열 데이터를 JSON.stringify 메서드로 문자열 변환 후 저장
    */
-  productImageNamesString: string;
+  productImageUrlArray: string[];
   /**
    * new Date()에 new Date().getTimezoneOffset() * 60000 를 빼준다.(한국시간)
    * toISOString 메서드로 변환한다.
    */
   createdAt: string;
   updatedAt: string;
-};
-
-/**
- * 기존 string 에 한꺼번에 join 된 이미지 링크들을 다운로드 링크 배열로 분리해서 저장할 타입
- */
-export type ProductData = ProductSchema & {
-  productImageUrlArray: string[];
 };
 
 /**
@@ -69,8 +63,8 @@ export type ProductFormData = {
   productName: string;
   productDescription: string;
   productCategory: string;
-  productPrice: number;
-  productQuantity: number;
+  productPrice: string;
+  productQuantity: string;
 };
 
 const app = initializeApp(firebaseConfig);

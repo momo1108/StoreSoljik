@@ -12,6 +12,7 @@ import ProtectedRouteForSigning from './ProtectedRouteForSigning';
 import ProtectedRouteForBuyer from './ProtectedRouteForBuyer';
 import ProtectedRouteForSeller from './ProtectedRouteForSeller';
 import Update from '@/pages/seller/update/Update';
+import Detail from '@/pages/buyer/detail/Detail';
 
 const MainRouter = () => {
   return (
@@ -22,8 +23,8 @@ const MainRouter = () => {
       </Route>
       <Route element={<ProtectedRouteForBuyer />}>
         <Route path='/' element={<Home />} />
-        <Route path='/home' element={<Home />} />
-        <Route path='/category' element={<Category />} />
+        <Route path='/category/:name' element={<Category />} />
+        <Route path='/detail/:id' element={<Detail />} />
         <Route path='/history' element={<History />} />
         <Route path='/purchase' element={<Purchase />} />
       </Route>

@@ -1,22 +1,15 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
+import { ChangeEventHandler, useEffect, useState } from 'react';
 import { FirestoreError, doc, setDoc } from 'firebase/firestore';
+import { ProductFormData, ProductSchema, db } from '@/firebase';
+import { StorageError } from 'firebase/storage';
 import {
-  ProductData,
-  ProductFormData,
-  ProductSchema,
-  db,
-  storage,
-} from '@/firebase';
-import {
-  StorageError,
-  deleteObject,
-  listAll,
-  ref,
-  uploadBytes,
-} from 'firebase/storage';
+  deleteProductDocument,
+  deleteProductImages,
+  uploadProductImage,
+} from '@/services/productService';
 
 const useUpdate = () => {
   const navigate = useNavigate();
@@ -26,7 +19,7 @@ const useUpdate = () => {
    * 판매 상품 목록에서 전달받은 데이터 저장.
    * 저장한 데이터로 초기 입력값을 설정(이미지 제외)
    */
-  const { state }: { state: { data: ProductData } | null } = useLocation();
+  const { state }: { state: { data: ProductSchema } | null } = useLocation();
   useEffect(() => {
     if (state === null) {
       navigate('/items');
@@ -37,8 +30,8 @@ const useUpdate = () => {
     productCategory: originalProductData.productCategory,
     productName: originalProductData.productName,
     productDescription: originalProductData.productDescription,
-    productPrice: originalProductData.productPrice,
-    productQuantity: originalProductData.productQuantity,
+    productPrice: originalProductData.productPrice.toString(),
+    productQuantity: originalProductData.productQuantity.toString(),
   };
 
   /**
@@ -51,7 +44,6 @@ const useUpdate = () => {
   };
 
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
-  const productImageNamesArray = useRef<string[]>([]);
 
   const {
     register,
@@ -78,11 +70,9 @@ const useUpdate = () => {
          * 대신 for of 를 사용하자.
          */
         const newImages: string[] = [];
-        productImageNamesArray.current = [];
 
         for (const file of watchImages) {
           newImages.push(URL.createObjectURL(file));
-          productImageNamesArray.current.push(file.name);
         }
 
         setImagePreviewUrls(newImages);
@@ -120,7 +110,28 @@ const useUpdate = () => {
 
     try {
       /**
-       * 1. FireStore 로직
+       * 1. Storage 로직
+       */
+      const productImageUrlArray: string[] =
+        originalProductData!.productImageUrlArray;
+
+      if (isUpdatingImage) {
+        /**
+         * 기존 이미지들을 삭제해준다.
+         */
+        await deleteProductImages(originalProductData!.id);
+        productImageUrlArray.length = 0;
+
+        for (const imageFile of data.images) {
+          const imageDownloadUrl = await uploadProductImage(
+            `${originalProductData!.id}/${imageFile.name}`,
+            imageFile,
+          );
+          productImageUrlArray.push(imageDownloadUrl);
+        }
+      }
+      /**
+       * 2. FireStore 로직
        */
       const documentData: ProductSchema = {
         id: originalProductData!.id,
@@ -128,50 +139,30 @@ const useUpdate = () => {
         sellerNickname: userInfo!.nickname,
         productName: data.productName,
         productDescription: data.productDescription,
-        productPrice: data.productPrice,
-        productQuantity: data.productQuantity,
+        productPrice: parseInt(data.productPrice),
+        productQuantity: parseInt(data.productQuantity),
         productCategory: data.productCategory,
-        productImageNamesString: isUpdatingImage
-          ? productImageNamesArray.current.join('**')
-          : originalProductData!.productImageNamesString,
+        productImageUrlArray,
+        productSalesrate: originalProductData!.productSalesrate,
         createdAt: originalProductData!.createdAt,
         updatedAt: isoTime,
       };
 
       await setDoc(doc(db, 'product', originalProductData!.id), documentData);
 
-      /**
-       * 2. Storage 로직
-       */
-      if (isUpdatingImage) {
-        /**
-         * 기존 이미지들을 삭제해준다.
-         */
-        const listRef = ref(storage, originalProductData!.id);
-        const listItems = await listAll(listRef);
-        for (const itemRef of listItems.items) {
-          await deleteObject(itemRef);
-        }
-
-        for (const imageFile of data.images) {
-          const imageRef = ref(
-            storage,
-            `${originalProductData!.id}/${imageFile.name}`,
-          );
-          await uploadBytes(imageRef, imageFile);
-        }
-      }
-
       // 완료 후 판매 상품 페이지로 이동
       alert('판매 상품 등록이 완료됐습니다!');
       navigate('/items');
     } catch (error: unknown) {
-      if (error instanceof FirestoreError) {
-        alert('제품정보 업데이트에 실패했습니다. 잠시 후에 다시 시도해주세요.');
-      } else if (error instanceof StorageError) {
+      if (error instanceof StorageError) {
+        await deleteProductImages(originalProductData!.id);
         alert(
-          '제품 이미지 업데이트 과정 중간에 에러가 발생했습니다. 잠시 후에 반드시 다시 시도해주세요.',
+          '제품 이미지 업데이트 과정 중간에 에러가 발생했습니다. 원본 이미지 파일이 삭제된 상태이니 잠시 후에 반드시 다시 시도해주세요.',
         );
+      } else if (error instanceof FirestoreError) {
+        await deleteProductImages(originalProductData!.id);
+        await deleteProductDocument(originalProductData!.id);
+        alert('제품정보 업데이트에 실패했습니다. 잠시 후에 다시 시도해주세요.');
       }
     }
   };
@@ -228,6 +219,10 @@ const useUpdate = () => {
         value: 0,
         message: '최저 가격은 0원부터 가능합니다.',
       },
+      max: {
+        value: 99999999,
+        message: '최대 가격은 1억원 미만입니다.',
+      },
     }),
 
     productQuantity: register('productQuantity', {
@@ -235,6 +230,10 @@ const useUpdate = () => {
       min: {
         value: 0,
         message: '재고량은 0개부터 가능합니다.',
+      },
+      max: {
+        value: 10000,
+        message: '최대 재고량은 10000개 입니다.',
       },
     }),
   };

@@ -59,7 +59,7 @@ const useSignup = () => {
       alert('회원 가입 완료');
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {
-        if (error.code == 'auth/email-already-in-use') {
+        if (error.code === 'auth/email-already-in-use') {
           alert('이미 가입된 이메일입니다.');
         } else {
           alert(error);

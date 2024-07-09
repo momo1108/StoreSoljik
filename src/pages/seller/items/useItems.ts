@@ -1,5 +1,9 @@
-import { ProductData, ProductSchema, db, storage } from '@/firebase';
-import { deleteProduct } from '@/services/productService';
+import { ProductSchema, db } from '@/firebase';
+import { useAuth } from '@/hooks/useAuth';
+import {
+  deleteProductDocument,
+  deleteProductImages,
+} from '@/services/productService';
 import {
   useInfiniteQuery,
   useMutation,
@@ -15,12 +19,9 @@ import {
   query,
   QueryDocumentSnapshot,
   startAt,
+  where,
 } from 'firebase/firestore';
-import {
-  ref as imageRef,
-  getDownloadURL,
-  StorageError,
-} from 'firebase/storage';
+import { StorageError } from 'firebase/storage';
 import { MouseEventHandler, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
@@ -28,8 +29,7 @@ import { useNavigate } from 'react-router-dom';
 type PageParamType = QueryDocumentSnapshot<DocumentData, DocumentData>;
 
 type FetchProductsResult = {
-  productArray: ProductData[];
-  currentPage: PageParamType | null;
+  documentArray: ProductSchema[];
   nextPage: PageParamType | null;
 };
 
@@ -45,6 +45,7 @@ type queryFnType = ({
 }: queryFnProps) => Promise<FetchProductsResult>;
 
 const useItems = () => {
+  const { userInfo } = useAuth();
   const navigate = useNavigate();
   const onClickRegistration: MouseEventHandler<HTMLButtonElement> = () =>
     navigate('/registration');
@@ -57,6 +58,7 @@ const useItems = () => {
      */
     let productsQuery = query(
       collection(db, 'product'),
+      where('sellerEmail', '==', userInfo?.email),
       orderBy('createdAt', 'desc'),
       limit(pageSize + 1),
     );
@@ -72,28 +74,16 @@ const useItems = () => {
 
     const nextPage =
       productDocuments.docs.length > 10 ? productDocuments.docs[10] : null;
-    const productArray: ProductData[] = [];
-
-    for (const doc of documentArray) {
-      const imagesNames = doc.productImageNamesString.split('**');
-      const imageUrls = await Promise.all(
-        imagesNames.map((img) =>
-          getDownloadURL(imageRef(storage, `${doc.id}/${img}`)),
-        ),
-      );
-      productArray.push({ ...doc, productImageUrlArray: imageUrls });
-    }
 
     return {
-      productArray,
-      currentPage: pageParam as PageParamType,
+      documentArray,
       nextPage,
     };
   };
 
   const { data, status, error, fetchNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery<FetchProductsResult>({
-      queryKey: ['product'],
+      queryKey: ['product', 'seller'],
       queryFn: fetchProducts,
       initialPageParam: null,
       getNextPageParam: (lastPage) => lastPage.nextPage,
@@ -110,7 +100,7 @@ const useItems = () => {
     }
   }, [inView, fetchNextPage]);
 
-  const navigateToUpdate = async (data: ProductData) => {
+  const navigateToUpdate = async (data: ProductSchema) => {
     const copiedData = JSON.parse(JSON.stringify(data));
     navigate('/update', { state: { data: copiedData } });
   };
@@ -119,16 +109,17 @@ const useItems = () => {
 
   const deleteItemFromDB = async (id: string) => {
     try {
-      await deleteProduct(id);
+      await deleteProductImages(id);
+      await deleteProductDocument(id);
     } catch (error: unknown) {
-      if (error instanceof FirestoreError) {
-        throw new Error(
-          '제품정보 삭제에 실패했습니다. 잠시 후에 다시 시도해주세요.',
-        );
-      } else if (error instanceof StorageError) {
+      if (error instanceof StorageError) {
         // https://firebase.google.com/docs/storage/web/handle-errors?hl=ko
         throw new Error(
           '제품 이미지 삭제에 실패했습니다. 잠시 후에 다시 시도해주세요.',
+        );
+      } else if (error instanceof FirestoreError) {
+        throw new Error(
+          '제품정보 삭제에 실패했습니다. 잠시 후에 다시 시도해주세요.',
         );
       } else {
         throw error as Error;
@@ -139,13 +130,13 @@ const useItems = () => {
   const deleteItem = useMutation({
     mutationFn: deleteItemFromDB,
     onMutate: async (itemId: string) => {
-      await queryClient.cancelQueries({ queryKey: ['product'] });
+      await queryClient.cancelQueries({ queryKey: ['product', 'seller'] });
 
-      const previousData = queryClient.getQueryData(['product']);
+      const previousData = queryClient.getQueryData(['product', 'seller']);
 
       // Optimistic Update: 아이템을 미리 제거합니다.
       queryClient.setQueryData(
-        ['product'],
+        ['product', 'seller'],
         (oldData: {
           pages: FetchProductsResult[];
           pageParams: PageParamType;
@@ -154,7 +145,7 @@ const useItems = () => {
             ...oldData,
             pages: oldData.pages.map((page: FetchProductsResult) => ({
               ...page,
-              items: page.productArray.filter(
+              items: page.documentArray.filter(
                 (product) => product.id !== itemId,
               ),
             })),
@@ -167,11 +158,11 @@ const useItems = () => {
     onError: (err, itemId, context) => {
       // 에러 발생 시 이전 데이터를 복원합니다.
       console.error(itemId, err);
-      queryClient.setQueryData(['product'], context!.previousData);
+      queryClient.setQueryData(['product', 'seller'], context!.previousData);
     },
     onSettled: () => {
       // 성공/실패와 관계없이 무효화하여 최신 데이터를 가져오게 합니다.
-      queryClient.invalidateQueries({ queryKey: ['product'] });
+      queryClient.invalidateQueries({ queryKey: ['product', 'seller'] });
     },
   });
 

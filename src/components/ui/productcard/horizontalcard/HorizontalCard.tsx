@@ -2,10 +2,11 @@ import { MouseEventHandler } from 'react';
 import { H4 } from '../../header/Header.Style';
 import * as S from './HorizontalCard.Style';
 import { ClassName } from '@/types/GlobalType';
-import { ProductData } from '@/firebase';
+import { ProductSchema } from '@/firebase';
+import { getIsoDate, getIsoTime } from '@/utils/utils';
 
 type HorizontalCardProps = ClassName & {
-  data: ProductData;
+  data: ProductSchema;
   handleClickUpdate: MouseEventHandler<HTMLButtonElement>;
   handleClickDelete: MouseEventHandler<HTMLButtonElement>;
 };
@@ -31,8 +32,8 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
         <S.CardContentTitleBox>
           <H4 className='hideTextOverflow'>{productName}</H4>
           <S.DatetimeP>
-            <span>{createdAt.slice(0, 10)}</span>
-            <span>{createdAt.slice(11, 16)}</span>
+            <span>{getIsoDate(createdAt)}</span>
+            <span>{getIsoTime(createdAt)}</span>
           </S.DatetimeP>
         </S.CardContentTitleBox>
         <S.DescriptionP>{productDescription}</S.DescriptionP>

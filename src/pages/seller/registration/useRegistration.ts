@@ -1,18 +1,21 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { FirestoreError, doc, setDoc } from 'firebase/firestore';
-import { ProductFormData, ProductSchema, db, storage } from '@/firebase';
+import { ProductFormData, ProductSchema, db } from '@/firebase';
 import { v4 as uuidv4 } from 'uuid';
-import { StorageError, ref, uploadBytes } from 'firebase/storage';
-import { deleteProduct } from '@/services/productService';
+import { StorageError } from 'firebase/storage';
+import {
+  deleteProductDocument,
+  deleteProductImages,
+  uploadProductImage,
+} from '@/services/productService';
 
 const useRegistration = () => {
   const navigate = useNavigate();
   const { userInfo } = useAuth();
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
-  const productImageNamesArray = useRef<string[]>([]);
 
   const {
     register,
@@ -33,11 +36,9 @@ const useRegistration = () => {
        * 대신 for of 를 사용하자.
        */
       const newImages: string[] = [];
-      productImageNamesArray.current = [];
 
       for (const file of watchImages) {
         newImages.push(URL.createObjectURL(file));
-        productImageNamesArray.current.push(file.name);
       }
 
       setImagePreviewUrls(newImages);
@@ -45,8 +46,8 @@ const useRegistration = () => {
   }, [watchImages]);
 
   /**
-   * 1. 등록버튼 클릭 시 이미지 제외한 정보들 FireStore 의 product 컬렉션으로 저장.
-   * 2. 프로덕트의 id 를 받아와서 이미지를 Storage 에 저장할 때 경로로 활용.(저장 경로 : 판매상품id/image_번호_원본파일이름.확장자)
+   * 1. 프로덕트의 id 를 받아와서 이미지를 Storage 에 저장할 때 경로로 활용.(저장 경로 : 판매상품id/image_번호_원본파일이름.확장자)
+   * 2. 등록버튼 클릭 시 이미지 제외한 정보들 FireStore 의 product 컬렉션으로 저장.
    */
   const submitLogic: SubmitHandler<ProductFormData> = async (data) => {
     const timeOffset = new Date().getTimezoneOffset() * 60000;
@@ -55,7 +56,19 @@ const useRegistration = () => {
 
     try {
       /**
-       * 1. FireStore 로직
+       * 1. Storage 로직
+       */
+      const productImageUrlArray: string[] = [];
+      for (const imageFile of data.images) {
+        const imageDownloadUrl = await uploadProductImage(
+          `${id}/${imageFile.name}`,
+          imageFile,
+        );
+        productImageUrlArray.push(imageDownloadUrl);
+      }
+
+      /**
+       * 2. FireStore 로직
        */
       const documentData: ProductSchema = {
         id,
@@ -63,36 +76,30 @@ const useRegistration = () => {
         sellerNickname: userInfo!.nickname,
         productName: data.productName,
         productDescription: data.productDescription,
-        productPrice: data.productPrice,
-        productQuantity: data.productQuantity,
+        productPrice: parseInt(data.productPrice),
+        productQuantity: parseInt(data.productQuantity),
+        productSalesrate: 0,
         productCategory: data.productCategory,
-        productImageNamesString: productImageNamesArray.current.join('**'),
+        productImageUrlArray: productImageUrlArray,
         createdAt: isoTime,
         updatedAt: isoTime,
       };
 
       await setDoc(doc(db, 'product', id), documentData);
 
-      /**
-       * 2. Storage 로직
-       */
-      for (const imageFile of data.images) {
-        const imageRef = ref(storage, `${id}/${imageFile.name}`);
-        await uploadBytes(imageRef, imageFile);
-      }
-
       // 완료 후 판매 상품 페이지로 이동
       alert('판매 상품 등록이 완료됐습니다!');
       navigate('/items');
     } catch (error: unknown) {
-      if (error instanceof FirestoreError) {
-        alert('제품정보 저장에 실패했습니다. 잠시 후에 다시 시도해주세요.');
-      } else if (error instanceof StorageError) {
-        await deleteProduct(id);
-
+      if (error instanceof StorageError) {
+        await deleteProductImages(id);
         alert(
           '제품 이미지 업로드에 실패했습니다. 잠시 후에 다시 시도해주세요.',
         );
+      } else if (error instanceof FirestoreError) {
+        await deleteProductImages(id);
+        await deleteProductDocument(id);
+        alert('제품정보 저장에 실패했습니다. 잠시 후에 다시 시도해주세요.');
       }
     }
   };
@@ -147,6 +154,10 @@ const useRegistration = () => {
         value: 0,
         message: '최저 가격은 0원부터 가능합니다.',
       },
+      max: {
+        value: 99999999,
+        message: '최대 가격은 1억원 미만입니다.',
+      },
     }),
 
     productQuantity: register('productQuantity', {
@@ -154,6 +165,10 @@ const useRegistration = () => {
       min: {
         value: 0,
         message: '재고량은 0개부터 가능합니다.',
+      },
+      max: {
+        value: 10000,
+        message: '최대 재고량은 10000개 입니다.',
       },
     }),
   };
