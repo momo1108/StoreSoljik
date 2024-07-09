@@ -134,6 +134,9 @@ input::placeholder {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+/* a 링크 색깔 초기화 */
+a { color: inherit; } 
 `;
 
 export default GlobalStyle;
