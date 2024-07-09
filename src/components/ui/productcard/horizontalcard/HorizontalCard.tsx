@@ -2,10 +2,10 @@ import { MouseEventHandler } from 'react';
 import { H4 } from '../../header/Header.Style';
 import * as S from './HorizontalCard.Style';
 import { ClassName } from '@/types/GlobalType';
-import { ProductData } from '@/firebase';
+import { ProductSchema } from '@/firebase';
 
 type HorizontalCardProps = ClassName & {
-  data: ProductData;
+  data: ProductSchema;
   handleClickUpdate: MouseEventHandler<HTMLButtonElement>;
   handleClickDelete: MouseEventHandler<HTMLButtonElement>;
 };

@@ -18,7 +18,7 @@ export const CardImageBox = styled.div<{ $src: string }>`
   background-color: #efefef;
   background-image: url(${(props) => props.$src});
   background-repeat: no-repeat;
-  background-size: contain;
+  background-size: cover;
   background-position: center;
   border-radius: ${(props) => props.theme.color.radius};
 `;
@@ -47,14 +47,14 @@ export const DatetimeP = styled.p`
 `;
 
 export const DescriptionP = styled.p`
-  color: #777;
+  color: ${(props) => props.theme.color.gray};
   font-size: ${(props) => props.theme.fontSize.sm};
   line-height: 1.2;
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 4; /* number of lines to show */
-  line-clamp: 4;
   -webkit-box-orient: vertical;
+  line-clamp: 4;
 `;
 
 export const CardContentBottomBox = styled.div`

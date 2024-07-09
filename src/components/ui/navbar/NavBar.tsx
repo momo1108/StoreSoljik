@@ -18,7 +18,7 @@ const NavBar: React.FC<NavBarProps> = ({ className = '', navData = [] }) => {
         return (
           <li key={`routeTo${nav.name}`}>
             <Link
-              className={`${location.pathname.startsWith(nav.path) ? 'active' : ''}`}
+              className={`${location.pathname === nav.path ? 'active' : ''}`}
               to={nav.path}
             >
               {nav.name}
