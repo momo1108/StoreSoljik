@@ -1,5 +1,6 @@
 import Checkbox from '@/components/form/checkbox/Checkbox';
 import Button from '@/components/ui/button/Button';
+import HR from '@/components/ui/hr/HR';
 import media from '@/style/media';
 import styled from 'styled-components';
 
@@ -42,13 +43,6 @@ export const SigninFormContainer = styled.form`
     font-size: ${(props) => props.theme.fontSize.lg};
     line-height: 32px;
   }
-
-  & > hr {
-    width: 100%;
-    height: 1px;
-    background: ${(props) => props.theme.color.border};
-    border: none;
-  }
 `;
 
 export const SigninCheckbox = styled(Checkbox)``;
@@ -58,6 +52,11 @@ export const SignButton = styled(Button)`
   height: 48px;
   font-size: ${(props) => props.theme.fontSize.md};
   font-weight: 600;
+`;
+
+export const SignHR = styled(HR)`
+  height: 1px;
+  background: ${(props) => props.theme.color.border};
 `;
 
 export const SigninIconBox = styled.div`
