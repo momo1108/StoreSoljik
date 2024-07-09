@@ -1,8 +1,39 @@
 import { db, storage } from '@/firebase';
-import { deleteDoc, doc } from 'firebase/firestore';
-import { deleteObject, listAll, ref } from 'firebase/storage';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDocs,
+  query,
+  writeBatch,
+} from 'firebase/firestore';
+import {
+  deleteObject,
+  getDownloadURL,
+  listAll,
+  ref,
+  uploadBytes,
+} from 'firebase/storage';
 
-const deleteProductImages = async (id: string) => {
+const updateBatch = async () => {
+  let productsQuery = query(collection(db, 'product'));
+  console.log(productsQuery);
+  const productDocuments = await getDocs(productsQuery);
+  const batch = writeBatch(db);
+  productDocuments.docs.map((doc) =>
+    batch.update(doc.ref, { productSalesrate: '0' }),
+  );
+  await batch.commit();
+};
+
+export const uploadProductImage = async (path: string, imageFile: File) => {
+  const imageRef = ref(storage, path);
+  await uploadBytes(imageRef, imageFile);
+  const imageDownloadUrl = await getDownloadURL(imageRef);
+  return imageDownloadUrl;
+};
+
+export const deleteProductImages = async (id: string) => {
   // 판매 상품 경로의 이미지 폴더의 ref 를 불러옵니다.
   const listRef = ref(storage, id);
 
@@ -13,12 +44,7 @@ const deleteProductImages = async (id: string) => {
   }
 };
 
-const deleteProductDocument = async (id: string) => {
+export const deleteProductDocument = async (id: string) => {
   // 판매 상품의 id 에 맞는 Document 를 삭제합니다.
   await deleteDoc(doc(db, 'product', id));
-};
-
-export const deleteProduct = async (id: string) => {
-  await deleteProductDocument(id);
-  await deleteProductImages(id);
 };
