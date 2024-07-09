@@ -39,7 +39,7 @@ const useSignin = () => {
       await signInWithEmailAndPassword(auth, data.email, data.password);
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {
-        if (error.code == 'auth/invalid-credential') {
+        if (error.code === 'auth/invalid-credential') {
           alert('잘못된 ID 혹은 비밀번호입니다.');
         } else {
           alert(error);
