@@ -1,7 +1,7 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
-import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
+import { ChangeEventHandler, useEffect, useState } from 'react';
 import { FirestoreError, doc, setDoc } from 'firebase/firestore';
 import { ProductFormData, ProductSchema, db } from '@/firebase';
 import { StorageError } from 'firebase/storage';
