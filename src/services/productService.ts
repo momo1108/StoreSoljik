@@ -1,12 +1,5 @@
 import { db, storage } from '@/firebase';
-import {
-  collection,
-  deleteDoc,
-  doc,
-  getDocs,
-  query,
-  writeBatch,
-} from 'firebase/firestore';
+import { deleteDoc, doc } from 'firebase/firestore';
 import {
   deleteObject,
   getDownloadURL,
@@ -15,16 +8,16 @@ import {
   uploadBytes,
 } from 'firebase/storage';
 
-const updateBatch = async () => {
-  let productsQuery = query(collection(db, 'product'));
-  console.log(productsQuery);
-  const productDocuments = await getDocs(productsQuery);
-  const batch = writeBatch(db);
-  productDocuments.docs.map((doc) =>
-    batch.update(doc.ref, { productSalesrate: '0' }),
-  );
-  await batch.commit();
-};
+// const updateBatch = async () => {
+//   let productsQuery = query(collection(db, 'product'));
+//   console.log(productsQuery);
+//   const productDocuments = await getDocs(productsQuery);
+//   const batch = writeBatch(db);
+//   productDocuments.docs.map((doc) =>
+//     batch.update(doc.ref, { productSalesrate: '0' }),
+//   );
+//   await batch.commit();
+// };
 
 export const uploadProductImage = async (path: string, imageFile: File) => {
   const imageRef = ref(storage, path);
