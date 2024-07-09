@@ -18,7 +18,13 @@ const HeaderContentForBuyer: React.FC = () => {
           }}
         ></HeaderLogoBox>
         <S.HeaderNavBox>
-          <b>안녕하세요</b> 안녕하세요 헤더입니다.
+          <S.HeaderNavBar
+            navData={[
+              { name: '홈페이지', path: '/' },
+              { name: '카테고리별 상품', path: '/category' },
+              { name: '구매내역', path: '/history' },
+            ]}
+          />
         </S.HeaderNavBox>
         <S.HeaderMenuBox>
           <Button onClick={logout}>로그아웃</Button>
