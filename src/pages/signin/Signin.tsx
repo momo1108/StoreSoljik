@@ -79,7 +79,7 @@ const Signin: React.FC = () => {
             >
               회원가입
             </S.SignButton>
-            <hr />
+            <S.SignHR />
             <h3>소셜 로그인</h3>
             <S.SigninIconBox>gd</S.SigninIconBox>
           </S.SigninFormContainer>

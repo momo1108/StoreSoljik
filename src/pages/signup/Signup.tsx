@@ -90,7 +90,7 @@ const Signup: React.FC = () => {
               >
                 로그인으로 돌아가기
               </S.SignButton>
-              <hr />
+              <S.SignHR />
               <h3>소셜 로그인</h3>
               <S.SigninIconBox>gd</S.SigninIconBox>
             </S.SignupInputContainer>
