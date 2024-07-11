@@ -8,7 +8,7 @@ import {
   QueryFunction,
   QueryKey,
   useInfiniteQuery,
-  useQueryClient,
+  // useQueryClient,
 } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
