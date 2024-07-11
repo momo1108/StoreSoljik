@@ -18,7 +18,7 @@ const Detail: React.FC = () => {
     error,
     recommendData,
     recommendStatus,
-    recommendError,
+    // recommendError,
   } = useDetail();
   return (
     <>

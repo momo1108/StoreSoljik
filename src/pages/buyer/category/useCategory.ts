@@ -74,16 +74,16 @@ const useCategory = () => {
   };
 
   // 현재 카테고리와 정렬 기준에 따라 쿼리 결과를 미리 fetch합니다.
-  const fetchSelectedQuery = (newFilterOptions: ProductFilter) => {
-    queryClient.prefetchQuery({
-      queryKey: queryKey,
-      queryFn: (({ pageParam }) =>
-        fetchProductsWrapper({
-          pageParam,
-          filterOptions: newFilterOptions,
-        })) as QueryFunction<FetchInfiniteProductsResult, string[], unknown>,
-    });
-  };
+  // const fetchSelectedQuery = (newFilterOptions: ProductFilter) => {
+  //   queryClient.prefetchQuery({
+  //     queryKey: queryKey,
+  //     queryFn: (({ pageParam }) =>
+  //       fetchProductsWrapper({
+  //         pageParam,
+  //         filterOptions: newFilterOptions,
+  //       })) as QueryFunction<FetchInfiniteProductsResult, string[], unknown>,
+  //   });
+  // };
 
   const { data, status, error, fetchNextPage, isFetchingNextPage, isLoading } =
     useInfiniteQuery<FetchInfiniteProductsResult>({
