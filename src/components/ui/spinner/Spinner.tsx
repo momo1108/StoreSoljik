@@ -1,11 +1,10 @@
-import { ClassName } from '@/types/GlobalType';
+import { Children, ClassName } from '@/types/GlobalType';
 import * as S from './Spinner.Style';
-import { ReactNode } from 'react';
 
-export type SpinnerProps = ClassName & {
-  children?: ReactNode;
-  spinnerSize?: number;
-};
+export type SpinnerProps = ClassName &
+  Children & {
+    spinnerSize?: number;
+  };
 
 const Spinner: React.FC<SpinnerProps> = ({
   className = '',

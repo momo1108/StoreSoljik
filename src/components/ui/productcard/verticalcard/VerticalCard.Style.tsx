@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Button from '../../button/Button';
+import ClampedP from '../../clampp/ClampedP';
 
 export const CardContainer = styled.div`
   display: flex;
@@ -38,14 +39,12 @@ export const DatetimeP = styled.p`
   color: #666;
 `;
 
-export const DescriptionP = styled.p`
+export const DescriptionP = styled(ClampedP)`
   font-size: ${(props) => props.theme.fontSize.sm};
   color: #333;
   height: 40.5px;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
   -webkit-line-clamp: 3;
-  overflow: hidden;
+  line-clamp: 3;
 `;
 
 export const PriceQuantityBox = styled.div`

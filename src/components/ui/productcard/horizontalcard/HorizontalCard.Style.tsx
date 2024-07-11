@@ -1,5 +1,6 @@
 import styled from 'styled-components';
 import Button from '../../button/Button';
+import ClampedP from '../../clampp/ClampedP';
 
 export const CardContainer = styled.div`
   display: flex;
@@ -46,15 +47,10 @@ export const DatetimeP = styled.p`
   font-size: ${(props) => props.theme.fontSize.sm};
 `;
 
-export const DescriptionP = styled.p`
+export const DescriptionP = styled(ClampedP)`
   color: ${(props) => props.theme.color.gray};
   font-size: ${(props) => props.theme.fontSize.sm};
   line-height: 1.2;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 4; /* number of lines to show */
-  -webkit-box-orient: vertical;
-  line-clamp: 4;
 `;
 
 export const CardContentBottomBox = styled.div`
