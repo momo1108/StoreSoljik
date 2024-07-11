@@ -26,13 +26,13 @@ const fontSize: Record<FontSizes, string> = {
 };
 
 const lineHeight: Record<FontSizes, string> = {
-  xxxs: '0.5rem',
-  xxs: '0.6rem',
-  xs: '0.7rem',
-  sm: '0.85rem',
-  base: '1rem',
-  md: '1.13rem',
-  lg: '1.25rem',
+  xxxs: '0.6rem',
+  xxs: '0.7rem',
+  xs: '0.8rem',
+  sm: '0.95rem',
+  base: '1.13rem',
+  md: '1.3rem',
+  lg: '1.5rem',
   xl: '2rem',
   xxl: '2.875rem',
   xxxl: '3.5rem',
@@ -71,6 +71,7 @@ const light = {
   radius: '0.5rem',
   gray: '#777',
   brighterGray: '#DDD',
+  beige: '#F2F0EA',
 };
 
 const dark = {
@@ -103,6 +104,7 @@ const dark = {
   radius: '0.5rem',
   gray: '#999',
   brighterGray: '#333',
+  beige: '#F2F0EA',
 };
 
 const theme = {
