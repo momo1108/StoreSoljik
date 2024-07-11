@@ -21,7 +21,7 @@ const VerticalCard: React.FC<VerticalCardProps> = ({ data, className }) => {
   } = data;
   return (
     <S.CardContainer className={className}>
-      <Carousel type='image' data={productImageUrlArray} />
+      <Carousel data={productImageUrlArray} />
       <S.CardContentBox>
         <S.CardContentTitleBox>
           <H4 className='hideTextOverflow'>{productName}</H4>
@@ -29,7 +29,7 @@ const VerticalCard: React.FC<VerticalCardProps> = ({ data, className }) => {
             <span>{getIsoDate(createdAt)}</span>
           </S.DatetimeP>
         </S.CardContentTitleBox>
-        <S.DescriptionP>{productDescription}</S.DescriptionP>
+        <S.DescriptionP className='descr'>{productDescription}</S.DescriptionP>
         <S.PriceQuantityBox>
           <S.PriceP>
             <span id='title'>판매가</span>

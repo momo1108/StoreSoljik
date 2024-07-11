@@ -1,6 +1,6 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import { FirestoreError, doc, setDoc } from 'firebase/firestore';
 import { ProductFormData, ProductSchema, db } from '@/firebase';
@@ -13,7 +13,7 @@ import {
 
 const useUpdate = () => {
   const navigate = useNavigate();
-  const { userInfo } = useAuth();
+  const { userInfo } = useFirebaseAuth();
 
   /**
    * 판매 상품 목록에서 전달받은 데이터 저장.

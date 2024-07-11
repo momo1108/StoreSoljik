@@ -13,6 +13,7 @@ import ProtectedRouteForBuyer from './ProtectedRouteForBuyer';
 import ProtectedRouteForSeller from './ProtectedRouteForSeller';
 import Update from '@/pages/seller/update/Update';
 import Detail from '@/pages/buyer/detail/Detail';
+import NotFound from '@/pages/notfound/NotFound';
 
 const MainRouter = () => {
   return (
@@ -23,7 +24,7 @@ const MainRouter = () => {
       </Route>
       <Route element={<ProtectedRouteForBuyer />}>
         <Route path='/' element={<Home />} />
-        <Route path='/category/:name' element={<Category />} />
+        <Route path='/category' element={<Category />} />
         <Route path='/detail/:id' element={<Detail />} />
         <Route path='/history' element={<History />} />
         <Route path='/purchase' element={<Purchase />} />
@@ -34,6 +35,7 @@ const MainRouter = () => {
         <Route path='/registration' element={<Registration />} />
         <Route path='/update' element={<Update />} />
       </Route>
+      <Route path='*' element={<NotFound />} />
     </Routes>
   );
 };

@@ -6,13 +6,14 @@ import styled from 'styled-components';
 export const HomeContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 940px;
+  width: 950px;
   gap: 40px;
 `;
 
 export const HotItemBox = styled.div`
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: 10px;
 `;
 export const HomeTitleHeader = styled(H2)`

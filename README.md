@@ -9,7 +9,7 @@
     1인 개발 커머스 프로젝트 입니다.
     <br />
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template" ><s>데모 사이트(아직 준비중입니다...)</s></a>
+    <a href="https://github.com/othneildrew/Best-README-Template" ><s>데모 사이트(대부분 페이지 단위 구현이 완료될 때 마다 버전을 업데이트하고 있습니다.)</s></a>
     <br />
     Contact : banghyechan@gmail.com
   </p>
@@ -75,7 +75,7 @@
 
 프로젝트의 아키텍처와 기술 스택 선정 이유를 간략하게 설명합니다.
 
-![Project Architecture][src/assets/images/project_architecture.png]
+<img src="src/assets/images/project_architecture.png" alt="Logo">
 
 <br />
 
