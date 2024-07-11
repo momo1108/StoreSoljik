@@ -1,12 +1,13 @@
 import { useCallback, useState } from 'react';
-import MainRouter from './router/MainRouter.tsx';
+import MainRouter from './router/MainRouter';
 import { BrowserRouter } from 'react-router-dom';
 import { ThemeProvider } from 'styled-components';
-import GlobalStyle from './style/GlobalStyle.tsx';
+import GlobalStyle from './style/GlobalStyle';
 import theme from './style/theme.ts';
-import { AuthProvider } from './hooks/useAuth.tsx';
+import { AuthProvider } from './hooks/useFirebaseAuth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
+import { Toaster } from 'sonner';
 
 function App() {
   /**
@@ -44,6 +45,7 @@ function App() {
           <QueryClientProvider client={queryClient}>
             <MainRouter />
             <ReactQueryDevtools initialIsOpen={false} />
+            <Toaster />
           </QueryClientProvider>
         </AuthProvider>
       </BrowserRouter>
