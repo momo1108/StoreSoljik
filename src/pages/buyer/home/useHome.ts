@@ -9,7 +9,7 @@ type ProductPerCategory = {
 
 const useHome = () => {
   const { data: allProductArray } = useQuery<ProductSchema[]>({
-    queryKey: ['product', 'buyer'],
+    queryKey: ['products', 'buyer'],
     queryFn: async () => {
       const querySnapshot = await getDocs(
         query(collection(db, 'product'), orderBy('productSalesrate', 'desc')),
