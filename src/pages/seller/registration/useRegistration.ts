@@ -1,6 +1,6 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { useEffect, useState } from 'react';
 import { FirestoreError, doc, setDoc } from 'firebase/firestore';
 import { ProductFormData, ProductSchema, db } from '@/firebase';
@@ -11,10 +11,15 @@ import {
   deleteProductImages,
   uploadProductImage,
 } from '@/services/productService';
+import {
+  createCategory,
+  getAllCategories,
+  updateCategory,
+} from '@/services/categoryService';
 
 const useRegistration = () => {
   const navigate = useNavigate();
-  const { userInfo } = useAuth();
+  const { userInfo } = useFirebaseAuth();
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
   const {
@@ -86,6 +91,16 @@ const useRegistration = () => {
       };
 
       await setDoc(doc(db, 'product', id), documentData);
+
+      /**
+       * 3. 카테고리 컬렉션 정보 업데이트
+       */
+      const allCategories = await getAllCategories();
+      if (!!allCategories.includes(data.productCategory)) {
+        await updateCategory(data.productCategory, true);
+      } else {
+        await createCategory(data.productCategory);
+      }
 
       // 완료 후 판매 상품 페이지로 이동
       alert('판매 상품 등록이 완료됐습니다!');
