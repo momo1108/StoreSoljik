@@ -62,7 +62,10 @@ const Items: React.FC = () => {
                               `"${item.productName}" 상품을 삭제하시겠습니까?`,
                             )
                           )
-                            deleteItem.mutate(item.id);
+                            deleteItem.mutate({
+                              id: item.id,
+                              category: item.productCategory,
+                            });
                         }}
                       />
                     );

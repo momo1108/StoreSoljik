@@ -1,93 +1,137 @@
-import { ProductSchema, db } from '@/firebase';
-import { useAuth } from '@/hooks/useAuth';
+import { ProductSchema } from '@/firebase';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { updateCategory } from '@/services/categoryService';
 import {
   deleteProductDocument,
   deleteProductImages,
+  fetchInfiniteProducts,
+  FetchInfiniteProductsResult,
+  PageParamType,
 } from '@/services/productService';
 import {
   useInfiniteQuery,
   useMutation,
   useQueryClient,
 } from '@tanstack/react-query';
-import {
-  collection,
-  DocumentData,
-  FirestoreError,
-  getDocs,
-  limit,
-  orderBy,
-  query,
-  QueryDocumentSnapshot,
-  startAt,
-  where,
-} from 'firebase/firestore';
+import { FirestoreError, orderBy, where } from 'firebase/firestore';
 import { StorageError } from 'firebase/storage';
-import { MouseEventHandler, useEffect, useState } from 'react';
+import { MouseEventHandler, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
 
-type PageParamType = QueryDocumentSnapshot<DocumentData, DocumentData>;
-
-type FetchProductsResult = {
-  documentArray: ProductSchema[];
-  nextPage: PageParamType | null;
-};
-
-/**
- * useInfiniteQuery 사용 시 타입 에러가 나길래 unknown 으로 수정 후 fetch 함수 로직 내에서 number 로 지정하여 사용
- */
-type queryFnProps = {
-  pageParam: unknown;
-};
-
-type queryFnType = ({
-  pageParam,
-}: queryFnProps) => Promise<FetchProductsResult>;
-
 const useItems = () => {
-  const { userInfo } = useAuth();
+  const { userInfo } = useFirebaseAuth();
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
   const onClickRegistration: MouseEventHandler<HTMLButtonElement> = () =>
     navigate('/registration');
-  const [pageSize] = useState<number>(10);
 
-  const fetchProducts: queryFnType = async ({ pageParam }: queryFnProps) => {
-    /**
-     * 현재 인덱스부터 10개씩 짤라서 사용한다.
-     * 단 추가된 마지막 1개는 다음 페이지가 있는지 체크하기 위한 용도로 사용한다.
-     */
-    let productsQuery = query(
-      collection(db, 'product'),
-      where('sellerEmail', '==', userInfo?.email),
-      orderBy('createdAt', 'desc'),
-      limit(pageSize + 1),
-    );
-
-    if (pageParam) {
-      productsQuery = query(productsQuery, startAt(pageParam));
-    }
-
-    const productDocuments = await getDocs(productsQuery);
-    const documentArray: ProductSchema[] = productDocuments.docs.map(
-      (doc) => doc.data() as ProductSchema,
-    );
-
-    const nextPage =
-      productDocuments.docs.length > 10 ? productDocuments.docs[10] : null;
-
-    return {
-      documentArray,
-      nextPage,
-    };
+  const navigateToUpdate = async (data: ProductSchema) => {
+    const copiedData = JSON.parse(JSON.stringify(data));
+    navigate('/update', { state: { data: copiedData } });
   };
 
+  const queryFnWrapper: ({
+    pageParam,
+  }: {
+    pageParam: unknown;
+  }) => Promise<FetchInfiniteProductsResult> = ({ pageParam }) =>
+    fetchInfiniteProducts({
+      pageParam,
+      filters: [where('sellerEmail', '==', userInfo?.email)],
+      sortOrders: [orderBy('createdAt', 'desc')],
+      pageSize: 10,
+    });
+
   const { data, status, error, fetchNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery<FetchProductsResult>({
-      queryKey: ['product', 'seller'],
-      queryFn: fetchProducts,
+    useInfiniteQuery<FetchInfiniteProductsResult>({
+      queryKey: ['products', 'seller'],
+      queryFn: queryFnWrapper,
       initialPageParam: null,
       getNextPageParam: (lastPage) => lastPage.nextPage,
     });
+
+  const deleteItemFromDB = async ({
+    id,
+    category,
+  }: {
+    id: string;
+    category: string;
+  }) => {
+    try {
+      await deleteProductImages(id);
+      await deleteProductDocument(id);
+      await updateCategory(category, false);
+    } catch (error: unknown) {
+      if (error instanceof StorageError) {
+        // https://firebase.google.com/docs/storage/web/handle-errors?hl=ko
+        const errorInstance = new Error(
+          '제품 이미지 삭제에 실패했습니다. 잠시 후에 다시 시도해주세요.',
+        );
+        errorInstance.name = 'firebase.storage.image.delete';
+        throw errorInstance;
+      } else if (error instanceof FirestoreError) {
+        const errorInstance = new Error(
+          '제품정보 삭제에 실패했습니다. 잠시 후에 다시 시도해주세요.',
+        );
+        errorInstance.name = 'firebase.store.product.delete';
+        throw errorInstance;
+      } else {
+        throw error as Error;
+      }
+    }
+  };
+
+  const deleteItem = useMutation({
+    mutationFn: deleteItemFromDB,
+    onMutate: async ({ id: productId }) => {
+      await queryClient.cancelQueries({ queryKey: ['products', 'seller'] });
+
+      const previousData = queryClient.getQueryData(['products', 'seller']);
+
+      // Optimistic Update: 아이템을 미리 제거합니다.
+      queryClient.setQueryData(
+        ['products', 'seller'],
+        (oldData: {
+          pages: FetchInfiniteProductsResult[];
+          pageParams: PageParamType;
+        }) => {
+          return {
+            ...oldData,
+            pages: oldData.pages.map((page: FetchInfiniteProductsResult) => ({
+              ...page,
+              items: page.documentArray.filter(
+                (product) => product.id !== productId,
+              ),
+            })),
+          };
+        },
+      );
+
+      alert('상품 삭제를 완료했습니다.');
+
+      return { previousData };
+    },
+    onError: (err, productId, context) => {
+      // 에러 발생 시 이전 데이터를 복원합니다.
+      console.error(productId, err);
+      queryClient.setQueryData(['products', 'seller'], context!.previousData);
+      if (err.name === 'firebase.store.product.delete') {
+        alert(
+          '상품 삭제 도중 에러가 발생했습니다. 제품 이미지가 삭제된 상태이니 반드시 다시 삭제를 진행해주세요.',
+        );
+      } else if (err.name === 'firebase.storage.image.delete') {
+        alert(
+          '상품 이미지 삭제 도중 에러가 발생했습니다. 제품 이미지의 일부가가 삭제된 상태이니 반드시 다시 삭제를 시도해주세요.',
+        );
+      }
+    },
+    onSettled: () => {
+      // 성공/실패와 관계없이 무효화하여 최신 데이터를 가져오게 합니다.
+      queryClient.invalidateQueries({ queryKey: ['products', 'seller'] });
+    },
+  });
 
   const { ref, inView } = useInView({
     /* options */
@@ -99,72 +143,6 @@ const useItems = () => {
       fetchNextPage();
     }
   }, [inView, fetchNextPage]);
-
-  const navigateToUpdate = async (data: ProductSchema) => {
-    const copiedData = JSON.parse(JSON.stringify(data));
-    navigate('/update', { state: { data: copiedData } });
-  };
-
-  const queryClient = useQueryClient();
-
-  const deleteItemFromDB = async (id: string) => {
-    try {
-      await deleteProductImages(id);
-      await deleteProductDocument(id);
-    } catch (error: unknown) {
-      if (error instanceof StorageError) {
-        // https://firebase.google.com/docs/storage/web/handle-errors?hl=ko
-        throw new Error(
-          '제품 이미지 삭제에 실패했습니다. 잠시 후에 다시 시도해주세요.',
-        );
-      } else if (error instanceof FirestoreError) {
-        throw new Error(
-          '제품정보 삭제에 실패했습니다. 잠시 후에 다시 시도해주세요.',
-        );
-      } else {
-        throw error as Error;
-      }
-    }
-  };
-
-  const deleteItem = useMutation({
-    mutationFn: deleteItemFromDB,
-    onMutate: async (itemId: string) => {
-      await queryClient.cancelQueries({ queryKey: ['product', 'seller'] });
-
-      const previousData = queryClient.getQueryData(['product', 'seller']);
-
-      // Optimistic Update: 아이템을 미리 제거합니다.
-      queryClient.setQueryData(
-        ['product', 'seller'],
-        (oldData: {
-          pages: FetchProductsResult[];
-          pageParams: PageParamType;
-        }) => {
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page: FetchProductsResult) => ({
-              ...page,
-              items: page.documentArray.filter(
-                (product) => product.id !== itemId,
-              ),
-            })),
-          };
-        },
-      );
-
-      return { previousData };
-    },
-    onError: (err, itemId, context) => {
-      // 에러 발생 시 이전 데이터를 복원합니다.
-      console.error(itemId, err);
-      queryClient.setQueryData(['product', 'seller'], context!.previousData);
-    },
-    onSettled: () => {
-      // 성공/실패와 관계없이 무효화하여 최신 데이터를 가져오게 합니다.
-      queryClient.invalidateQueries({ queryKey: ['product', 'seller'] });
-    },
-  });
 
   return {
     onClickRegistration,
