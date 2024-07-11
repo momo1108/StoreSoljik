@@ -16,7 +16,6 @@ import { useInView } from 'react-intersection-observer';
 import { useLocation } from 'react-router-dom';
 
 const useCategory = () => {
-  const queryClient = useQueryClient();
   const { state } = useLocation();
   const [validCategories, setValidcategories] = useState<string[]>([]);
   useEffect(() => {
@@ -74,6 +73,7 @@ const useCategory = () => {
   };
 
   // 현재 카테고리와 정렬 기준에 따라 쿼리 결과를 미리 fetch합니다.
+  // const queryClient = useQueryClient();
   // const fetchSelectedQuery = (newFilterOptions: ProductFilter) => {
   //   queryClient.prefetchQuery({
   //     queryKey: queryKey,
