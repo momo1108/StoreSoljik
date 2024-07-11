@@ -1,9 +1,9 @@
-import { useAuth } from '@/hooks/useAuth';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import Loading from '@/pages/loading/Loading';
 import { Navigate, Outlet } from 'react-router-dom';
 
 const ProtectedRouteForUser = () => {
-  const { userInfo, loading } = useAuth();
+  const { userInfo, loading } = useFirebaseAuth();
 
   return loading ? (
     <Loading />

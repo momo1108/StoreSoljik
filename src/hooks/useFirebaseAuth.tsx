@@ -50,7 +50,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   );
 };
 
-export const useAuth = () => {
+export const useFirebaseAuth = () => {
   return useContext(AuthContext);
 };
 

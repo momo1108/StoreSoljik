@@ -2,11 +2,11 @@ import * as S from './HeaderContentForBuyer.Style';
 import HeaderLogoBox from '../../logo/HeaderLogoBox';
 import Button from '@/components/ui/button/Button';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/hooks/useAuth';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 
 const HeaderContentForBuyer: React.FC = () => {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout } = useFirebaseAuth();
 
   return (
     <>
