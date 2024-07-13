@@ -3,10 +3,15 @@ import HeaderLogoBox from '../../logo/HeaderLogoBox';
 import Button from '@/components/ui/button/Button';
 import { useNavigate } from 'react-router-dom';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { HiShoppingCart } from 'react-icons/hi2';
+import { useCartUI } from '@/hooks/useCartUI';
+import { useCartItems } from '@/hooks/useCartItems';
 
 const HeaderContentForBuyer: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useFirebaseAuth();
+  const { toggleCart } = useCartUI();
+  const { items } = useCartItems();
 
   return (
     <>
@@ -27,6 +32,14 @@ const HeaderContentForBuyer: React.FC = () => {
           />
         </S.HeaderNavBox>
         <S.HeaderMenuBox>
+          {location.pathname === 'purchase' ? (
+            <></>
+          ) : (
+            <S.CartButton onClick={toggleCart}>
+              <HiShoppingCart size={30} />
+              <S.LengthSpan>{items.length}</S.LengthSpan>
+            </S.CartButton>
+          )}
           <Button onClick={logout}>로그아웃</Button>
         </S.HeaderMenuBox>
       </S.HeaderTopBox>

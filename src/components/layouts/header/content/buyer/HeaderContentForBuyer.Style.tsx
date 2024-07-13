@@ -55,4 +55,33 @@ export const HeaderMenuBox = styled.div`
   display: flex;
   align-items: center;
   flex-basis: fit-content;
+  gap: 16px;
+`;
+
+export const CartButton = styled.button`
+  position: relative;
+  display: flex;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  background: none;
+  &:hover > svg {
+    animation: shake-lr 0.3s cubic-bezier(0.455, 0.03, 0.515, 0.955) both;
+  }
+`;
+
+export const LengthSpan = styled.span`
+  position: absolute;
+  top: -11px;
+  right: 0px;
+  padding: 0 4px;
+  min-width: 16px;
+  height: 16px;
+  line-height: 16px;
+  text-align: center;
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  font-weight: bold;
+  color: ${({ theme }) => theme.color.background};
+  background-color: ${({ theme }) => theme.color.foreground};
+  border-radius: 8px;
 `;
