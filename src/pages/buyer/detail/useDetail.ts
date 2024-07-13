@@ -1,6 +1,8 @@
 import { ProductSchema } from '@/firebase';
+import { useCartItems } from '@/hooks/useCartItems';
+import { useCartUI } from '@/hooks/useCartUI';
 import { fetchProducts, getProductData } from '@/services/productService';
-import { QueryKey, useQuery } from '@tanstack/react-query';
+import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
 import { where } from 'firebase/firestore';
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,19 +15,24 @@ const useDetail = () => {
     navigate('/');
   }
 
-  const [cartItemQuantity, setCartItemQuantity] = useState<string>('');
+  // 구매 수량 state
+  const [cartItemQuantity, setCartItemQuantity] = useState<string>('1');
+  /**
+   * 구매 수량 input 태그의 onchange 이벤트 핸들러 함수.
+   * 값의 범위를 1 ~ 200 으로 제한합니다.
+   * @param event 이벤트 객체
+   */
   const handleOnchangeQuantityInput: ChangeEventHandler<HTMLInputElement> = (
     event,
   ) => {
-    try {
-      const parsedValue = parseInt(event.target.value);
+    const parsedValue = parseInt(event.target.value);
+    if (isNaN(parsedValue)) setCartItemQuantity('1');
+    else {
       let valueToSet = '1';
       if (parsedValue < 1) valueToSet = '1';
       else if (parsedValue > 200) valueToSet = '200';
       else valueToSet = parsedValue.toString();
       setCartItemQuantity(valueToSet);
-    } catch {
-      setCartItemQuantity('0');
     }
   };
 
@@ -40,17 +47,17 @@ const useDetail = () => {
       throw errorInstance;
     }
   };
-  const { data, status, error } = useQuery<ProductSchema>({
-    queryKey: ['product', param.id],
-    queryFn: fetchProductdata,
-  });
-
   const fetchProductRecommendList = async ({
     queryKey,
   }: {
     queryKey: QueryKey;
   }) => {
     const [, , productCategory] = queryKey;
+    if (!productCategory) {
+      const errorInstance = new Error('카테고리 정보가 로딩되기 전입니다.');
+      errorInstance.name = 'reactquery.query.product';
+      throw errorInstance;
+    }
     const productData = await fetchProducts({
       filters: [where('productCategory', '==', productCategory)],
       pageSize: 8,
@@ -63,6 +70,15 @@ const useDetail = () => {
       throw errorInstance;
     }
   };
+
+  const { data, status, error, refetch } = useQuery<ProductSchema>({
+    queryKey: ['product', param.id],
+    queryFn: fetchProductdata,
+    retry: false,
+  });
+
+  // console.log(data, status, error);
+
   const {
     data: recommendData,
     status: recommendStatus,
@@ -72,14 +88,29 @@ const useDetail = () => {
     queryFn: fetchProductRecommendList,
   });
 
-  console.log(recommendData, recommendStatus, recommendError);
+  useQueries({
+    queries:
+      recommendData === undefined
+        ? []
+        : recommendData.map((product) => ({
+            queryKey: ['product', product.id],
+            queryFn: fetchProductdata,
+          })),
+  });
+
+  // console.log(recommendData, recommendStatus, recommendError);
+
+  const { isOpen, toggleCart } = useCartUI();
+  const { checkItemIsInCart, addItem } = useCartItems();
+  const isProductInCart: boolean = checkItemIsInCart(data);
+  const handleClickPurchase = () => {};
 
   useEffect(() => {
-    if (error && status === 'error') {
-      alert(error.message);
-      navigate(-1);
-    }
-  }, [status, error]);
+    // 여기서 추천상품 스크롤 초기화?
+    console.log('param changed!');
+    setCartItemQuantity('1');
+    if (isOpen) toggleCart();
+  }, [param.id]);
 
   return {
     cartItemQuantity,
@@ -87,9 +118,13 @@ const useDetail = () => {
     data,
     status,
     error,
+    refetch,
     recommendData,
     recommendStatus,
     recommendError,
+    handleClickPurchase,
+    isProductInCart,
+    addItem,
   };
 };
 
