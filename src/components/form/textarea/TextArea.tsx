@@ -5,14 +5,14 @@ import { InputHTMLAttributes } from 'react';
 
 type TextAreaProps = ClassName &
   InputHTMLAttributes<HTMLInputElement> & {
-    isTitleVisible?: boolean;
+    titleVisibility?: 'visible' | 'invisible' | 'hidden';
     description?: string;
     reactHookForm?: UseFormRegisterReturn<string>;
   };
 
 const TextArea: React.FC<TextAreaProps> = ({
   title = 'title',
-  isTitleVisible = true,
+  titleVisibility = 'visible',
   description = '',
   placeholder = '',
   className = '',
@@ -23,7 +23,14 @@ const TextArea: React.FC<TextAreaProps> = ({
     <S.InputContainer className={className}>
       <p
         className='title'
-        style={{ visibility: isTitleVisible ? 'visible' : 'hidden' }}
+        style={
+          titleVisibility === 'hidden'
+            ? { display: 'none' }
+            : {
+                visibility:
+                  titleVisibility === 'visible' ? 'visible' : 'hidden',
+              }
+        }
       >
         {title}
       </p>
