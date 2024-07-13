@@ -4,7 +4,7 @@ import { forwardRef, InputHTMLAttributes } from 'react';
 
 type ForwardedInputProps = ClassName &
   InputHTMLAttributes<HTMLInputElement> & {
-    isTitleVisible?: boolean;
+    titleVisibility?: 'visible' | 'invisible' | 'hidden';
     description?: string;
     ref?: React.RefObject<HTMLInputElement>;
   };
@@ -12,7 +12,7 @@ type ForwardedInputProps = ClassName &
 const ForwardedInput = forwardRef<HTMLInputElement, ForwardedInputProps>(
   (
     {
-      isTitleVisible = true,
+      titleVisibility = 'visible',
       description = '',
       title = 'title',
       type = 'text',
@@ -26,7 +26,14 @@ const ForwardedInput = forwardRef<HTMLInputElement, ForwardedInputProps>(
       <S.InputContainer className={className}>
         <p
           className='title'
-          style={{ visibility: isTitleVisible ? 'visible' : 'hidden' }}
+          style={
+            titleVisibility === 'hidden'
+              ? { display: 'none' }
+              : {
+                  visibility:
+                    titleVisibility === 'visible' ? 'visible' : 'hidden',
+                }
+          }
         >
           {title}
         </p>
