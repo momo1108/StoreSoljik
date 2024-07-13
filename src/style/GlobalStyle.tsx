@@ -66,6 +66,16 @@ table {
 	border-spacing: 0;
 }
 
+/* button 초기화 */
+button {
+   background: none;
+   color: inherit;
+   border: none;
+   padding: 0;
+   font: inherit;
+   cursor: pointer;
+   outline: inherit;
+}
 
 /* font 설정 */
 @font-face {
@@ -140,6 +150,104 @@ a {
   color: inherit; 
   text-decoration: none;
 } 
+
+/* animation 설정 */
+
+@keyframes animloader {
+  0% {
+    box-shadow:
+      -38px -12px,
+      -14px 0,
+      14px 0,
+      38px 0;
+  }
+  33% {
+    box-shadow:
+      -38px 0px,
+      -14px -12px,
+      14px 0,
+      38px 0;
+  }
+  66% {
+    box-shadow:
+      -38px 0px,
+      -14px 0,
+      14px -12px,
+      38px 0;
+  }
+  100% {
+    box-shadow:
+      -38px 0,
+      -14px 0,
+      14px 0,
+      38px -12px;
+  }
+}
+
+@keyframes fontColorChanger {
+  0% {
+    color: black;
+  }
+  33% {
+    color: #333;
+  }
+  66% {
+    color: #23c;
+  }
+  100% {
+    color: black;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes prixClipFix {
+  0% {
+    clip-path: polygon(50% 50%, 0 0, 0 0, 0 0, 0 0, 0 0);
+  }
+  25% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 0, 100% 0, 100% 0);
+  }
+  50% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 100% 100%, 100% 100%);
+  }
+  75% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 100%);
+  }
+  100% {
+    clip-path: polygon(50% 50%, 0 0, 100% 0, 100% 100%, 0 100%, 0 0);
+  }
+}
+
+@keyframes shake-lr {
+  0%,
+  100% {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+    -webkit-transform-origin: 50% 50%;
+    transform-origin: 50% 50%;
+  }
+  20% {
+    -webkit-transform: rotate(5deg);
+    transform: rotate(5deg);
+  }
+  40%,
+  80% {
+    -webkit-transform: rotate(-7deg);
+    transform: rotate(-7deg);
+  }
+  60% {
+    -webkit-transform: rotate(7deg);
+    transform: rotate(7deg);
+  }
+}
 `;
 
 export default GlobalStyle;
