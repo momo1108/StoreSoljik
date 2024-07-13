@@ -70,6 +70,7 @@ const light = {
   ring: 'hsl(221.2 83.2% 53.3%)',
   radius: '0.5rem',
   gray: '#777',
+  brightGray: '#AAA',
   brighterGray: '#DDD',
   beige: '#F2F0EA',
 };
@@ -103,6 +104,7 @@ const dark = {
   ring: 'hsl(224.3 76.3% 48%)',
   radius: '0.5rem',
   gray: '#999',
+  brightGray: '#666',
   brighterGray: '#333',
   beige: '#F2F0EA',
 };
