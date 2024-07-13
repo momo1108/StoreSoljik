@@ -4,13 +4,13 @@ import { InputHTMLAttributes } from 'react';
 
 type StateInputProps = ClassName &
   InputHTMLAttributes<HTMLInputElement> & {
-    isTitleVisible?: boolean;
+    titleVisibility?: 'visible' | 'invisible' | 'hidden';
     description?: string;
     attrs?: InputHTMLAttributes<HTMLInputElement>;
   };
 
 const StateInput: React.FC<StateInputProps> = ({
-  isTitleVisible = true,
+  titleVisibility = 'visible',
   description = '',
   className = '',
   title = 'title',
@@ -24,7 +24,14 @@ const StateInput: React.FC<StateInputProps> = ({
     <S.InputContainer className={className}>
       <p
         className='title'
-        style={{ visibility: isTitleVisible ? 'visible' : 'hidden' }}
+        style={
+          titleVisibility === 'hidden'
+            ? { display: 'none' }
+            : {
+                visibility:
+                  titleVisibility === 'visible' ? 'visible' : 'hidden',
+              }
+        }
       >
         {title}
       </p>

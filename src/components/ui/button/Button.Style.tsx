@@ -3,10 +3,10 @@ import styled from 'styled-components';
 import { ButtonProps } from './Button';
 
 export const StyledButton = styled.button<
-  ButtonProps & { $styleType: 'normal' | 'primary' }
+  ButtonProps & { $styleType: 'normal' | 'primary' | 'disabled' }
 >`
   display: flex;
-  gap: 4px;
+  gap: 8px;
   justify-content: center;
   align-items: center;
   cursor: pointer;
@@ -14,10 +14,16 @@ export const StyledButton = styled.button<
   color: ${(props) =>
     props.$styleType === 'primary'
       ? props.theme.color.primaryForeground
-      : 'inherit'};
+      : props.$styleType === 'normal'
+        ? 'inherit'
+        : props.theme.color.mutedForeground};
 
   background: ${(props) =>
-    props.$styleType === 'primary' ? props.theme.color.primary : '#0000'};
+    props.$styleType === 'primary'
+      ? props.theme.color.primary
+      : props.$styleType === 'normal'
+        ? '#0000'
+        : props.theme.color.muted};
   border: 2px solid
     ${(props) =>
       props.$styleType === 'primary'
@@ -27,7 +33,9 @@ export const StyledButton = styled.button<
     background: ${(props) =>
       props.$styleType === 'primary'
         ? props.theme.color.primaryHover
-        : '#09090909'};
+        : props.$styleType === 'normal'
+          ? '#09090909'
+          : props.theme.color.muted};
     border: 2px solid
       ${(props) =>
         props.$styleType === 'primary'

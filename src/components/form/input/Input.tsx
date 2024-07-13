@@ -5,14 +5,14 @@ import { InputHTMLAttributes } from 'react';
 
 type InputProps = ClassName &
   InputHTMLAttributes<HTMLInputElement> & {
-    isTitleVisible?: boolean;
+    titleVisibility?: 'visible' | 'invisible' | 'hidden';
     description?: string;
     reactHookForm?: UseFormRegisterReturn<string>;
   };
 
 const Input: React.FC<InputProps> = ({
   title = 'title',
-  isTitleVisible = true,
+  titleVisibility = 'visible',
   description = '',
   type = 'text',
   placeholder = '',
@@ -25,7 +25,14 @@ const Input: React.FC<InputProps> = ({
     <S.InputContainer className={className}>
       <p
         className='title'
-        style={{ visibility: isTitleVisible ? 'visible' : 'hidden' }}
+        style={
+          titleVisibility === 'hidden'
+            ? { display: 'none' }
+            : {
+                visibility:
+                  titleVisibility === 'visible' ? 'visible' : 'hidden',
+              }
+        }
       >
         {title}
       </p>

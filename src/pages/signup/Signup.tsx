@@ -5,6 +5,8 @@ import VerticalRadio from '@/components/form/radio/VerticalRadio';
 import useSignup from './useSignup';
 import Spinner from '@/components/ui/spinner/Spinner';
 import Input from '@/components/form/input/Input';
+import HR from '@/components/ui/hr/HR';
+import { useTheme } from 'styled-components';
 
 const Signup: React.FC = () => {
   const {
@@ -19,6 +21,7 @@ const Signup: React.FC = () => {
     registerNickname,
     accountTypeOptions,
   } = useSignup();
+  const theme = useTheme();
 
   return (
     <>
@@ -90,7 +93,7 @@ const Signup: React.FC = () => {
               >
                 로그인으로 돌아가기
               </S.SignButton>
-              <S.SignHR />
+              <HR color={theme.color.border} />
               <h3>소셜 로그인</h3>
               <S.SigninIconBox>gd</S.SigninIconBox>
             </S.SignupInputContainer>

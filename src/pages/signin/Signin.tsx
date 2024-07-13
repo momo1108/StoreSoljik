@@ -5,6 +5,8 @@ import useSignin from './useSignin';
 import Spinner from '@/components/ui/spinner/Spinner';
 import Input from '@/components/form/input/Input';
 import signinImgUrl from '@/assets/images/signup.png';
+import HR from '@/components/ui/hr/HR';
+import { useTheme } from 'styled-components';
 
 const Signin: React.FC = () => {
   const {
@@ -17,6 +19,8 @@ const Signin: React.FC = () => {
     registerPassword,
     registerMaintainCheckbox,
   } = useSignin();
+  const theme = useTheme();
+
   return (
     <>
       <Header userType={'guest'} />
@@ -79,7 +83,7 @@ const Signin: React.FC = () => {
             >
               회원가입
             </S.SignButton>
-            <S.SignHR />
+            <HR color={theme.color.border} />
             <h3>소셜 로그인</h3>
             <S.SigninIconBox>gd</S.SigninIconBox>
           </S.SigninFormContainer>
