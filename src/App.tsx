@@ -28,6 +28,18 @@ function App() {
    * react-query 클라이언트 인스턴스 생성
    */
   const queryClient = new QueryClient();
+  queryClient.setQueryDefaults(['product'], {
+    staleTime: 1000 * 60,
+    refetchInterval: 1000 * 60,
+    refetchIntervalInBackground: false,
+    gcTime: 1000 * 60 * 30,
+  });
+  queryClient.setQueryDefaults(['products'], {
+    staleTime: 1000 * 60 * 5,
+    refetchInterval: 1000 * 60 * 5,
+    refetchIntervalInBackground: false,
+    gcTime: 1000 * 60 * 30,
+  });
 
   // ThemeProvider 의 type 을 오버라이드해서 theme 에 들어갈 타입을 지정하면 사용하기 편하지 않을까?
   return (
@@ -45,7 +57,14 @@ function App() {
           <QueryClientProvider client={queryClient}>
             <MainRouter />
             <ReactQueryDevtools initialIsOpen={false} />
-            <Toaster />
+            <Toaster
+              toastOptions={{
+                style: {
+                  padding: '15px',
+                },
+                closeButton: true,
+              }}
+            />
           </QueryClientProvider>
         </AuthProvider>
       </BrowserRouter>

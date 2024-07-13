@@ -1,15 +1,16 @@
 // import media from '@/style/media';
 import StateInput from '@/components/form/stateinput/StateInput';
-import HR from '@/components/ui/hr/HR';
 import VerticalCard from '@/components/ui/productcard/verticalcard/VerticalCard';
 import Spinner from '@/components/ui/spinner/Spinner';
 import styled from 'styled-components';
 
 export const ErrorBox = styled.div`
   display: flex;
+  flex-direction: column;
   height: 100%;
   justify-content: center;
   align-items: center;
+  gap: 24px;
 `;
 
 export const DetailContainer = styled.div`
@@ -82,6 +83,9 @@ export const PriceDiv = styled.div`
   h2 {
     color: ${(props) => props.theme.color.destructive};
   }
+  h4 {
+    padding-left: 6px;
+  }
 `;
 
 export const DescriptionP = styled.p`
@@ -90,14 +94,10 @@ export const DescriptionP = styled.p`
   line-height: ${(props) => props.theme.lineHeight.base};
 `;
 
-export const Hr = styled(HR)`
-  height: 1px;
-  background: ${(props) => props.theme.color.brighterGray};
-`;
-
 export const InfoFormBox = styled.div`
   display: flex;
   flex-direction: column;
+  width: 100%;
   gap: 10px;
 `;
 
@@ -143,7 +143,7 @@ export const ButtonBox = styled.div`
   gap: 15px;
 
   button {
-    width: 165px;
+    min-width: 165px;
   }
 `;
 
