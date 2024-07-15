@@ -6,13 +6,16 @@ import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
 import { where } from 'firebase/firestore';
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const useDetail = () => {
   const navigate = useNavigate();
   const param = useParams();
   if (!param.id) {
-    alert('존재하지 않는 상품 페이지입니다.');
-    navigate('/');
+    toast.error('존재하지 않는 상품 페이지입니다.');
+    setTimeout(() => {
+      navigate('/');
+    }, 1000);
   }
 
   // 구매 수량 state
@@ -113,7 +116,6 @@ const useDetail = () => {
 
   useEffect(() => {
     // 여기서 추천상품 스크롤 초기화?
-    console.log('param changed!');
     setCartItemQuantity('1');
     if (isOpen) toggleCart();
   }, [param.id]);

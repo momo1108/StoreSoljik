@@ -18,6 +18,7 @@ import { StorageError } from 'firebase/storage';
 import { MouseEventHandler, useEffect } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const useItems = () => {
   const { userInfo } = useFirebaseAuth();
@@ -109,7 +110,7 @@ const useItems = () => {
         },
       );
 
-      alert('상품 삭제를 완료했습니다.');
+      toast.success('상품 삭제를 완료했습니다.');
 
       return { previousData };
     },
@@ -118,11 +119,11 @@ const useItems = () => {
       console.error(productId, err);
       queryClient.setQueryData(['products', 'seller'], context!.previousData);
       if (err.name === 'firebase.store.product.delete') {
-        alert(
+        toast.error(
           '상품 삭제 도중 에러가 발생했습니다. 제품 이미지가 삭제된 상태이니 반드시 다시 삭제를 진행해주세요.',
         );
       } else if (err.name === 'firebase.storage.image.delete') {
-        alert(
+        toast.error(
           '상품 이미지 삭제 도중 에러가 발생했습니다. 제품 이미지의 일부가가 삭제된 상태이니 반드시 다시 삭제를 시도해주세요.',
         );
       }

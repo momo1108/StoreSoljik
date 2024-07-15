@@ -16,6 +16,7 @@ import {
   getAllCategories,
   updateCategory,
 } from '@/services/categoryService';
+import { toast } from 'sonner';
 
 const useRegistration = () => {
   const navigate = useNavigate();
@@ -103,18 +104,22 @@ const useRegistration = () => {
       }
 
       // 완료 후 판매 상품 페이지로 이동
-      alert('판매 상품 등록이 완료됐습니다!');
-      navigate('/items');
+      toast.success('판매 상품 등록이 완료됐습니다!');
+      setTimeout(() => {
+        navigate('/items');
+      }, 1000);
     } catch (error: unknown) {
       if (error instanceof StorageError) {
         await deleteProductImages(id);
-        alert(
+        toast.error(
           '제품 이미지 업로드에 실패했습니다. 잠시 후에 다시 시도해주세요.',
         );
       } else if (error instanceof FirestoreError) {
         await deleteProductImages(id);
         await deleteProductDocument(id);
-        alert('제품정보 저장에 실패했습니다. 잠시 후에 다시 시도해주세요.');
+        toast.error(
+          '제품정보 저장에 실패했습니다. 잠시 후에 다시 시도해주세요.',
+        );
       }
     }
   };

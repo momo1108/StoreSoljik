@@ -17,6 +17,7 @@ import {
 import { DocumentData, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { FirebaseError } from 'firebase/app';
+import { toast } from 'sonner';
 
 type AccountType = '구매자' | '판매자';
 
@@ -113,7 +114,7 @@ const useProvideAuth = () => {
             await deleteDoc(doc(db, 'user', auth.currentUser.uid));
             await deleteUser(auth.currentUser);
           }
-          alert('가입에 실패했습니다. 다시 시도해주세요.');
+          toast.error('가입에 실패했습니다. 다시 시도해주세요.');
         }
       } else {
         const userInfo = formatUser(user, 'User');
