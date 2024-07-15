@@ -1,6 +1,5 @@
 import * as S from './HeaderContentForBuyer.Style';
 import HeaderLogoBox from '../../logo/HeaderLogoBox';
-import Button from '@/components/ui/button/Button';
 import { useNavigate } from 'react-router-dom';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { HiShoppingCart } from 'react-icons/hi2';
@@ -32,7 +31,7 @@ const HeaderContentForBuyer: React.FC = () => {
           />
         </S.HeaderNavBox>
         <S.HeaderMenuBox>
-          {location.pathname === 'purchase' ? (
+          {location.pathname === '/purchase' ? (
             <></>
           ) : (
             <S.CartButton onClick={toggleCart}>
@@ -40,7 +39,7 @@ const HeaderContentForBuyer: React.FC = () => {
               <S.LengthSpan>{items.length}</S.LengthSpan>
             </S.CartButton>
           )}
-          <Button onClick={logout}>로그아웃</Button>
+          <S.SignoutButton onClick={logout}>로그아웃</S.SignoutButton>
         </S.HeaderMenuBox>
       </S.HeaderTopBox>
     </>

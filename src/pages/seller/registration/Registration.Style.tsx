@@ -70,7 +70,7 @@ export const WarningMessageP = styled.p`
   color: ${(props) => props.theme.color.invalid};
 `;
 
-export const RegistrationContentBox = styled.div`
+export const RegistrationContentContainer = styled.div`
   display: grid;
   width: 1140px;
   flex-grow: 1;
@@ -81,7 +81,7 @@ export const RegistrationContentBox = styled.div`
   }
 `;
 
-export const RegistrationContentColumnContainer = styled.div`
+export const RegistrationContentColumnBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 25px;
@@ -92,9 +92,10 @@ export const RegistrationContentItemBox = styled.div`
   flex-direction: column;
   gap: 20px;
   padding: 25px 40px 35px 40px;
-  background: #fafafa;
   border-radius: 20px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
 `;
 
 export const RegistrationContentImageBox = styled(RegistrationContentItemBox)`
