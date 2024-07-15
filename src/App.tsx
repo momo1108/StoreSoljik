@@ -58,6 +58,7 @@ function App() {
             <MainRouter />
             <ReactQueryDevtools initialIsOpen={false} />
             <Toaster
+              richColors
               toastOptions={{
                 style: {
                   padding: '15px',

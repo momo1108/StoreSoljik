@@ -10,6 +10,7 @@ import { UserSchema, auth, db } from '@/firebase';
 import { FirestoreError, doc, setDoc } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
 import { MouseEventHandler } from 'react';
+import { toast } from 'sonner';
 
 type SignupFormDataType = {
   email: string;
@@ -56,18 +57,23 @@ const useSignup = () => {
         displayName: `${data.nickname}#${data.accountType}`,
       });
 
-      alert('회원 가입 완료');
+      toast.success('회원 가입 완료');
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {
         if (error.code === 'auth/email-already-in-use') {
-          alert('이미 가입된 이메일입니다.');
+          toast.error('이미 가입된 이메일입니다.');
         } else {
-          alert(error);
+          toast.error(error.message);
         }
       } else if (error instanceof FirestoreError) {
-        if (auth.currentUser) await deleteUser(auth.currentUser);
+        if (auth.currentUser) {
+          await deleteUser(auth.currentUser);
+          toast.error(
+            '가입 정보 등록에 실패했습니다. 다시 회원가입을 시도해주세요.',
+          );
+        }
       } else {
-        alert(error);
+        toast.error((error as Error).message);
       }
     }
   };

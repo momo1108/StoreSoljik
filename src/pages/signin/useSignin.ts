@@ -8,6 +8,7 @@ import {
 import { auth } from '@/firebase';
 import { FirebaseError } from 'firebase/app';
 import { MouseEventHandler } from 'react';
+import { toast } from 'sonner';
 
 type SigninFormDataType = {
   email: string;
@@ -40,12 +41,12 @@ const useSignin = () => {
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {
         if (error.code === 'auth/invalid-credential') {
-          alert('잘못된 ID 혹은 비밀번호입니다.');
+          toast.error('잘못된 ID 혹은 비밀번호입니다.');
         } else {
-          alert(error);
+          toast.error(error.message);
         }
       } else {
-        alert(error);
+        toast.error((error as Error).message);
       }
     }
   };

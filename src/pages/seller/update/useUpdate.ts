@@ -10,6 +10,7 @@ import {
   deleteProductImages,
   uploadProductImage,
 } from '@/services/productService';
+import { toast } from 'sonner';
 
 const useUpdate = () => {
   const navigate = useNavigate();
@@ -151,18 +152,22 @@ const useUpdate = () => {
       await setDoc(doc(db, 'product', originalProductData!.id), documentData);
 
       // 완료 후 판매 상품 페이지로 이동
-      alert('판매 상품 등록이 완료됐습니다!');
-      navigate('/items');
+      toast.success('판매 상품 등록이 완료됐습니다!');
+      setTimeout(() => {
+        navigate('/items');
+      }, 1000);
     } catch (error: unknown) {
       if (error instanceof StorageError) {
         await deleteProductImages(originalProductData!.id);
-        alert(
+        toast.error(
           '제품 이미지 업데이트 과정 중간에 에러가 발생했습니다. 원본 이미지 파일이 삭제된 상태이니 잠시 후에 반드시 다시 시도해주세요.',
         );
       } else if (error instanceof FirestoreError) {
         await deleteProductImages(originalProductData!.id);
         await deleteProductDocument(originalProductData!.id);
-        alert('제품정보 업데이트에 실패했습니다. 잠시 후에 다시 시도해주세요.');
+        toast.error(
+          '제품정보 업데이트에 실패했습니다. 잠시 후에 다시 시도해주세요.',
+        );
       }
     }
   };
