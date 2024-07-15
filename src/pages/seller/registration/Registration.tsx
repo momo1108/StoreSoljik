@@ -49,8 +49,8 @@ const Registration: React.FC = () => {
             현재 페이지를 벗어나는 경우 작성된 내용은 모두 사라집니다.
           </S.WarningMessageP>
 
-          <S.RegistrationContentBox>
-            <S.RegistrationContentColumnContainer>
+          <S.RegistrationContentContainer>
+            <S.RegistrationContentColumnBox>
               <S.RegistrationContentImageBox>
                 <h3>상품 이미지 등록</h3>
                 {errors.images && errors.images.message ? (
@@ -92,9 +92,9 @@ const Registration: React.FC = () => {
                   }
                 />
               </S.RegistrationContentItemBox>
-            </S.RegistrationContentColumnContainer>
+            </S.RegistrationContentColumnBox>
 
-            <S.RegistrationContentColumnContainer>
+            <S.RegistrationContentColumnBox>
               <S.RegistrationContentItemBox>
                 <h3>판매 상품 정보</h3>
                 <Input
@@ -132,8 +132,8 @@ const Registration: React.FC = () => {
                   }
                 />
               </S.RegistrationContentItemBox>
-            </S.RegistrationContentColumnContainer>
-          </S.RegistrationContentBox>
+            </S.RegistrationContentColumnBox>
+          </S.RegistrationContentContainer>
         </S.RegistrationForm>
       </Main>
     </>

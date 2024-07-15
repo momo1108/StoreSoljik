@@ -5,14 +5,14 @@ import Spinner from '@/components/ui/spinner/Spinner';
 // import media from '@/style/media';
 import styled from 'styled-components';
 
-export const RegistrationMain = styled(Main)`
+export const UpdateMain = styled(Main)`
   flex-direction: column;
   justify-content: start;
   align-items: center;
   gap: 10px;
 `;
 
-export const RegistrationForm = styled.form`
+export const UpdateForm = styled.form`
   display: flex;
   flex-direction: column;
   justify-content: start;
@@ -20,7 +20,7 @@ export const RegistrationForm = styled.form`
   gap: 10px;
 `;
 
-export const RegistrationTitleBox = styled.div`
+export const UpdateTitleBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -29,24 +29,24 @@ export const RegistrationTitleBox = styled.div`
   box-sizing: border-box;
 `;
 
-export const RegistrationTitleHeader = styled(H2)`
+export const UpdateTitleHeader = styled(H2)`
   display: flex;
   align-items: center;
   gap: 12px;
 `;
 
-export const RegistrationSubmitBox = styled.div`
+export const UpdateSubmitBox = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
 `;
 
-export const RegistrationSpinner = styled(Spinner)`
+export const UpdateSpinner = styled(Spinner)`
   font-size: ${(props) => props.theme.fontSize.md};
   color: ${(props) => props.theme.color.primary};
 `;
 
-export const RegistrationSubmitButton = styled(Button)<{ $iconSize: number }>`
+export const UpdateSubmitButton = styled(Button)<{ $iconSize: number }>`
   background: ${(props) => props.theme.color.primary};
   color: ${(props) => props.theme.color.primaryForeground};
   font-size: ${(props) => props.theme.fontSize.lg};
@@ -70,7 +70,7 @@ export const WarningMessageP = styled.p`
   color: ${(props) => props.theme.color.invalid};
 `;
 
-export const RegistrationContentBox = styled.div`
+export const UpdateContentContainer = styled.div`
   display: grid;
   width: 1140px;
   flex-grow: 1;
@@ -81,30 +81,31 @@ export const RegistrationContentBox = styled.div`
   }
 `;
 
-export const RegistrationContentColumnContainer = styled.div`
+export const UpdateContentColumnBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 25px;
 `;
 
-export const RegistrationContentItemBox = styled.div`
+export const UpdateContentItemBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 20px;
   padding: 25px 40px 35px 40px;
-  background: #fafafa;
   border-radius: 20px;
-  box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
 `;
 
-export const RegistrationContentImageBox = styled(RegistrationContentItemBox)`
+export const UpdateContentImageBox = styled(UpdateContentItemBox)`
   & > span.errorSpan {
     font-weight: bold;
     color: ${(props) => props.theme.color.invalid};
   }
 `;
 
-export const RegistrationContentImagePreviewBox = styled.div`
+export const UpdateContentImagePreviewBox = styled.div`
   display: grid;
   height: 350px;
   gap: 10px;
