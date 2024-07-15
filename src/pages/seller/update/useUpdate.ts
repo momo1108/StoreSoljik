@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import { FirestoreError, doc, setDoc } from 'firebase/firestore';
-import { ProductFormData, ProductSchema, db } from '@/firebase';
+import { db } from '@/firebase';
 import { StorageError } from 'firebase/storage';
 import {
   deleteProductDocument,
@@ -11,6 +11,8 @@ import {
   uploadProductImage,
 } from '@/services/productService';
 import { toast } from 'sonner';
+import { ProductFormData } from '@/types/FormType';
+import { ProductSchema } from '@/types/FirebaseType';
 
 const useUpdate = () => {
   const navigate = useNavigate();

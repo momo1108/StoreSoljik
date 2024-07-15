@@ -6,18 +6,13 @@ import {
   deleteUser,
   updateProfile,
 } from 'firebase/auth';
-import { UserSchema, auth, db } from '@/firebase';
+import { auth, db } from '@/firebase';
 import { FirestoreError, doc, setDoc } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
 import { MouseEventHandler } from 'react';
 import { toast } from 'sonner';
-
-type SignupFormDataType = {
-  email: string;
-  password: string; // DB 에는 저장하지 않는 필드(인증은 Authentication 으로만 진행)
-  accountType: '구매자' | '판매자';
-  nickname: string;
-};
+import { UserSchema } from '@/types/FirebaseType';
+import { SignupFormDataType } from '@/types/FormType';
 
 const useSignup = () => {
   const navigate = useNavigate();

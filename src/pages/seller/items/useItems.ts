@@ -1,4 +1,3 @@
-import { ProductSchema } from '@/firebase';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { updateCategory } from '@/services/categoryService';
 import {
@@ -8,6 +7,7 @@ import {
   FetchInfiniteProductsResult,
   PageParamType,
 } from '@/services/productService';
+import { ProductSchema } from '@/types/FirebaseType';
 import {
   useInfiniteQuery,
   useMutation,

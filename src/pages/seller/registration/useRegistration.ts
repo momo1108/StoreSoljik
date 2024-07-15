@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { useEffect, useState } from 'react';
 import { FirestoreError, doc, setDoc } from 'firebase/firestore';
-import { ProductFormData, ProductSchema, db } from '@/firebase';
+import { db } from '@/firebase';
 import { v4 as uuidv4 } from 'uuid';
 import { StorageError } from 'firebase/storage';
 import {
@@ -17,6 +17,8 @@ import {
   updateCategory,
 } from '@/services/categoryService';
 import { toast } from 'sonner';
+import { ProductFormData } from '@/types/FormType';
+import { ProductSchema } from '@/types/FirebaseType';
 
 const useRegistration = () => {
   const navigate = useNavigate();
