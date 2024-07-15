@@ -52,7 +52,7 @@ const useDetail = () => {
   }: {
     queryKey: QueryKey;
   }) => {
-    const [, , productCategory] = queryKey;
+    const [, productCategory] = queryKey;
     if (!productCategory) {
       const errorInstance = new Error('카테고리 정보가 로딩되기 전입니다.');
       errorInstance.name = 'reactquery.query.product';
@@ -63,7 +63,8 @@ const useDetail = () => {
       pageSize: 8,
     });
 
-    if (productData) return productData;
+    if (productData)
+      return { category: productCategory as string, result: productData };
     else {
       const errorInstance = new Error('존재하지 않는 상품입니다.');
       errorInstance.name = 'firebase.store.product.read';
@@ -83,8 +84,11 @@ const useDetail = () => {
     data: recommendData,
     status: recommendStatus,
     error: recommendError,
-  } = useQuery<ProductSchema[]>({
-    queryKey: ['product', param.id, data?.productCategory, 'recommendation'],
+  } = useQuery<{
+    category: string;
+    result: ProductSchema[];
+  }>({
+    queryKey: ['products', data?.productCategory, 'recent'],
     queryFn: fetchProductRecommendList,
   });
 
@@ -92,10 +96,12 @@ const useDetail = () => {
     queries:
       recommendData === undefined
         ? []
-        : recommendData.map((product) => ({
-            queryKey: ['product', product.id],
-            queryFn: fetchProductdata,
-          })),
+        : recommendData.result
+            .filter((product) => product.id !== data?.id)
+            .map((product) => ({
+              queryKey: ['product', product.id],
+              queryFn: fetchProductdata,
+            })),
   });
 
   // console.log(recommendData, recommendStatus, recommendError);

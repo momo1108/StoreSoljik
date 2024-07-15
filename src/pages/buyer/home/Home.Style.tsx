@@ -30,6 +30,9 @@ export const HomeTitleHeader = styled(H2)`
 
 export const HotItemCarouselSkeleton = styled.div`
   box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   width: 100%;
   height: 295px;
   padding: 20px 0;
@@ -67,6 +70,16 @@ export const CategoryButton = styled(Button)`
 export const ProductCardList = styled.ul`
   display: flex;
   gap: 20px;
+`;
+
+export const ErrorBox = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 380px;
+  background: #eee;
+  border-radius: ${(props) => props.theme.color.radius};
 `;
 
 export const VerticalCardSkeleton = styled.div`
