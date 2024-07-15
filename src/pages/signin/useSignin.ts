@@ -9,12 +9,7 @@ import { auth } from '@/firebase';
 import { FirebaseError } from 'firebase/app';
 import { MouseEventHandler } from 'react';
 import { toast } from 'sonner';
-
-type SigninFormDataType = {
-  email: string;
-  password: string;
-  isMaintainChecked: boolean;
-};
+import { SigninFormDataType } from '@/types/FormType';
 
 const useSignin = () => {
   const navigate = useNavigate();

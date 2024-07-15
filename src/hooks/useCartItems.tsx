@@ -1,4 +1,3 @@
-import { ProductSchema } from '@/firebase';
 import {
   createContext,
   useContext,
@@ -8,6 +7,7 @@ import {
   useEffect,
 } from 'react';
 import { useFirebaseAuth } from './useFirebaseAuth';
+import { ProductSchema } from '@/types/FirebaseType';
 
 interface CartItem {
   id: string;

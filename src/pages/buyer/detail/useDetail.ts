@@ -1,7 +1,7 @@
-import { ProductSchema } from '@/firebase';
 import { useCartItems } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
 import { fetchProducts, getProductData } from '@/services/productService';
+import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
 import { where } from 'firebase/firestore';
 import { ChangeEventHandler, useEffect, useState } from 'react';

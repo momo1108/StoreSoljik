@@ -1,4 +1,5 @@
-import { db, ProductSchema, storage } from '@/firebase';
+import { db, storage } from '@/firebase';
+import { ProductSchema } from '@/types/FirebaseType';
 import {
   collection,
   deleteDoc,
