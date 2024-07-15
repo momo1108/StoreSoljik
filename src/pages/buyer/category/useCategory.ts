@@ -29,7 +29,7 @@ const useCategory = () => {
   }, [setValidcategories]);
 
   const [filterOptions, setFilterOptions] = useState<ProductFilter>({
-    category: state ? state.category : '전체',
+    category: state?.category || '전체',
     field: 'createdAt',
     direction: 'desc',
   });
