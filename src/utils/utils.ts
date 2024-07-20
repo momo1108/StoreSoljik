@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 export const checkPathIsActive: (path: string) => boolean = (path) => {
   if (path === '/') {
     return path === location.pathname;
@@ -29,3 +31,39 @@ export function compareArray<T>(array1: Array<T>, array2: Array<T>): boolean {
 
 export const sleep: (delay: number) => Promise<void> = (delay) =>
   new Promise((resolve) => setTimeout(resolve, delay));
+
+type MessageObject = {
+  message?: string;
+  description?: string;
+};
+
+type LoadScript = (
+  src: string,
+  successMessages: MessageObject,
+  errorMessages: MessageObject,
+) => Promise<void>;
+
+export const loadScript: LoadScript = (src, successMessages, errorMessages) => {
+  return new Promise((resolve, reject) => {
+    if (document.getElementById('KakaoPostcodeApi')) resolve();
+    else {
+      const script = document.createElement('script');
+      script.id = 'KakaoPostcodeApi';
+      script.src = src;
+      script.async = true;
+      script.onload = () => {
+        toast.info(successMessages.message, {
+          description: successMessages.description,
+        });
+        resolve();
+      };
+      script.onerror = () => {
+        toast.error(errorMessages.message, {
+          description: errorMessages.description,
+        });
+        reject(new Error(`Failed to load script ${src}`));
+      };
+      document.body.appendChild(script);
+    }
+  });
+};
