@@ -25,6 +25,9 @@ export type ProductFormData = {
   productQuantity: string;
 };
 
+/**
+ * react-hook-form 에서 사용할 구매자 정보 입력필드들
+ */
 export type PurchaseFormData = {
   buyerName: string;
   buyerPhoneNumber: string;

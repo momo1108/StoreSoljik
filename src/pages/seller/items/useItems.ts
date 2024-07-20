@@ -15,7 +15,7 @@ import {
 } from '@tanstack/react-query';
 import { FirestoreError, orderBy, where } from 'firebase/firestore';
 import { StorageError } from 'firebase/storage';
-import { MouseEventHandler, useEffect } from 'react';
+import { MouseEventHandler, useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -33,6 +33,7 @@ const useItems = () => {
     navigate('/update', { state: { data: copiedData } });
   };
 
+  const [pageSize] = useState<number>(10);
   const queryFnWrapper: ({
     pageParam,
   }: {
@@ -42,7 +43,7 @@ const useItems = () => {
       pageParam,
       filters: [where('sellerEmail', '==', userInfo?.email)],
       sortOrders: [orderBy('createdAt', 'desc')],
-      pageSize: 10,
+      pageSize: pageSize,
     });
 
   const { data, status, error, fetchNextPage, isFetchingNextPage, isLoading } =
@@ -50,7 +51,10 @@ const useItems = () => {
       queryKey: ['products', 'seller'],
       queryFn: queryFnWrapper,
       initialPageParam: null,
-      getNextPageParam: (lastPage) => lastPage.nextPage,
+      getNextPageParam: (lastPage) =>
+        lastPage.documentArray && lastPage.documentArray.length > pageSize
+          ? lastPage.documentArray[pageSize]
+          : null,
     });
 
   const deleteItemFromDB = async ({
@@ -90,29 +94,61 @@ const useItems = () => {
       await queryClient.cancelQueries({ queryKey: ['products', 'seller'] });
 
       const previousData = queryClient.getQueryData(['products', 'seller']);
+      const copiedPreviousData = JSON.parse(JSON.stringify(previousData));
 
       // Optimistic Update: 아이템을 미리 제거합니다.
-      queryClient.setQueryData(
+      const result = queryClient.setQueryData(
         ['products', 'seller'],
         (oldData: {
           pages: FetchInfiniteProductsResult[];
-          pageParams: PageParamType;
+          pageParams: PageParamType[];
         }) => {
-          return {
-            ...oldData,
-            pages: oldData.pages.map((page: FetchInfiniteProductsResult) => ({
-              ...page,
-              items: page.documentArray.filter(
-                (product) => product.id !== productId,
-              ),
-            })),
+          const flattenedDataArray = oldData.pages
+            .map((page: FetchInfiniteProductsResult) =>
+              page.dataArray.slice(0, pageSize),
+            )
+            .flat()
+            .filter((product) => product.id !== productId);
+          const flattenedDocumentArray = oldData.pages
+            .map((page: FetchInfiniteProductsResult) =>
+              page.documentArray.slice(0, pageSize),
+            )
+            .flat()
+            .filter((product) => product.id !== productId);
+          const totalLength = flattenedDataArray.length;
+
+          const newData: {
+            pages: FetchInfiniteProductsResult[];
+            pageParams: PageParamType[];
+          } = {
+            pages: [
+              {
+                dataArray: flattenedDataArray.slice(0, pageSize + 1),
+                documentArray: flattenedDocumentArray.slice(0, pageSize + 1),
+              },
+            ],
+            pageParams: [null],
           };
+
+          for (let i = 1; i <= Math.floor(totalLength / pageSize); i++) {
+            newData.pages.push({
+              dataArray: flattenedDataArray.slice(
+                i * pageSize,
+                (i + 1) * pageSize + 1,
+              ),
+              documentArray: flattenedDocumentArray.slice(0, pageSize + 1),
+            });
+            newData.pageParams.push(flattenedDocumentArray[i * pageSize]);
+          }
+
+          return newData;
         },
       );
 
-      toast.success('상품 삭제를 완료했습니다.');
+      console.log('optimistic done!');
+      console.log(result);
 
-      return { previousData };
+      return { previousData: copiedPreviousData };
     },
     onError: (err, productId, context) => {
       // 에러 발생 시 이전 데이터를 복원합니다.
@@ -127,6 +163,9 @@ const useItems = () => {
           '상품 이미지 삭제 도중 에러가 발생했습니다. 제품 이미지의 일부가가 삭제된 상태이니 반드시 다시 삭제를 시도해주세요.',
         );
       }
+    },
+    onSuccess: () => {
+      toast.success('상품 삭제를 완료했습니다.');
     },
     onSettled: () => {
       // 성공/실패와 관계없이 무효화하여 최신 데이터를 가져오게 합니다.
@@ -155,6 +194,7 @@ const useItems = () => {
     isLoading,
     navigateToUpdate,
     deleteItem,
+    pageSize,
   };
 };
 

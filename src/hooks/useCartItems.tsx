@@ -9,7 +9,7 @@ import {
 import { useFirebaseAuth } from './useFirebaseAuth';
 import { ProductSchema } from '@/types/FirebaseType';
 
-interface CartItem {
+export interface CartItem {
   id: string;
   productName: string;
   productPrice: number;
