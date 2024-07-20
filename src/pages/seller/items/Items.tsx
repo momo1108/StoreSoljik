@@ -19,6 +19,7 @@ const Items: React.FC = () => {
     ref,
     navigateToUpdate,
     deleteItem,
+    pageSize,
   } = useItems();
   return (
     <>
@@ -50,7 +51,7 @@ const Items: React.FC = () => {
                 </S.ErrorBox>
               ) : (
                 data?.pages.map((page) => {
-                  return page.documentArray.slice(0, 10).map((item) => {
+                  return page.dataArray.slice(0, pageSize).map((item) => {
                     return (
                       <HorizontalCard
                         data={item}

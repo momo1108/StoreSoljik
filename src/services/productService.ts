@@ -90,11 +90,16 @@ type FetchInfiniteProductsParams = {
   pageSize?: number;
 };
 
-export type PageParamType = QueryDocumentSnapshot<DocumentData, DocumentData>;
+export type QueryDocumentType = QueryDocumentSnapshot<
+  DocumentData,
+  DocumentData
+>;
+
+export type PageParamType = QueryDocumentType | null;
 
 export type FetchInfiniteProductsResult = {
-  documentArray: ProductSchema[];
-  nextPage: PageParamType | null;
+  dataArray: ProductSchema[];
+  documentArray: QueryDocumentType[];
 };
 
 type FetchProductsParams = {
@@ -148,18 +153,13 @@ export const fetchInfiniteProducts = async ({
 
   const productsQuery = buildFirestoreQuery(db, 'product', constraints);
   const productDocuments = await getDocs(productsQuery);
-  const documentArray: ProductSchema[] = productDocuments.docs.map(
+  const dataArray: ProductSchema[] = productDocuments.docs.map(
     (doc) => doc.data() as ProductSchema,
   );
 
-  const nextPage =
-    productDocuments.docs.length > pageSize
-      ? productDocuments.docs[pageSize]
-      : null;
-
   return {
-    documentArray,
-    nextPage,
+    dataArray,
+    documentArray: productDocuments.docs,
   };
 };
 

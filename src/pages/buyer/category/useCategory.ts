@@ -45,6 +45,7 @@ const useCategory = () => {
     filterOptions.direction,
   ];
 
+  const [pageSize] = useState<number>(8);
   const fetchProductsWrapper = async ({
     pageParam,
     filterOptions,
@@ -67,7 +68,7 @@ const useCategory = () => {
                 ['createdAt', 'desc'],
               ]) as [string, 'asc' | 'desc'][]
         ).map((order) => orderBy(...order)),
-        pageSize: 8,
+        pageSize: pageSize,
       });
     } catch (error) {
       toast.error(`데이터 로딩에 실패했습니다.\n${(error as Error).message}`);
@@ -98,7 +99,10 @@ const useCategory = () => {
         unknown
       >,
       initialPageParam: null,
-      getNextPageParam: (lastPage) => lastPage.nextPage,
+      getNextPageParam: (lastPage) =>
+        lastPage.documentArray.length > pageSize
+          ? lastPage.documentArray[pageSize]
+          : null,
     });
 
   const { ref, inView } = useInView({
@@ -122,6 +126,7 @@ const useCategory = () => {
     isFetchingNextPage,
     isLoading,
     ref,
+    pageSize,
   };
 };
 
