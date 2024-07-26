@@ -14,6 +14,7 @@ import { orderBy, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useLocation } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const useCategory = () => {
   const { state } = useLocation();
@@ -24,12 +25,13 @@ const useCategory = () => {
         setValidcategories(res);
       })
       .catch((err) => {
+        toast.error((err as Error).message);
         console.log(err);
       });
   }, [setValidcategories]);
 
   const [filterOptions, setFilterOptions] = useState<ProductFilter>({
-    category: state ? state.category : '전체',
+    category: state?.category || '전체',
     field: 'createdAt',
     direction: 'desc',
   });
@@ -43,6 +45,7 @@ const useCategory = () => {
     filterOptions.direction,
   ];
 
+  const [pageSize] = useState<number>(8);
   const fetchProductsWrapper = async ({
     pageParam,
     filterOptions,
@@ -65,9 +68,10 @@ const useCategory = () => {
                 ['createdAt', 'desc'],
               ]) as [string, 'asc' | 'desc'][]
         ).map((order) => orderBy(...order)),
-        pageSize: 8,
+        pageSize: pageSize,
       });
     } catch (error) {
+      toast.error(`데이터 로딩에 실패했습니다.\n${(error as Error).message}`);
       console.log(error);
     }
   };
@@ -95,7 +99,10 @@ const useCategory = () => {
         unknown
       >,
       initialPageParam: null,
-      getNextPageParam: (lastPage) => lastPage.nextPage,
+      getNextPageParam: (lastPage) =>
+        lastPage.documentArray.length > pageSize
+          ? lastPage.documentArray[pageSize]
+          : null,
     });
 
   const { ref, inView } = useInView({
@@ -119,6 +126,7 @@ const useCategory = () => {
     isFetchingNextPage,
     isLoading,
     ref,
+    pageSize,
   };
 };
 

@@ -8,8 +8,13 @@
   <p align="center">
     1인 개발 커머스 프로젝트 입니다.
     <br />
+    <img src="src/assets/images/main_screenshot.png" width="600" alt="main_screenshot">
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template" ><s>데모 사이트(대부분 페이지 단위 구현이 완료될 때 마다 버전을 업데이트하고 있습니다.)</s></a>
+    <a href="https://github.com/othneildrew/Best-README-Template" >데모 사이트</a>
+    <br />
+    테스트 판매자 계정 : momo1108@daum.net / 1q2w3e4r!@
+    <br />
+    테스트 구매자 계정 : test@test.com / 1q2w3e4r!@
     <br />
     Contact : banghyechan@gmail.com
   </p>
@@ -42,6 +47,18 @@
     <li>
       <a href="#prettier">Prettier</a>
     </li>
+    <li>
+      <a href="#prettier">Prettier</a>
+    </li>
+    <li>
+      <a href="#관련-vscode-설정">관련 VSCode 설정</a>
+    </li>
+    <li>
+      <a href="#트러블-슈팅">트러블 슈팅</a>
+    </li>
+    <li>
+      <a href="#최적화">최적화</a>
+    </li>
   </ol>
 </details>
 
@@ -51,9 +68,6 @@
 <br />
 
 ## 프로젝트 소개
-
-<img src="src/assets/images/main_screenshot.png" alt="hr">
-
 세상에는 수많은 종류의 커머스들이 존재합니다. 그러나, 리뷰에 관해서는 신뢰성이 보장되지 않는다는 공통점이 존재합니다. 이 프로젝트는 그러한 불만을 해소하기 위해 만들어졌습니다.
 
 **어떻게?**
@@ -62,6 +76,15 @@
 > - 상품마다 실시간 소통이 가능한 채팅 기능을 통해, 실제 구매자와 궁금한 점들을 소통할 수 있습니다.
 
 이 프로젝트의 목적은 단순한 기능개발 뿐 아니라, 최적화와 관련된 스킬을 익히는 것을 목적으로 합니다.
+
+<br />
+
+### 구현 기능
+1. 회원가입 / 로그인 / 로그아웃
+2. 판매자 판매상품 CRUD
+3. 구매자 상품 조회, 구매
+
+
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -190,7 +213,6 @@
  │   └──📁 form
  │   └──📁 layouts
  ├──📁 pages
- ├──📁 context
  ├──📁 router
  ├──📁 hooks
  ├──📁 utils
@@ -209,41 +231,17 @@
   <summary><b>구조 설명</b></summary>
 <br>
 
-### assets
-프로젝트의 이미지, 폰트 파일 등 코드와 관련없는 파일들을 저장합니다.
-
-### components
-기능별로 코드를 세분화하여 컴포넌트로 저장합니다.
-
-1. 버튼, 모달, 카드 등의 사용자 인터페이스 요소가 포함된 ui 폴더
-2. input, checkbox, date picker 등 form과 관련된 제어를 하기 위한 form 폴더
-3. 사이드바나 내비게이션 바, 컨테이너 등 레이아웃을 기반으로 하는 layouts 폴더
-
-### pages
-각 페이지의 폴더가 위치하며, 각 페이지의 루트 파일(index.tsx)과 해당 페이지에 속하는 모든 파일(ex. Login.Styled.ts, LoginForm.tsx 컴포넌트, useLogin.ts 훅)을 저장하여 페이지별 코드와 전역 코드를 분리합니다.
-
-페이지 관련 코드를 한 곳에 모두 모아놓기 때문에, 이해하기가 쉬워집니다.
-
-### context
-여러 React Context API 파일을 저장합니다.
-
-### router
-페이지 라우팅 관련 파일을 저장합니다.
-
-### hooks
-여러 페이지에서 사용되는 전역 hook 들을 저장합니다. 특정 페이지에서만 사용되는 hook 은 해당 페이지 폴더에 저장합니다.
-
-### utils
-모든 유틸리티 기능들을 저장합니다.
-
-### services
-외부 API와 상호작용하는 모든 코드들을 저장합니다.(ex. Firebase 에서 상품 목록 불러오기 등의 비즈니스 로직 코드)
-
-### style
-styled componets 에 사용할 글로벌 스타일이나 테마를 저장합니다.
-
-### tests
-모든 테스트 코드들을 저장합니다.
+|디렉토리명|역할|
+|:---|:---|
+|**assets**|프로젝트의 이미지, 폰트 파일 등 코드와 관련없는 파일들을 저장합니다.|
+|**components**|기능별로 코드를 세분화하여 컴포넌트로 저장합니다.<br><br>1. 버튼, 모달, 카드 등의 사용자 인터페이스 요소가 포함된 ui 폴더<br>2. input, checkbox, date picker 등 form과 관련된 제어를 하기 위한 form 폴더<br>3. 사이드바나 내비게이션 바, 컨테이너 등 레이아웃을 기반으로 하는 layouts 폴더|
+|**pages**|각 페이지의 폴더가 위치하며, 각 페이지의 루트 파일(index.tsx)과 해당 페이지에 속하는 모든 파일(ex. Login.Styled.ts, LoginForm.tsx 컴포넌트, useLogin.ts 훅)을 저장하여 페이지별 코드와 전역 코드를 분리합니다.<br>페이지 관련 코드를 한 곳에 모두 모아놓기 때문에, 이해하기가 쉬워집니다.|
+|**router**|페이지 라우팅 관련 파일을 저장합니다.|
+|**hooks**|여러 페이지에서 사용되는 전역 hook 들을 저장합니다. 특정 페이지에서만 사용되는 hook 은 해당 페이지 폴더에 저장합니다.|
+|**utils**|모든 유틸리티 기능들을 저장합니다.|
+|**services**|외부 API와 상호작용하는 모든 코드들을 저장합니다.(ex. Firebase 에서 상품 목록 불러오기 등의 비즈니스 로직 코드)|
+|**style**|styled componets 에 사용할 글로벌 스타일이나 테마를 저장합니다.|
+|**tests**|모든 테스트 코드들을 저장합니다.|
 
 </details>
 
@@ -309,10 +307,11 @@ import * as S from 'Product.Styled'
 
 <br />
 
-<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br />
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
+<br />
 
 ## 커밋 컨벤션
 커밋은 가능한 하나의 문제 단위로 쪼개서 작성하여 알아보기 쉽게 합니다. 커밋의 목적별로 Prefix 를 사용하며, 종류는 다음과 같습니다.
@@ -387,6 +386,19 @@ import * as S from 'Product.Styled'
 ```
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
+<br />
+
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
+<br />
+
+## 트러블 슈팅
+### Firebase 연동
+1. Firestore 에서의 데이터 filtering, ordering
+2. Firebase authentication 서비스 적용
+
+### React Query 적용
+1. Optimistic Update 의 오작동 개선
+2. 여러 필터링 조건에 따른 infiniteQuery 설정
 
 
 <!-- MARKDOWN LINKS & IMAGES -->

@@ -131,7 +131,7 @@ const Detail: React.FC = () => {
                         <span>{error?.message}</span>
                       </S.RecommendationErrorBox>
                     ) : recommendData ? (
-                      recommendData
+                      recommendData.result
                         .filter((product) => product.id !== data.id)
                         .slice(0, 10)
                         .map((product) => (

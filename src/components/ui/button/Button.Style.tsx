@@ -9,7 +9,8 @@ export const StyledButton = styled.button<
   gap: 8px;
   justify-content: center;
   align-items: center;
-  cursor: pointer;
+  cursor: ${(props) =>
+    props.$styleType === 'disabled' ? 'not-allowed' : 'pointer'};
   outline: none;
   color: ${(props) =>
     props.$styleType === 'primary'

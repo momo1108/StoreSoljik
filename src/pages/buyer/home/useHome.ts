@@ -1,49 +1,74 @@
-import { db, ProductSchema } from '@/firebase';
-import { useQuery } from '@tanstack/react-query';
-import { collection, getDocs, orderBy, query } from 'firebase/firestore';
-import { useMemo } from 'react';
-
-type ProductPerCategory = {
-  [key: string]: ProductSchema[];
-} | null;
+import { getValidCategories } from '@/services/categoryService';
+import { fetchProducts } from '@/services/productService';
+import { ProductSchema } from '@/types/FirebaseType';
+import { useQueries, useQuery } from '@tanstack/react-query';
+import { orderBy, where } from 'firebase/firestore';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 const useHome = () => {
-  const { data: allProductArray } = useQuery<ProductSchema[]>({
-    queryKey: ['products', 'buyer'],
-    queryFn: async () => {
-      const querySnapshot = await getDocs(
-        query(collection(db, 'product'), orderBy('productSalesrate', 'desc')),
-      );
-      const documentArray = querySnapshot.docs.map(
-        (doc) => doc.data() as ProductSchema,
-      );
+  const [categories, setCategories] = useState<string[]>([]);
+  const [categoryFetchStatus, setCategoryFetchStatus] = useState<
+    'pending' | 'success' | 'error'
+  >('pending');
+  useEffect(() => {
+    const getCategories = async () => {
+      try {
+        const data = await getValidCategories();
+        setCategories(data);
+        setCategoryFetchStatus('success');
+      } catch (error) {
+        setCategoryFetchStatus('error');
+        toast.error(
+          `카테고리 데이터를 불러오는 중 에러가 발생했습니다.\n${error}`,
+        );
+      }
+    };
 
-      return documentArray;
+    getCategories();
+  }, []);
+
+  const {
+    data: hotProductsArray,
+    status: hotProductsStatus,
+    error: hotProductsError,
+  } = useQuery<ProductSchema[]>({
+    queryKey: ['products', 'hot'],
+    queryFn: async () =>
+      await fetchProducts({
+        sortOrders: [orderBy('productSalesrate', 'desc')],
+        pageSize: 8,
+      }),
+  });
+
+  const recentProductsQueryPerCategory = useQueries({
+    queries: categories.map((category) => ({
+      queryKey: ['products', category, 'recent'],
+      queryFn: async () => ({
+        category,
+        result: await fetchProducts({
+          filters: [where('productCategory', '==', category)],
+          pageSize: 8,
+        }),
+      }),
+    })),
+    combine: (results) => {
+      return results.map((categoryQuery) => ({
+        data: categoryQuery.data,
+        status: categoryQuery.status,
+        error: categoryQuery.error,
+      }));
     },
   });
 
-  const productPerCategory = useMemo<ProductPerCategory>(() => {
-    if (allProductArray) {
-      const ppc = allProductArray.reduce(
-        (prev: Record<string, ProductSchema[]>, cur: ProductSchema) => {
-          if (prev[cur.productCategory])
-            return {
-              ...prev,
-              [cur.productCategory]: [...prev[cur.productCategory], cur],
-            } as Record<string, ProductSchema[]>;
-          else
-            return {
-              ...prev,
-              [cur.productCategory]: [cur],
-            } as Record<string, ProductSchema[]>;
-        },
-        {} as Record<string, ProductSchema[]>,
-      );
-      return ppc;
-    } else return null;
-  }, [allProductArray]);
-
-  return { allProductArray, productPerCategory };
+  return {
+    hotProductsArray,
+    hotProductsStatus,
+    hotProductsError,
+    categories,
+    categoryFetchStatus,
+    recentProductsQueryPerCategory,
+  };
 };
 
 export default useHome;

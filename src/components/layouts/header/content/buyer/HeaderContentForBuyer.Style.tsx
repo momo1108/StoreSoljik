@@ -1,3 +1,4 @@
+import Button from '@/components/ui/button/Button';
 import NavBar from '@/components/ui/navbar/NavBar';
 import media from '@/style/media';
 import styled from 'styled-components';
@@ -55,7 +56,7 @@ export const HeaderMenuBox = styled.div`
   display: flex;
   align-items: center;
   flex-basis: fit-content;
-  gap: 16px;
+  gap: 32px;
 `;
 
 export const CartButton = styled.button`
@@ -84,4 +85,12 @@ export const LengthSpan = styled.span`
   color: ${({ theme }) => theme.color.background};
   background-color: ${({ theme }) => theme.color.foreground};
   border-radius: 8px;
+`;
+
+export const SignoutButton = styled(Button)`
+  padding: 10px;
+  border: none;
+  &:hover {
+    border: none;
+  }
 `;

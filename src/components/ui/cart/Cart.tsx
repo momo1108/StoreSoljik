@@ -6,12 +6,15 @@ import HR from '../hr/HR';
 import React from 'react';
 import { H4 } from '../header/Header.Style';
 import Button from '../button/Button';
-import { ProductSchema } from '@/firebase';
 import { RiDeleteBin5Line } from 'react-icons/ri';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ProductSchema } from '@/types/FirebaseType';
 
 const Cart = () => {
   const { isOpen, toggleCart } = useCartUI();
   const { items, totalPrice, updateItem, removeItem } = useCartItems();
+  const navigate = useNavigate();
+  const { state } = useLocation();
 
   return (
     <S.CartContainer $isOpen={isOpen}>
@@ -90,7 +93,22 @@ const Cart = () => {
       </S.TotalPriceBox>
       <HR color={'#ddd'} />
       <S.FooterBox>
-        <S.CheckoutButton styleType='primary'>구매하기</S.CheckoutButton>
+        <S.CheckoutButton
+          onClick={() => {
+            if (items.length) {
+              toggleCart();
+              navigate('/purchase', {
+                state: {
+                  prevRoute: window.location.pathname,
+                  prevState: state,
+                },
+              });
+            }
+          }}
+          styleType='primary'
+        >
+          구매하기
+        </S.CheckoutButton>
       </S.FooterBox>
     </S.CartContainer>
   );

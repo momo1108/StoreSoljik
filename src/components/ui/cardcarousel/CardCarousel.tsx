@@ -1,9 +1,9 @@
 import Slider, { Settings } from 'react-slick';
 import * as S from './CardCarousel.Style';
-import { ProductSchema } from '@/firebase';
 import { H3, H4 } from '../header/Header.Style';
 import Button from '../button/Button';
 import { Link } from 'react-router-dom';
+import { ProductSchema } from '@/types/FirebaseType';
 
 export const defaultSetiing = {
   dots: true,

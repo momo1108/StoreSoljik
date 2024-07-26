@@ -8,6 +8,8 @@ export const InputContainer = styled.div`
   font-weight: bold;
 
   & > p.description {
+    font-weight: normal;
+    color: ${({ theme }) => theme.color.gray};
     padding: 0 2px;
     font-size: ${(props) => props.theme.fontSize.base};
   }
@@ -25,8 +27,10 @@ export const InputContainer = styled.div`
     border-radius: ${(props) => props.theme.color.radius};
     outline: none;
 
-    &:focus and &[data-invalid='false'] {
-      border-color: ${(props) => props.theme.color.valid};
+    &:focus {
+      &[data-invalid='false'] {
+        border-color: ${(props) => props.theme.color.valid};
+      }
     }
     &[data-invalid='true'] {
       border-color: ${(props) => props.theme.color.invalid};

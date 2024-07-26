@@ -1,4 +1,3 @@
-import { ProductSchema } from '@/firebase';
 import {
   createContext,
   useContext,
@@ -8,8 +7,9 @@ import {
   useEffect,
 } from 'react';
 import { useFirebaseAuth } from './useFirebaseAuth';
+import { ProductSchema } from '@/types/FirebaseType';
 
-interface CartItem {
+export interface CartItem {
   id: string;
   productName: string;
   productPrice: number;
@@ -23,7 +23,11 @@ interface CartItemsContextType {
   cartSize: number;
   totalPrice: number;
   addItem: (product: ProductSchema, productQuantity: number) => void;
-  updateItem: (product: ProductSchema, productQuantity: number) => void;
+  updateItem: (
+    product: ProductSchema,
+    productQuantity: number,
+    maxQuantity?: number,
+  ) => void;
   removeItem: (product: ProductSchema) => void;
   checkItemIsInCart: (product: ProductSchema | undefined) => boolean;
   clearCart: () => void;
@@ -98,10 +102,18 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
     ]);
   };
 
-  const updateItem = (product: ProductSchema, productQuantity: number) => {
+  const updateItem = (
+    product: ProductSchema,
+    productQuantity: number,
+    maxQuantity: number = 200,
+  ) => {
     if (isNaN(productQuantity)) return;
     productQuantity =
-      productQuantity > 200 ? 200 : productQuantity < 1 ? 1 : productQuantity;
+      productQuantity > maxQuantity
+        ? maxQuantity
+        : productQuantity < 1
+          ? 1
+          : productQuantity;
     setItems((prevItems) =>
       prevItems.map(
         (item): CartItem =>
