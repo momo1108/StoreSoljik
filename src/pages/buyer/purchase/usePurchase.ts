@@ -5,10 +5,17 @@ import { ChangeEventHandler, MouseEventHandler, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useCartItems } from '@/hooks/useCartItems';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
-import { v4 } from 'uuid';
 import { toast } from 'sonner';
-import { Payment, processPayment } from '@/services/paymentService';
+import { confirmPayment, processPayment } from '@/services/paymentService';
 import { createPurchaseRegisterObject } from '@/utils/createRegisterObject';
+import {
+  fetchProducts,
+  purchaseProducts,
+  rollbackPurchaseProducts,
+} from '@/services/productService';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
+import { where } from 'firebase/firestore';
 
 const usePurchase = () => {
   const {
@@ -18,11 +25,13 @@ const usePurchase = () => {
     setValue,
   } = useForm<PurchaseFormData>();
   const { openPostcodeSearch } = usePostcode();
-  const { totalPrice, items } = useCartItems();
+  const { totalPrice, items, clearCart } = useCartItems();
   const { userInfo } = useFirebaseAuth();
   const [isReadyToCheckout, setIsReadyToCheckout] = useState<boolean>(false);
+  const navigate = useNavigate();
+  const { state } = useLocation();
 
-  const handleUpdateCheckbox: ChangeEventHandler<HTMLInputElement> = (
+  const handlePurchaseCheckbox: ChangeEventHandler<HTMLInputElement> = (
     event,
   ) => {
     setIsReadyToCheckout(event.target.checked);
@@ -35,13 +44,22 @@ const usePurchase = () => {
       );
       return;
     }
-    const orderId: string = userInfo!.uid + v4();
-    console.log(orderId, orderId.length);
+
+    refetchProductQuantityArray();
+
+    let orderId: string = '';
+
     try {
+      orderId = await purchaseProducts(
+        items,
+        userInfo!.uid,
+        `${items[0].productName}${items.length > 1 ? ` 외 ${items.length - 1}건` : ''}`,
+      );
+
       /**
        * Toss Payments 로직
        */
-      const paymentResultData = await processPayment({
+      const confirmData = await processPayment({
         totalPrice,
         orderId,
         items,
@@ -50,11 +68,22 @@ const usePurchase = () => {
         phoneNumber: data.buyerPhoneNumber,
       });
 
+      const paymentResultData = await confirmPayment({ confirmData });
+
       toast.success(
-        `"${(paymentResultData as Payment).orderName}" 주문 건의 결제액 "${(paymentResultData as Payment).totalAmount.toLocaleString()}원" 결제가 성공적으로 완료됐습니다.`,
+        `"${paymentResultData.orderName}" 주문 건의 결제액 "${paymentResultData.totalAmount.toLocaleString()}원" 결제가 성공적으로 완료됐습니다.`,
       );
+
+      clearCart();
+
+      if (state?.prevRoute)
+        navigate(state?.prevRoute, { state: state?.prevState || null });
+      else navigate('/');
     } catch (error: unknown) {
-      toast.error((error as Error).message);
+      if (orderId) await rollbackPurchaseProducts(items, orderId);
+      toast.error('구매 도중 에러가 발생했습니다.', {
+        description: (error as Error).message,
+      });
     }
   };
 
@@ -100,6 +129,28 @@ const usePurchase = () => {
 
   const registerObject = createPurchaseRegisterObject(register);
 
+  const {
+    data: productQuantityArray,
+    status: productQuantityArrayStatus,
+    error: productQuantityArrayError,
+    refetch: refetchProductQuantityArray,
+  } = useQuery({
+    queryKey: ['products', 'quantity'],
+    queryFn: async () => {
+      const productData = await fetchProducts({
+        filters: [
+          where(
+            'id',
+            'in',
+            items.map((item) => item.id),
+          ),
+        ],
+      });
+
+      return productData;
+    },
+  });
+
   return {
     registerObject,
     isSubmitting,
@@ -108,7 +159,10 @@ const usePurchase = () => {
     submitLogic,
     handleClickPostcode,
     isReadyToCheckout,
-    handleUpdateCheckbox,
+    handlePurchaseCheckbox,
+    productQuantityArray,
+    productQuantityArrayStatus,
+    productQuantityArrayError,
   };
 };
 

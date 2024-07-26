@@ -7,13 +7,14 @@ import React from 'react';
 import { H4 } from '../header/Header.Style';
 import Button from '../button/Button';
 import { RiDeleteBin5Line } from 'react-icons/ri';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ProductSchema } from '@/types/FirebaseType';
 
 const Cart = () => {
   const { isOpen, toggleCart } = useCartUI();
   const { items, totalPrice, updateItem, removeItem } = useCartItems();
   const navigate = useNavigate();
+  const { state } = useLocation();
 
   return (
     <S.CartContainer $isOpen={isOpen}>
@@ -96,7 +97,12 @@ const Cart = () => {
           onClick={() => {
             if (items.length) {
               toggleCart();
-              navigate('/purchase');
+              navigate('/purchase', {
+                state: {
+                  prevRoute: window.location.pathname,
+                  prevState: state,
+                },
+              });
             }
           }}
           styleType='primary'
