@@ -24,7 +24,6 @@ const Purchase: React.FC = () => {
     isSubmitting,
     productQuantityArray,
     productQuantityArrayStatus,
-    productQuantityArrayError,
   } = usePurchase();
   const { items, updateItem, totalPrice, removeItem } = useCartItems();
 
