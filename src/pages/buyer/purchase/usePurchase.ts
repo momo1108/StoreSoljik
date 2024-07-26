@@ -80,6 +80,7 @@ const usePurchase = () => {
         navigate(state?.prevRoute, { state: state?.prevState || null });
       else navigate('/');
     } catch (error: unknown) {
+      console.log(error);
       if (orderId) await rollbackPurchaseProducts(items, orderId);
       toast.error('구매 도중 에러가 발생했습니다.', {
         description: (error as Error).message,
