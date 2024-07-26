@@ -40,6 +40,10 @@ type ProcessPayment = (params: {
   email: string;
   name: string;
   phoneNumber: string;
+}) => Promise<RequestPaymentResult>;
+
+type ConfirmPayment = (params: {
+  confirmData: RequestPaymentResult;
 }) => Promise<Payment>;
 
 export const processPayment: ProcessPayment = async ({
@@ -59,6 +63,8 @@ export const processPayment: ProcessPayment = async ({
   const tossPaymentsWindow = tossPayments.payment({
     customerKey: import.meta.env.VITE_tossClientKey,
   });
+
+  // sdk 에서 void 로 잘못 return 해주기 때문에 unknown 으로 저장 후 type 지정
   const requestPaymentResult: unknown = await tossPaymentsWindow.requestPayment(
     {
       method: 'CARD',
@@ -84,6 +90,10 @@ export const processPayment: ProcessPayment = async ({
 
   toast.info('결제의 승인을 요청하는 중입니다.');
 
+  return confirmData;
+};
+
+export const confirmPayment: ConfirmPayment = async ({ confirmData }) => {
   const paymentResult = await fetch(
     'https://api.tosspayments.com/v1/payments/confirm',
     {
@@ -103,11 +113,12 @@ export const processPayment: ProcessPayment = async ({
 
   if (!paymentResult.ok) {
     const errorInstance = new Error();
-    errorInstance.name = paymentResultData.code;
-    errorInstance.message = paymentResultData.message;
+    errorInstance.name = 'toss.sdk.payment';
+    errorInstance.message =
+      paymentResultData.code + ' ' + paymentResultData.message;
 
     throw errorInstance;
   }
 
-  return paymentResultData;
+  return paymentResultData as Payment;
 };

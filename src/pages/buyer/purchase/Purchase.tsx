@@ -3,7 +3,6 @@ import Main from '@/components/layouts/main/Main';
 import * as S from './Purchase.Style';
 import usePurchase from './usePurchase';
 import Button from '@/components/ui/button/Button';
-import { useCartItems } from '@/hooks/useCartItems';
 import { ProductSchema } from '@/types/FirebaseType';
 import React from 'react';
 import { H4 } from '@/components/ui/header/Header.Style';
@@ -11,6 +10,7 @@ import { FiMinus, FiPlus } from 'react-icons/fi';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import HR from '@/components/ui/hr/HR';
 import Checkbox from '@/components/form/checkbox/Checkbox';
+import { useCartItems } from '@/hooks/useCartItems';
 
 const Purchase: React.FC = () => {
   const {
@@ -20,7 +20,10 @@ const Purchase: React.FC = () => {
     submitLogic,
     handleClickPostcode,
     isReadyToCheckout,
-    handleUpdateCheckbox,
+    handlePurchaseCheckbox,
+    isSubmitting,
+    productQuantityArray,
+    productQuantityArrayStatus,
   } = usePurchase();
   const { items, updateItem, totalPrice, removeItem } = useCartItems();
 
@@ -91,7 +94,19 @@ const Purchase: React.FC = () => {
                       alt={item.productName}
                     />
                     <S.ItemDetailsBox>
-                      <H4 className='hideTextOverflow'>{item.productName}</H4>
+                      <S.ItemDatailHeader>
+                        <H4 className='hideTextOverflow'>{item.productName}</H4>
+                        <p>
+                          재고량:{' '}
+                          {productQuantityArrayStatus === 'pending'
+                            ? '불러오는 중입니다.'
+                            : productQuantityArrayStatus === 'error'
+                              ? '불러오지 못했습니다.'
+                              : productQuantityArray?.find(
+                                  (product) => product.id === item.id,
+                                )?.productQuantity || '불러오지 못했습니다.'}
+                        </p>
+                      </S.ItemDatailHeader>
                       <S.ItemQuantityBox>
                         <S.ItemInputBox>
                           <Button
@@ -99,6 +114,9 @@ const Purchase: React.FC = () => {
                               updateItem(
                                 item as ProductSchema,
                                 item.productQuantity - 1,
+                                productQuantityArray?.find(
+                                  (product) => product.id === item.id,
+                                )?.productQuantity || 200,
                               )
                             }
                           >
@@ -110,6 +128,9 @@ const Purchase: React.FC = () => {
                               updateItem(
                                 item as ProductSchema,
                                 parseInt(event.target.value),
+                                productQuantityArray?.find(
+                                  (product) => product.id === item.id,
+                                )?.productQuantity || 200,
                               )
                             }
                             attrs={{ value: item.productQuantity }}
@@ -119,6 +140,9 @@ const Purchase: React.FC = () => {
                               updateItem(
                                 item as ProductSchema,
                                 item.productQuantity + 1,
+                                productQuantityArray?.find(
+                                  (product) => product.id === item.id,
+                                )?.productQuantity || 200,
                               )
                             }
                           >
@@ -155,12 +179,15 @@ const Purchase: React.FC = () => {
               <Checkbox
                 id='purchaseCheckbox'
                 description='구매 품목과 결제 금액을 확인했습니다.'
-                onChange={handleUpdateCheckbox}
+                onChange={handlePurchaseCheckbox}
               />
               <S.CheckoutButton
                 type='submit'
                 attrs={{ form: 'buyerForm' }}
-                styleType={isReadyToCheckout ? 'primary' : 'disabled'}
+                styleType={
+                  isReadyToCheckout && !isSubmitting ? 'primary' : 'disabled'
+                }
+                disabled={isSubmitting}
               >
                 구매하기
               </S.CheckoutButton>

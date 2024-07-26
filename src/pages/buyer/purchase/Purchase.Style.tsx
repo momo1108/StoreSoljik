@@ -94,6 +94,13 @@ export const ItemDetailsBox = styled.div`
   overflow: hidden;
 `;
 
+export const ItemDatailHeader = styled.div`
+  p {
+    font-size: ${({ theme }) => theme.fontSize.sm};
+    color: ${({ theme }) => theme.color.gray};
+  }
+`;
+
 export const ItemPriceBox = styled.div`
   color: #999;
 `;
