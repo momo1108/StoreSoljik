@@ -1,4 +1,6 @@
-import { db, ProductSchema, storage } from '@/firebase';
+import { db, storage } from '@/firebase';
+import { CartItem } from '@/hooks/useCartItems';
+import { OrderSchema, OrderStatus, ProductSchema } from '@/types/FirebaseType';
 import {
   collection,
   deleteDoc,
@@ -13,6 +15,7 @@ import {
   Query,
   QueryConstraint,
   QueryDocumentSnapshot,
+  runTransaction,
   startAt,
 } from 'firebase/firestore';
 import {
@@ -25,7 +28,6 @@ import {
 
 // const updateBatch = async () => {
 //   let productsQuery = query(collection(db, 'product'));
-//   console.log(productsQuery);
 //   const productDocuments = await getDocs(productsQuery);
 //   const batch = writeBatch(db);
 //   productDocuments.docs.map((doc) =>
@@ -77,9 +79,113 @@ export const deleteProductDocument = async (id: string) => {
   await deleteDoc(doc(db, 'product', id));
 };
 
+export const purchaseProducts = async (
+  cartItemsArray: CartItem[],
+  buyerId: string,
+  orderName: string,
+) => {
+  const orderId = await runTransaction(db, async (transaction) => {
+    const productRefs = cartItemsArray.map((product) =>
+      doc(db, 'product', product.id),
+    );
+    const productSnapshots = await Promise.all(
+      productRefs.map((ref) => transaction.get(ref)),
+    );
+
+    const purchaseErrorInstance = new Error();
+
+    // 상품의 재고를 체크합니다.
+    productSnapshots.forEach((snapshot, index) => {
+      if (!snapshot.exists()) {
+        purchaseErrorInstance.name = 'firebase.store.product.read';
+        purchaseErrorInstance.message = `상품 "${cartItemsArray[index].productName}" 의 정보를 읽어오는데 실패했습니다.`;
+        throw purchaseErrorInstance;
+      }
+
+      const productData = snapshot.data();
+
+      if (productData.productQuantity < cartItemsArray[index].productQuantity) {
+        purchaseErrorInstance.name = 'firebase.store.product.update';
+        purchaseErrorInstance.message = `상품 "${cartItemsArray[index].productName}" 의 재고가 부족합니다.`;
+        throw purchaseErrorInstance;
+      }
+    });
+
+    // 상품의 재고를 차감합니다.
+    productSnapshots.forEach((snapshot, index) => {
+      const productData = snapshot.data();
+      transaction.update(productRefs[index], {
+        productQuantity:
+          productData!.productQuantity - cartItemsArray[index].productQuantity,
+        productSalesrate:
+          productData!.productSalesrate + cartItemsArray[index].productQuantity,
+      });
+    });
+
+    const timeOffset = new Date().getTimezoneOffset() * 60000;
+    const isoTime = new Date(Date.now() - timeOffset).toISOString();
+
+    // 주문 정보를 DB에 저장합니다.
+    const orderRef = doc(collection(db, 'order'));
+    const orderData: OrderSchema = {
+      id: orderRef.id,
+      buyerId,
+      orderName,
+      orderStatus: OrderStatus.OrderCompleted,
+      productIdArray: cartItemsArray.map((item) => item.id),
+      productOrderQuantityArray: cartItemsArray.map(
+        (item) => item.productQuantity,
+      ),
+      createdAt: isoTime,
+      updatedAt: isoTime,
+    };
+    transaction.set(orderRef, orderData);
+
+    return orderRef.id;
+  });
+
+  return orderId;
+};
+
+export const rollbackPurchaseProducts = async (
+  cartItemsArray: CartItem[],
+  orderId: string,
+) => {
+  await runTransaction(db, async (transaction) => {
+    const productRefs = cartItemsArray.map((product) =>
+      doc(db, 'product', product.id),
+    );
+    const productSnapshots = await Promise.all(
+      productRefs.map((ref) => transaction.get(ref)),
+    );
+
+    const purchaseErrorInstance = new Error();
+
+    // 상품의 재고를 복구합니다.
+    productSnapshots.forEach((snapshot, index) => {
+      if (!snapshot.exists()) {
+        purchaseErrorInstance.name = 'firebase.store.product.read';
+        purchaseErrorInstance.message = `상품 "${cartItemsArray[index].productName}" 의 정보를 읽어오는데 실패했습니다.`;
+        throw purchaseErrorInstance;
+      }
+
+      const productData = snapshot.data();
+      transaction.update(productRefs[index], {
+        productQuantity:
+          productData!.productQuantity + cartItemsArray[index].productQuantity,
+        productSalesrate:
+          productData!.productSalesrate - cartItemsArray[index].productQuantity,
+      });
+    });
+
+    // 주문 레코드를 삭제합니다.
+    transaction.delete(doc(db, 'order', orderId));
+  });
+};
+
 /*
 ############################################################
-            Firestore - React Query 관련 코드
+            Firestore - React Query 의 queryFn 관련 코드
 ############################################################
 */
 type FetchInfiniteProductsParams = {
@@ -89,11 +195,16 @@ type FetchInfiniteProductsParams = {
   pageSize?: number;
 };
 
-export type PageParamType = QueryDocumentSnapshot<DocumentData, DocumentData>;
+export type QueryDocumentType = QueryDocumentSnapshot<
+  DocumentData,
+  DocumentData
+>;
+
+export type PageParamType = QueryDocumentType | null;
 
 export type FetchInfiniteProductsResult = {
-  documentArray: ProductSchema[];
-  nextPage: PageParamType | null;
+  dataArray: ProductSchema[];
+  documentArray: QueryDocumentType[];
 };
 
 type FetchProductsParams = {
@@ -147,18 +258,13 @@ export const fetchInfiniteProducts = async ({
 
   const productsQuery = buildFirestoreQuery(db, 'product', constraints);
   const productDocuments = await getDocs(productsQuery);
-  const documentArray: ProductSchema[] = productDocuments.docs.map(
+  const dataArray: ProductSchema[] = productDocuments.docs.map(
     (doc) => doc.data() as ProductSchema,
   );
 
-  const nextPage =
-    productDocuments.docs.length > pageSize
-      ? productDocuments.docs[pageSize]
-      : null;
-
   return {
-    documentArray,
-    nextPage,
+    dataArray,
+    documentArray: productDocuments.docs,
   };
 };
 

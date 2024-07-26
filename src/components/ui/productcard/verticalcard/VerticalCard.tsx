@@ -1,10 +1,10 @@
 import { H4 } from '../../header/Header.Style';
 import * as S from './VerticalCard.Style';
 import { ClassName } from '@/types/GlobalType';
-import { ProductSchema } from '@/firebase';
 import Carousel from '../../carousel/Carousel';
 import { Link } from 'react-router-dom';
 import { getIsoDate } from '@/utils/utils';
+import { ProductSchema } from '@/types/FirebaseType';
 
 type VerticalCardProps = ClassName & {
   data: ProductSchema;

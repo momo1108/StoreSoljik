@@ -2,8 +2,8 @@ import { MouseEventHandler } from 'react';
 import { H4 } from '../../header/Header.Style';
 import * as S from './HorizontalCard.Style';
 import { ClassName } from '@/types/GlobalType';
-import { ProductSchema } from '@/firebase';
 import { getIsoDate, getIsoTime } from '@/utils/utils';
+import { ProductSchema } from '@/types/FirebaseType';
 
 type HorizontalCardProps = ClassName & {
   data: ProductSchema;

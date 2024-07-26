@@ -23,38 +23,38 @@ const Update: React.FC = () => {
     <>
       <Header userType={'seller'}></Header>
       <Main>
-        <S.RegistrationForm onSubmit={handleSubmit(submitLogic)}>
-          <S.RegistrationTitleBox>
-            <S.RegistrationTitleHeader>
+        <S.UpdateForm onSubmit={handleSubmit(submitLogic)}>
+          <S.UpdateTitleBox>
+            <S.UpdateTitleHeader>
               <IoStorefrontSharp />
               판매 상품 수정
-            </S.RegistrationTitleHeader>
-            <S.RegistrationSubmitBox>
+            </S.UpdateTitleHeader>
+            <S.UpdateSubmitBox>
               {isSubmitting ? (
-                <S.RegistrationSpinner spinnerSize={20}>
+                <S.UpdateSpinner spinnerSize={20}>
                   수정 사항을 저장합니다
-                </S.RegistrationSpinner>
+                </S.UpdateSpinner>
               ) : (
                 <></>
               )}
-              <S.RegistrationSubmitButton
+              <S.UpdateSubmitButton
                 disabled={isSubmitting}
                 type='submit'
                 $iconSize={18}
               >
                 <FiPlus />
                 저장하기
-              </S.RegistrationSubmitButton>
-            </S.RegistrationSubmitBox>
-          </S.RegistrationTitleBox>
+              </S.UpdateSubmitButton>
+            </S.UpdateSubmitBox>
+          </S.UpdateTitleBox>
 
           <S.WarningMessageP>
             현재 페이지를 벗어나는 경우 작성된 내용은 모두 사라집니다.
           </S.WarningMessageP>
 
-          <S.RegistrationContentBox>
-            <S.RegistrationContentColumnContainer>
-              <S.RegistrationContentImageBox>
+          <S.UpdateContentContainer>
+            <S.UpdateContentColumnBox>
+              <S.UpdateContentImageBox>
                 <h3>상품 이미지 등록</h3>
                 {errors.images && errors.images.message ? (
                   <span className='errorSpan'>
@@ -68,7 +68,7 @@ const Update: React.FC = () => {
                   description='이미지를 수정합니다.'
                   onChange={handleCheckboxUpdate}
                 />
-                <S.RegistrationContentImagePreviewBox>
+                <S.UpdateContentImagePreviewBox>
                   {imagePreviewUrls && imagePreviewUrls[0] ? (
                     imagePreviewUrls.map((imgUrl, index) => (
                       <S.ImagePreviewItemBox
@@ -79,7 +79,7 @@ const Update: React.FC = () => {
                   ) : (
                     <span>선택된 이미지가 없습니다.</span>
                   )}
-                </S.RegistrationContentImagePreviewBox>
+                </S.UpdateContentImagePreviewBox>
                 {isUpdatingImage ? (
                   <input
                     {...registerObject.productImages}
@@ -92,8 +92,8 @@ const Update: React.FC = () => {
                 ) : (
                   <></>
                 )}
-              </S.RegistrationContentImageBox>
-              <S.RegistrationContentItemBox>
+              </S.UpdateContentImageBox>
+              <S.UpdateContentItemBox>
                 <h3>카테고리 설정</h3>
                 <Input
                   title='카테고리'
@@ -103,11 +103,11 @@ const Update: React.FC = () => {
                     errors.productCategory && errors.productCategory.message
                   }
                 />
-              </S.RegistrationContentItemBox>
-            </S.RegistrationContentColumnContainer>
+              </S.UpdateContentItemBox>
+            </S.UpdateContentColumnBox>
 
-            <S.RegistrationContentColumnContainer>
-              <S.RegistrationContentItemBox>
+            <S.UpdateContentColumnBox>
+              <S.UpdateContentItemBox>
                 <h3>판매 상품 정보</h3>
                 <Input
                   title='상품명'
@@ -124,8 +124,8 @@ const Update: React.FC = () => {
                     errors.productDescription.message
                   }
                 />
-              </S.RegistrationContentItemBox>
-              <S.RegistrationContentItemBox>
+              </S.UpdateContentItemBox>
+              <S.UpdateContentItemBox>
                 <h3>상품 가격 및 재고량</h3>
                 <Input
                   title='상품 가격(원 단위, 숫자만 입력)'
@@ -143,10 +143,10 @@ const Update: React.FC = () => {
                     errors.productQuantity && errors.productQuantity.message
                   }
                 />
-              </S.RegistrationContentItemBox>
-            </S.RegistrationContentColumnContainer>
-          </S.RegistrationContentBox>
-        </S.RegistrationForm>
+              </S.UpdateContentItemBox>
+            </S.UpdateContentColumnBox>
+          </S.UpdateContentContainer>
+        </S.UpdateForm>
       </Main>
     </>
   );

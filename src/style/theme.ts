@@ -44,7 +44,7 @@ export type Themes = 'light' | 'dark';
 const light = {
   type: 'light',
   description: '#AAA',
-  valid: '#47E573',
+  valid: '#00C736',
   invalid: '#E54747',
   background: 'hsl(0 0% 100%)',
   foreground: 'hsl(222.2 84% 4.9%)',

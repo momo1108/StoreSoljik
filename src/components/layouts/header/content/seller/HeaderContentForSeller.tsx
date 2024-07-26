@@ -26,7 +26,7 @@ const HeaderContentForSeller: React.FC = () => {
           />
         </S.HeaderNavBox>
         <S.HeaderMenuBox>
-          <S.LogoutButton onClick={logout}>로그아웃</S.LogoutButton>
+          <S.SignoutButton onClick={logout}>로그아웃</S.SignoutButton>
         </S.HeaderMenuBox>
       </S.HeaderTopBox>
     </>

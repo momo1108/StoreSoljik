@@ -57,6 +57,10 @@ export const HeaderMenuBox = styled.div`
   flex-basis: fit-content;
 `;
 
-export const LogoutButton = styled(Button)`
-  padding: 5px 10px;
+export const SignoutButton = styled(Button)`
+  padding: 10px;
+  border: none;
+  &:hover {
+    border: none;
+  }
 `;

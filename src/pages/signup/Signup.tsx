@@ -56,7 +56,7 @@ const Signup: React.FC = () => {
 
               <Input
                 title='패스워드'
-                description='소문자/대문자/숫자/특수문자 중 2가지 이상을 사용합니다.'
+                description='대문자/소문자/숫자/특수문자 중 2가지 이상 조합해 10자 이상'
                 type='password'
                 autoComplete='off'
                 reactHookForm={registerPassword}
