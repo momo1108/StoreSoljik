@@ -131,11 +131,8 @@ export const purchaseProducts = async (
       id: orderRef.id,
       buyerId,
       orderName,
-      orderStatus: OrderStatus.OrderCompleted,
-      productIdArray: cartItemsArray.map((item) => item.id),
-      productOrderQuantityArray: cartItemsArray.map(
-        (item) => item.productQuantity,
-      ),
+      orderStatus: OrderStatus.OrderCreated,
+      cartItemsArray,
       createdAt: isoTime,
       updatedAt: isoTime,
     };

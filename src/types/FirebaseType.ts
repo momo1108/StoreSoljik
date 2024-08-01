@@ -1,3 +1,5 @@
+import { CartItem } from '@/hooks/useCartItems';
+
 export type UserSchema = {
   /**
    * id 는 Authentication 서비스에서 정해진 uid 를 사용한다.
@@ -38,6 +40,7 @@ export type ProductSchema = {
 };
 
 export enum OrderStatus {
+  OrderCreated = 'OrderCreated', // 주문 생성 후 결제 전
   OrderCompleted = 'OrderCompleted', // 주문 완료
   AwaitingShipment = 'AwaitingShipment', // 발송 대기
   ShipmentStarted = 'ShipmentStarted', // 발송 시작
@@ -48,8 +51,7 @@ export type OrderSchema = {
   id: string; // 자동 생성된 id
   buyerId: string; // 구매자 id
   orderName: string; // 주문명(Ex. 파란색 티셔츠 외 7건)
-  productIdArray: string[]; // 주문에 포함된 각 상품들의 id 목록.(이를 통해 상품명, 판매자 등의 정보를 불러온다.)
-  productOrderQuantityArray: number[]; // 주문에 포함된 각 상품들의 주문량 목록
+  cartItemsArray: CartItem[]; // 주문에 포함된 각 상품 목록.(id 항목을 통해 상품 상페 정보를 불러온다.)
   orderStatus: OrderStatus; // 주문상태
   createdAt: string; // 생성 날짜
   updatedAt: string; // 수정 날짜
