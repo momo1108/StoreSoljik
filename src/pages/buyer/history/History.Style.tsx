@@ -8,4 +8,16 @@ export const CategoryContainer = styled.div`
   gap: 20px;
 `;
 
-export const OrderStatusBox = styled.div``;
+export const OrderStatusMenuList = styled.ul`
+  display: flex;
+  gap: 64px;
+  width: 100%;
+  background: #1111;
+  border-bottom: 1px solid ${(props) => props.theme.color.brighterGray};
+
+  li {
+    padding: 12px 16px;
+    font-size: ${(props) => props.theme.fontSize.lg};
+    font-weight: bold;
+  }
+`;
