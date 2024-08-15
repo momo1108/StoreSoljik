@@ -3,18 +3,15 @@ import { CartItem } from '@/hooks/useCartItems';
 import { UserInfo } from '@/hooks/useFirebaseAuth';
 import { OrderSchema, OrderStatus, ProductSchema } from '@/types/FirebaseType';
 import { ProductFormData } from '@/types/FormType';
+import { buildFirestoreQuery } from '@/utils/firebaseUtils';
 import {
   collection,
   deleteDoc,
   doc,
   DocumentData,
-  Firestore,
   getDoc,
   getDocs,
   limit,
-  orderBy,
-  query,
-  Query,
   QueryConstraint,
   QueryDocumentSnapshot,
   runTransaction,
@@ -278,21 +275,6 @@ type FetchProductsParams = {
 };
 
 /**
- * Firestore 에 여러 조건을 적용한 쿼리를 생성하는 함수
- * @param db 앱의 firestore 객체
- * @param collectionName DB 의 컬렉션(테이블)명
- * @param constraints 적용할 조건
- * @returns 완성된 쿼리(getDocs 메서드에 사용 가능)
- */
-const buildFirestoreQuery = (
-  db: Firestore,
-  collectionName: string,
-  constraints: QueryConstraint[],
-): Query => {
-  return query(collection(db, collectionName), ...constraints);
-};
-
-/**
  * useInfiniteQuery 의 queryFn 에 사용되는 함수.
  * @param pageParam 페이지의 시작이 될 Document (QueryDocumentSnapshot<DocumentData, DocumentData>;)
  * @param filters where 메서드로 구성된 배열 형태의 필터링 쿼리. Ex) [where('sellerEmail', '==', userInfo.email)]
@@ -345,15 +327,13 @@ export const fetchProducts = async ({
   sortOrders = [],
   pageSize = 0,
 }: FetchProductsParams): Promise<ProductSchema[]> => {
-  const constraints: QueryConstraint[] = [
-    ...filters,
-    ...sortOrders,
-    orderBy('createdAt', 'desc'),
-  ];
-
-  if (pageSize > 0) constraints.push(limit(pageSize));
-
-  const productsQuery = buildFirestoreQuery(db, 'product', constraints);
+  const productsQuery = buildFirestoreQuery(
+    db,
+    'product',
+    filters,
+    sortOrders,
+    pageSize,
+  );
   const productDocuments = await getDocs(productsQuery);
 
   const documentArray: ProductSchema[] = [];
