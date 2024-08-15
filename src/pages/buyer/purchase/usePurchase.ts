@@ -16,6 +16,8 @@ import {
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { where } from 'firebase/firestore';
+import { updateOrderStatus } from '@/services/orderService';
+import { OrderStatus } from '@/types/FirebaseType';
 
 const usePurchase = () => {
   const {
@@ -69,6 +71,10 @@ const usePurchase = () => {
       });
 
       const paymentResultData = await confirmPayment({ confirmData });
+      await updateOrderStatus({
+        orderId,
+        orderStatus: OrderStatus.OrderCompleted,
+      });
 
       toast.success(
         `"${paymentResultData.orderName}" 주문 건의 결제액 "${paymentResultData.totalAmount.toLocaleString()}원" 결제가 성공적으로 완료됐습니다.`,

@@ -1,11 +1,15 @@
 import { db } from '@/firebase';
-import { OrderSchema, ProductSchema } from '@/types/FirebaseType';
+import { OrderSchema, OrderStatus, ProductSchema } from '@/types/FirebaseType';
+import { buildFirestoreQuery } from '@/utils/firebaseUtils';
 import {
   collection,
   doc,
+  getCountFromServer,
   getDocs,
   query,
+  QueryConstraint,
   runTransaction,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import { toast } from 'sonner';
@@ -13,6 +17,7 @@ import { toast } from 'sonner';
 /*
 ############################################################
             Firestore - 주문 관련 코드
+최초 주문 생성은 productService 에 transaction 으로 묶여있는 상태
 ############################################################
 */
 
@@ -103,4 +108,57 @@ export const rollbackUnfinishedOrderData = async (
   toast.success(
     `미결제 주문 ${orderArray.length}건의 주문 취소가 완료되었습니다.`,
   );
+};
+
+export const updateOrderStatus = async ({
+  orderId,
+  orderStatus,
+}: {
+  orderId: string;
+  orderStatus: OrderStatus;
+}) => {
+  await updateDoc(doc(db, 'order', orderId), { orderStatus });
+};
+
+export const getOrderCount = async () => {
+  const q = query(collection(db, 'order'));
+  const snapshot = await getCountFromServer(q);
+  console.log(snapshot.data());
+};
+
+/*
+############################################################
+            Firestore - React Query 의 queryFn 관련 코드
+############################################################
+*/
+type FetchProductsParams = {
+  filters?: QueryConstraint[];
+  sortOrders?: QueryConstraint[];
+  pageSize?: number;
+};
+
+export const fetchOrders = async ({
+  filters = [],
+  sortOrders = [],
+  pageSize = 0,
+}: FetchProductsParams): Promise<OrderSchema[]> => {
+  const ordersQuery = buildFirestoreQuery(
+    db,
+    'order',
+    filters,
+    sortOrders,
+    pageSize,
+  );
+  const orderDocuments = await getDocs(ordersQuery);
+
+  const documentArray: OrderSchema[] = [];
+
+  if (!orderDocuments.empty)
+    orderDocuments.docs.forEach((doc) => {
+      documentArray.push(doc.data() as OrderSchema);
+    });
+
+  console.log(documentArray);
+
+  return documentArray;
 };
