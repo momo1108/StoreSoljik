@@ -1,12 +1,26 @@
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { fetchOrders, getOrderCount } from '@/services/orderService';
 import { OrderStatus } from '@/types/FirebaseType';
-import { useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { where } from 'firebase/firestore';
+import { useState } from 'react';
 
 const useHistory = () => {
-  const orderStatus = useRef<OrderStatus | 'All'>('All');
+  const orderStatus = useState<OrderStatus | 'All'>('All');
+  const { userInfo } = useFirebaseAuth();
+  console.log(userInfo?.uid);
+  getOrderCount();
 
-  useEffect(() => {
-    console.log('effect', orderStatus.current);
-  }, [orderStatus.current]);
+  const { data, error } = useQuery({
+    queryKey: ['orders', 'All'],
+    queryFn: async () => {
+      return await fetchOrders({
+        filters: [where('buyerId', '==', userInfo!.uid)],
+      });
+    },
+  });
+
+  console.log(error);
 
   // const { data, status, error, fetchNextPage, isFetchingNextPage, isLoading } =
   //   useInfiniteQuery<FetchInfiniteProductsResult>({
