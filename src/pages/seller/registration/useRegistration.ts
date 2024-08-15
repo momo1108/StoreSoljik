@@ -2,11 +2,11 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { useEffect, useState } from 'react';
-import { FirestoreError, doc, setDoc } from 'firebase/firestore';
-import { db } from '@/firebase';
+import { FirestoreError } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { StorageError } from 'firebase/storage';
 import {
+  createProductData,
   deleteProductDocument,
   deleteProductImages,
   uploadProductImage,
@@ -18,7 +18,6 @@ import {
 } from '@/services/categoryService';
 import { toast } from 'sonner';
 import { ProductFormData } from '@/types/FormType';
-import { ProductSchema } from '@/types/FirebaseType';
 import { createProductRegisterObject } from '@/utils/createRegisterObject';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
@@ -77,22 +76,13 @@ const useRegistration = () => {
       /**
        * 2. FireStore 로직
        */
-      const documentData: ProductSchema = {
+      await createProductData({
         id,
-        sellerEmail: userInfo!.email,
-        sellerNickname: userInfo!.nickname,
-        productName: data.productName,
-        productDescription: data.productDescription,
-        productPrice: parseInt(data.productPrice),
-        productQuantity: parseInt(data.productQuantity),
-        productSalesrate: 0,
-        productCategory: data.productCategory,
-        productImageUrlArray: productImageUrlArray,
-        createdAt: isoTime,
-        updatedAt: isoTime,
-      };
-
-      await setDoc(doc(db, 'product', id), documentData);
+        userInfo: userInfo!,
+        formData: data,
+        productImageUrlArray,
+        isoTime,
+      });
 
       /**
        * 3. 카테고리 컬렉션 정보 업데이트

@@ -21,7 +21,7 @@ import { toast } from 'sonner';
 
 type AccountType = '구매자' | '판매자';
 
-interface UserInfo {
+export interface UserInfo {
   uid: string;
   email: string;
   accountType: AccountType;
