@@ -1,6 +1,8 @@
 import { db, storage } from '@/firebase';
 import { CartItem } from '@/hooks/useCartItems';
+import { UserInfo } from '@/hooks/useFirebaseAuth';
 import { OrderSchema, OrderStatus, ProductSchema } from '@/types/FirebaseType';
+import { ProductFormData } from '@/types/FormType';
 import {
   collection,
   deleteDoc,
@@ -16,6 +18,7 @@ import {
   QueryConstraint,
   QueryDocumentSnapshot,
   runTransaction,
+  setDoc,
   startAt,
 } from 'firebase/firestore';
 import {
@@ -48,6 +51,45 @@ export type ProductFilter = {
   field: ProductField;
   direction: ProductDirection;
 };
+type CreateProductDataParam = {
+  id: string;
+  userInfo: UserInfo;
+  formData: ProductFormData;
+  productImageUrlArray: string[];
+  isoTime: string;
+};
+type UpdateProductDataParam = {
+  originalProductData: ProductSchema;
+  userInfo: UserInfo;
+  formData: ProductFormData;
+  productImageUrlArray: string[];
+  isoTime: string;
+};
+
+export const createProductData = async ({
+  id,
+  userInfo,
+  formData,
+  productImageUrlArray,
+  isoTime,
+}: CreateProductDataParam) => {
+  const documentData: ProductSchema = {
+    id,
+    sellerEmail: userInfo.email,
+    sellerNickname: userInfo.nickname,
+    productName: formData.productName,
+    productDescription: formData.productDescription,
+    productPrice: parseInt(formData.productPrice),
+    productQuantity: parseInt(formData.productQuantity),
+    productSalesrate: 0,
+    productCategory: formData.productCategory,
+    productImageUrlArray: productImageUrlArray,
+    createdAt: isoTime,
+    updatedAt: isoTime,
+  };
+
+  await setDoc(doc(db, 'product', id), documentData);
+};
 
 export const getProductData = async (productId: string) => {
   const productDocument = await getDoc(doc(db, 'product', productId));
@@ -61,6 +103,31 @@ export const uploadProductImage = async (path: string, imageFile: File) => {
   await uploadBytes(imageRef, imageFile);
   const imageDownloadUrl = await getDownloadURL(imageRef);
   return imageDownloadUrl;
+};
+
+export const updateProductData = async ({
+  originalProductData,
+  userInfo,
+  formData,
+  productImageUrlArray,
+  isoTime,
+}: UpdateProductDataParam) => {
+  const documentData: ProductSchema = {
+    id: originalProductData.id,
+    sellerEmail: userInfo.email,
+    sellerNickname: userInfo.nickname,
+    productName: formData.productName,
+    productDescription: formData.productDescription,
+    productPrice: parseInt(formData.productPrice),
+    productQuantity: parseInt(formData.productQuantity),
+    productCategory: formData.productCategory,
+    productImageUrlArray,
+    productSalesrate: originalProductData.productSalesrate,
+    createdAt: originalProductData.createdAt,
+    updatedAt: isoTime,
+  };
+
+  await setDoc(doc(db, 'product', originalProductData.id), documentData);
 };
 
 export const deleteProductImages = async (id: string) => {

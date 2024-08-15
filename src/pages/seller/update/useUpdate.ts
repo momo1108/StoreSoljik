@@ -2,11 +2,11 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { ChangeEventHandler, useEffect, useState } from 'react';
-import { FirestoreError, doc, setDoc } from 'firebase/firestore';
-import { db } from '@/firebase';
+import { FirestoreError } from 'firebase/firestore';
 import { StorageError } from 'firebase/storage';
 import {
   deleteProductImages,
+  updateProductData,
   uploadProductImage,
 } from '@/services/productService';
 import { toast } from 'sonner';
@@ -119,25 +119,17 @@ const useUpdate = () => {
           productImageUrlArray.push(imageDownloadUrl);
         }
       }
+
       /**
        * 2. FireStore 로직
        */
-      const documentData: ProductSchema = {
-        id: originalProductData!.id,
-        sellerEmail: userInfo!.email,
-        sellerNickname: userInfo!.nickname,
-        productName: data.productName,
-        productDescription: data.productDescription,
-        productPrice: parseInt(data.productPrice),
-        productQuantity: parseInt(data.productQuantity),
-        productCategory: data.productCategory,
+      await updateProductData({
+        originalProductData: originalProductData!,
+        userInfo: userInfo!,
+        formData: data,
         productImageUrlArray,
-        productSalesrate: originalProductData!.productSalesrate,
-        createdAt: originalProductData!.createdAt,
-        updatedAt: isoTime,
-      };
-
-      await setDoc(doc(db, 'product', originalProductData!.id), documentData);
+        isoTime,
+      });
 
       // 완료 후 판매 상품 페이지로 이동
       toast.success('판매 상품 수정이 완료됐습니다!');
