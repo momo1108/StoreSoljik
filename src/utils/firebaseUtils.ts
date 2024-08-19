@@ -2,7 +2,6 @@ import {
   collection,
   Firestore,
   limit,
-  orderBy,
   query,
   Query,
   QueryConstraint,
@@ -22,11 +21,7 @@ export const buildFirestoreQuery = (
   sortOrders: QueryConstraint[] = [],
   pageSize: number = 0,
 ): Query => {
-  const constraints: QueryConstraint[] = [
-    ...filters,
-    ...sortOrders,
-    orderBy('createdAt', 'desc'),
-  ];
+  const constraints: QueryConstraint[] = [...filters, ...sortOrders];
 
   if (pageSize > 0) constraints.push(limit(pageSize));
 
