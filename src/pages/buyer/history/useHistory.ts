@@ -2,7 +2,7 @@ import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { fetchOrders, getOrderCount } from '@/services/orderService';
 import { OrderStatus } from '@/types/FirebaseType';
 import { useQuery } from '@tanstack/react-query';
-import { where } from 'firebase/firestore';
+import { orderBy, where } from 'firebase/firestore';
 import { useState } from 'react';
 
 const useHistory = () => {
@@ -16,6 +16,7 @@ const useHistory = () => {
     queryFn: async () => {
       return await fetchOrders({
         filters: [where('buyerId', '==', userInfo!.uid)],
+        sortOrders: [orderBy('createdAt', 'desc')],
       });
     },
   });

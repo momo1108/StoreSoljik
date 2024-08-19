@@ -36,7 +36,10 @@ const useHome = () => {
     queryKey: ['products', 'hot'],
     queryFn: async () =>
       await fetchProducts({
-        sortOrders: [orderBy('productSalesrate', 'desc')],
+        sortOrders: [
+          orderBy('productSalesrate', 'desc'),
+          orderBy('createdAt', 'desc'),
+        ],
         pageSize: 8,
       }),
   });
@@ -48,6 +51,7 @@ const useHome = () => {
         category,
         result: await fetchProducts({
           filters: [where('productCategory', '==', category)],
+          sortOrders: [orderBy('createdAt', 'desc')],
           pageSize: 8,
         }),
       }),

@@ -15,7 +15,7 @@ import {
 } from '@/services/productService';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { where } from 'firebase/firestore';
+import { orderBy, where } from 'firebase/firestore';
 import { updateOrderStatus } from '@/services/orderService';
 import { OrderStatus } from '@/types/FirebaseType';
 
@@ -152,6 +152,7 @@ const usePurchase = () => {
             items.map((item) => item.id),
           ),
         ],
+        sortOrders: [orderBy('createdAt', 'desc')],
       });
 
       return productData;

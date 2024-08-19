@@ -3,7 +3,7 @@ import { useCartUI } from '@/hooks/useCartUI';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
-import { where } from 'firebase/firestore';
+import { orderBy, where } from 'firebase/firestore';
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -63,6 +63,7 @@ const useDetail = () => {
     }
     const productData = await fetchProducts({
       filters: [where('productCategory', '==', productCategory)],
+      sortOrders: [orderBy('createdAt', 'desc')],
       pageSize: 8,
     });
 
