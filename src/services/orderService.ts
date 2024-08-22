@@ -1,14 +1,26 @@
 import { db } from '@/firebase';
-import { OrderSchema, OrderStatus, ProductSchema } from '@/types/FirebaseType';
+import {
+  OrderSchema,
+  OrderStatus,
+  ProductSchema,
+  QueryDocumentType,
+} from '@/types/FirebaseType';
+import {
+  FetchInfiniteQueryParams,
+  FetchInfiniteQueryResult,
+  FetchQueryParams,
+} from '@/types/ReactQueryType';
 import { buildFirestoreQuery } from '@/utils/firebaseUtils';
 import {
   collection,
   doc,
   getCountFromServer,
   getDocs,
+  limit,
   query,
   QueryConstraint,
   runTransaction,
+  startAt,
   updateDoc,
   where,
 } from 'firebase/firestore';
@@ -120,28 +132,67 @@ export const updateOrderStatus = async ({
   await updateDoc(doc(db, 'order', orderId), { orderStatus });
 };
 
-export const getOrderCount = async () => {
-  const q = query(collection(db, 'order'));
-  const snapshot = await getCountFromServer(q);
-  console.log(snapshot.data());
-};
-
 /*
 ############################################################
             Firestore - React Query 의 queryFn 관련 코드
 ############################################################
 */
-type FetchProductsParams = {
-  filters?: QueryConstraint[];
-  sortOrders?: QueryConstraint[];
-  pageSize?: number;
+
+/**
+ * 조건에 맞는 상품 목록 InfiniteQuery 의 queryFn 에 사용되는 함수.
+ * @param pageParam 페이지의 시작이 될 Document (QueryDocumentSnapshot<DocumentData, DocumentData>;)
+ * @param filters where 메서드로 구성된 배열 형태의 필터링 쿼리. Ex) [where('sellerEmail', '==', userInfo.email)]
+ * @param sortOrders orderBy 메서드로 구성된 배열 형태의 정렬 쿼리. Ex) [orderBy('createdAt', 'desc')]
+ * @param pageSize 페이지 별 데이터 사이즈(페이징에 사용할 값을 그대로 대입해야 이전/다음 페이지를 제대로 계산 가능)
+ * @returns Promise<{
+  dataArray: OrderSchema[];
+  documentArray: QueryDocumentType[];
+}>
+ * @usage useInfiniteQuery<FetchInfiniteOrdersResult>({ ..., queryFn: ({ pageParam }) => fetchInfiniteOrders(pageParam, filters, sortOrders, 10) })
+ */
+export const fetchInfiniteOrders = async ({
+  pageParam,
+  filters = [],
+  sortOrders = [],
+  pageSize = 10,
+}: FetchInfiniteQueryParams): Promise<
+  FetchInfiniteQueryResult<OrderSchema>
+> => {
+  const constraints: QueryConstraint[] = [
+    ...filters,
+    ...sortOrders,
+    limit(pageSize + 1),
+  ];
+
+  if (pageParam) {
+    constraints.push(startAt(pageParam));
+  }
+
+  const ordersQuery = buildFirestoreQuery(db, 'orders', constraints);
+  const orderDocuments = await getDocs(ordersQuery);
+  const dataArray: OrderSchema[] = orderDocuments.docs.map(
+    (doc) => doc.data() as OrderSchema,
+  );
+
+  return {
+    dataArray,
+    documentArray: orderDocuments.docs,
+  };
 };
 
+/**
+ * 모든 주문 정보 Query 용 queryFn 에 사용되는 함수.
+ * @param filters where 메서드로 구성된 배열 형태의 필터링 쿼리. Ex) [where('sellerEmail', '==', userInfo.email)]
+ * @param sortOrders orderBy 메서드로 구성된 배열 형태의 정렬 쿼리. Ex) [orderBy('createdAt', 'desc')]
+ * @param pageSize 조회할 데이터 사이즈
+ * @returns Promise<OrderSchema[]>
+ * @usage useQuery<FetchOrdersResult>({ ..., queryFn: ({ pageParam }) => fetchOrders(filters, sortOrders) })
+ */
 export const fetchOrders = async ({
   filters = [],
   sortOrders = [],
   pageSize = 0,
-}: FetchProductsParams): Promise<OrderSchema[]> => {
+}: FetchQueryParams): Promise<OrderSchema[]> => {
   const ordersQuery = buildFirestoreQuery(
     db,
     'order',
