@@ -89,21 +89,28 @@ const useCategory = () => {
   //   });
   // };
 
-  const { data, status, error, fetchNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery<FetchInfiniteProductsResult>({
-      queryKey,
-      queryFn: (({ pageParam }) =>
-        fetchProductsWrapper({ pageParam, filterOptions })) as QueryFunction<
-        FetchInfiniteProductsResult,
-        QueryKey,
-        unknown
-      >,
-      initialPageParam: null,
-      getNextPageParam: (lastPage) =>
-        lastPage.documentArray.length > pageSize
-          ? lastPage.documentArray[pageSize]
-          : null,
-    });
+  const {
+    data,
+    status,
+    error,
+    fetchNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isPending,
+  } = useInfiniteQuery<FetchInfiniteProductsResult>({
+    queryKey,
+    queryFn: (({ pageParam }) =>
+      fetchProductsWrapper({ pageParam, filterOptions })) as QueryFunction<
+      FetchInfiniteProductsResult,
+      QueryKey,
+      unknown
+    >,
+    initialPageParam: null,
+    getNextPageParam: (lastPage) =>
+      lastPage.documentArray.length > pageSize
+        ? lastPage.documentArray[pageSize]
+        : null,
+  });
 
   const { ref, inView } = useInView({
     /* options */
@@ -125,6 +132,7 @@ const useCategory = () => {
     error,
     isFetchingNextPage,
     isLoading,
+    isPending,
     ref,
     pageSize,
   };

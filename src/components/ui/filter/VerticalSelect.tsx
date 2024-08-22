@@ -1,4 +1,4 @@
-import * as S from './VerticalFilter.Style';
+import * as S from './VerticalSelect.Style';
 import Spinner from '../spinner/Spinner';
 import {
   ProductDirection,
@@ -12,6 +12,7 @@ type VerticalSelectProps = {
   options: { name: string; value: string }[];
   getter: ProductFilter;
   setter: React.Dispatch<React.SetStateAction<ProductFilter>>;
+  disabled: boolean;
 };
 const VerticalSelect: React.FC<VerticalSelectProps> = ({
   title,
@@ -19,6 +20,7 @@ const VerticalSelect: React.FC<VerticalSelectProps> = ({
   options,
   getter,
   setter,
+  disabled,
 }) => {
   return (
     <S.Container>
@@ -28,7 +30,7 @@ const VerticalSelect: React.FC<VerticalSelectProps> = ({
           <S.OptionButton
             key={`filter_${type}_${option.name}`}
             className={getter[type] === option.value ? 'active' : ''}
-            disabled={getter[type] === option.value}
+            disabled={getter[type] === option.value || disabled}
             onClick={() => {
               if (type === 'category') {
                 setter({

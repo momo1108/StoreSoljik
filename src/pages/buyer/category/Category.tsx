@@ -3,7 +3,7 @@ import Main from '@/components/layouts/main/Main';
 import useCategory from './useCategory';
 import VerticalCard from '@/components/ui/productcard/verticalcard/VerticalCard';
 import * as S from './Category.Style';
-import VerticalSelect from '@/components/ui/filter/VerticalFilter';
+import VerticalSelect from '@/components/ui/filter/VerticalSelect';
 import Spinner from '@/components/ui/spinner/Spinner';
 import { H2 } from '@/components/ui/header/Header.Style';
 
@@ -17,6 +17,7 @@ const Category: React.FC = () => {
     error,
     isFetchingNextPage,
     isLoading,
+    isPending,
     ref,
     pageSize,
   } = useCategory();
@@ -28,11 +29,11 @@ const Category: React.FC = () => {
         <S.CategoryContainer>
           <H2>카테고리별 상품 조회</H2>
           <S.FilterBox>
-            <VerticalSelect
-              title='카테고리'
-              type='category'
-              options={
-                categories.length
+            {[
+              {
+                title: '카테고리',
+                type: 'category',
+                options: categories.length
                   ? [
                       { name: '전체', value: '전체' },
                       ...categories.map((categoryName) => ({
@@ -40,32 +41,36 @@ const Category: React.FC = () => {
                         value: categoryName,
                       })),
                     ]
-                  : []
-              }
-              getter={filterOptions}
-              setter={setFilterOptions}
-            />
-            <VerticalSelect
-              title='정렬 기준'
-              type='field'
-              options={[
-                { name: '등록날짜순', value: 'createdAt' },
-                { name: '가격순', value: 'productPrice' },
-                { name: '판매량순', value: 'productSalesrate' },
-              ]}
-              getter={filterOptions}
-              setter={setFilterOptions}
-            />
-            <VerticalSelect
-              title='정렬 순서'
-              type='direction'
-              options={[
-                { name: '내림차순', value: 'desc' },
-                { name: '오름차순', value: 'asc' },
-              ]}
-              getter={filterOptions}
-              setter={setFilterOptions}
-            />
+                  : [],
+              },
+              {
+                title: '정렬 기준',
+                type: 'field',
+                options: [
+                  { name: '등록날짜순', value: 'createdAt' },
+                  { name: '가격순', value: 'productPrice' },
+                  { name: '판매량순', value: 'productSalesrate' },
+                ],
+              },
+              {
+                title: '정렬 순서',
+                type: 'direction',
+                options: [
+                  { name: '내림차순', value: 'desc' },
+                  { name: '오름차순', value: 'asc' },
+                ],
+              },
+            ].map((filterInfo) => (
+              <VerticalSelect
+                title={filterInfo.title}
+                type={filterInfo.type as 'field' | 'direction' | 'category'}
+                options={filterInfo.options}
+                getter={filterOptions}
+                setter={setFilterOptions}
+                disabled={isPending}
+                key={`select_${filterInfo.type}`}
+              />
+            ))}
           </S.FilterBox>
           <S.ProductCardList>
             {status === 'pending' ? (
