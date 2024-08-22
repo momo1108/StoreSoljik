@@ -1,9 +1,10 @@
 import { getValidCategories } from '@/services/categoryService';
 import {
   fetchInfiniteProducts,
-  FetchInfiniteProductsResult,
   ProductFilter,
 } from '@/services/productService';
+import { ProductSchema } from '@/types/FirebaseType';
+import { FetchInfiniteQueryResult } from '@/types/ReactQueryType';
 import {
   QueryFunction,
   QueryKey,
@@ -97,11 +98,11 @@ const useCategory = () => {
     isFetchingNextPage,
     isLoading,
     isPending,
-  } = useInfiniteQuery<FetchInfiniteProductsResult>({
+  } = useInfiniteQuery<FetchInfiniteQueryResult<ProductSchema>>({
     queryKey,
     queryFn: (({ pageParam }) =>
       fetchProductsWrapper({ pageParam, filterOptions })) as QueryFunction<
-      FetchInfiniteProductsResult,
+      FetchInfiniteQueryResult<ProductSchema>,
       QueryKey,
       unknown
     >,

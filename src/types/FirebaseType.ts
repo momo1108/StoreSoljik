@@ -1,4 +1,5 @@
 import { CartItem } from '@/hooks/useCartItems';
+import { DocumentData, QueryDocumentSnapshot } from 'firebase/firestore';
 
 export type UserSchema = {
   /**
@@ -56,3 +57,10 @@ export type OrderSchema = {
   createdAt: string; // 생성 날짜
   updatedAt: string; // 수정 날짜
 };
+
+export type QueryDocumentType = QueryDocumentSnapshot<
+  DocumentData,
+  DocumentData
+>;
+
+export type PageParamType = QueryDocumentType | null;

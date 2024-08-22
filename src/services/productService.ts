@@ -1,19 +1,27 @@
 import { db, storage } from '@/firebase';
 import { CartItem } from '@/hooks/useCartItems';
 import { UserInfo } from '@/hooks/useFirebaseAuth';
-import { OrderSchema, OrderStatus, ProductSchema } from '@/types/FirebaseType';
+import {
+  OrderSchema,
+  OrderStatus,
+  ProductSchema,
+  QueryDocumentType,
+} from '@/types/FirebaseType';
 import { ProductFormData } from '@/types/FormType';
+import {
+  FetchInfiniteQueryParams,
+  FetchInfiniteQueryResult,
+  FetchQueryParams,
+} from '@/types/ReactQueryType';
 import { buildFirestoreQuery } from '@/utils/firebaseUtils';
 import {
   collection,
   deleteDoc,
   doc,
-  DocumentData,
   getDoc,
   getDocs,
   limit,
   QueryConstraint,
-  QueryDocumentSnapshot,
   runTransaction,
   setDoc,
   startAt,
@@ -249,49 +257,27 @@ export const rollbackPurchaseProducts = async (
             Firestore - React Query 의 queryFn 관련 코드
 ############################################################
 */
-type FetchInfiniteProductsParams = {
-  pageParam: unknown;
-  filters?: QueryConstraint[];
-  sortOrders?: QueryConstraint[];
-  pageSize?: number;
-};
-
-export type QueryDocumentType = QueryDocumentSnapshot<
-  DocumentData,
-  DocumentData
->;
-
-export type PageParamType = QueryDocumentType | null;
-
-export type FetchInfiniteProductsResult = {
-  dataArray: ProductSchema[];
-  documentArray: QueryDocumentType[];
-};
-
-type FetchProductsParams = {
-  filters?: QueryConstraint[];
-  sortOrders?: QueryConstraint[];
-  pageSize?: number;
-};
 
 /**
- * useInfiniteQuery 의 queryFn 에 사용되는 함수.
+ * 조건에 맞는 상품 목록 InfiniteQuery 의 queryFn 에 사용되는 함수.
  * @param pageParam 페이지의 시작이 될 Document (QueryDocumentSnapshot<DocumentData, DocumentData>;)
  * @param filters where 메서드로 구성된 배열 형태의 필터링 쿼리. Ex) [where('sellerEmail', '==', userInfo.email)]
  * @param sortOrders orderBy 메서드로 구성된 배열 형태의 정렬 쿼리. Ex) [orderBy('createdAt', 'desc')]
- * @param pageSize 페이지 별 데이터 사이즈
+ * @param pageSize 페이지 별 데이터 사이즈(페이징에 사용할 값을 그대로 대입해야 이전/다음 페이지를 제대로 계산 가능)
  * @returns Promise<{
-  documentArray: ProductSchema[];
-  nextPage: PageParamType | null;
+  dataArray: ProductSchema[];
+  documentArray: QueryDocumentType[];
 }>
- * @usage useInfiniteQuery<FetchProductsResult>({ ..., queryFn: ({ pageParam }) => fetchInfiniteProducts(pageParam, filters, sortOrders, 10) })
+ * @usage useInfiniteQuery<FetchInfiniteProductsResult>({ ..., queryFn: ({ pageParam }) => fetchInfiniteProducts(pageParam, filters, sortOrders, 10) })
  */
 export const fetchInfiniteProducts = async ({
   pageParam,
   filters = [],
   sortOrders = [],
   pageSize = 10,
-}: FetchInfiniteProductsParams): Promise<FetchInfiniteProductsResult> => {
+}: FetchInfiniteQueryParams): Promise<
+  FetchInfiniteQueryResult<ProductSchema>
+> => {
   const constraints: QueryConstraint[] = [
     ...filters,
     ...sortOrders,
@@ -315,7 +301,7 @@ export const fetchInfiniteProducts = async ({
 };
 
 /**
- * useQuery 의 queryFn 에 사용되는 함수.
+ * 조건에 맞는 상품 목록 Query 용 queryFn 에 사용되는 함수.
  * @param filters where 메서드로 구성된 배열 형태의 필터링 쿼리. Ex) [where('sellerEmail', '==', userInfo.email)]
  * @param sortOrders orderBy 메서드로 구성된 배열 형태의 정렬 쿼리. Ex) [orderBy('createdAt', 'desc')]
  * @param pageSize 조회할 데이터 사이즈
@@ -326,7 +312,7 @@ export const fetchProducts = async ({
   filters = [],
   sortOrders = [],
   pageSize = 0,
-}: FetchProductsParams): Promise<ProductSchema[]> => {
+}: FetchQueryParams): Promise<ProductSchema[]> => {
   const productsQuery = buildFirestoreQuery(
     db,
     'product',
