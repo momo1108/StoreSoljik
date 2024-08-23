@@ -8,6 +8,21 @@ export const CategoryContainer = styled.div`
   gap: 20px;
 `;
 
+export const OrderStatusContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+`;
+
+export const OrderStatusList = styled.ul`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+`;
+
 export const OrderStatusMenuList = styled.ul`
   display: flex;
   gap: 64px;
