@@ -1,6 +1,10 @@
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { fetchInfiniteOrders, fetchOrders } from '@/services/orderService';
-import { OrderSchema, OrderStatus } from '@/types/FirebaseType';
+import {
+  KoreanOrderStatus,
+  OrderSchema,
+  OrderStatus,
+} from '@/types/FirebaseType';
 import { FetchInfiniteQueryResult } from '@/types/ReactQueryType';
 import {
   QueryFunction,
@@ -30,20 +34,25 @@ const useHistory = () => {
     },
   });
 
-  const orderStatusCount = useMemo<Record<OrderStatus, number>>(() => {
-    const countMap: Record<OrderStatus, number> = Object.values(
-      OrderStatus,
-    ).reduce(
-      (countMapAcc, status) => {
-        countMapAcc[status as OrderStatus] = 0;
-        return countMapAcc;
-      },
-      {} as Record<OrderStatus, number>,
-    );
+  const orderStatusCount = useMemo<Record<KoreanOrderStatus, number>>(() => {
+    const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
+      OrderCreated: '주문 생성',
+      OrderCompleted: '주문 완료',
+      AwaitingShipment: '발송 대기',
+      ShipmentStarted: '발송 시작',
+      OrderCancelled: '주문 취소',
+    };
+    const countMap: Record<KoreanOrderStatus, number> = {
+      '주문 생성': 0,
+      '주문 완료': 0,
+      '발송 대기': 0,
+      '발송 시작': 0,
+      '주문 취소': 0,
+    };
 
     if (allOrderData) {
       allOrderData.forEach((data) => {
-        countMap[data.orderStatus]++;
+        countMap[koreanOrderStatusMap[data.orderStatus]]++;
       });
     }
 
@@ -62,8 +71,11 @@ const useHistory = () => {
         pageParam,
         filters:
           orderStatus !== 'All'
-            ? [where('orderStatus', '==', orderStatus)]
-            : [],
+            ? [
+                where('orderStatus', '==', orderStatus),
+                where('buyerId', '==', userInfo!.uid),
+              ]
+            : [where('buyerId', '==', userInfo!.uid)],
         sortOrders: [orderBy('createdAt', 'desc')],
         pageSize: pageSize,
       });

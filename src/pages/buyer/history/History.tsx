@@ -3,12 +3,27 @@ import Main from '@/components/layouts/main/Main';
 import * as S from './History.Style';
 import { H2, H3 } from '@/components/ui/header/Header.Style';
 import useHistory from './useHistory';
-import { OrderStatus } from '@/types/FirebaseType';
+import { KoreanOrderStatus, OrderStatus } from '@/types/FirebaseType';
 import { useState } from 'react';
 
 const History: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<OrderStatus | 'All'>('All');
-  useHistory();
+  const {
+    allOrderData,
+    allOrderError,
+    allOrderStatus,
+    orderStatusCount,
+    orderStatus,
+    setOrderStatus,
+    data,
+    status,
+    error,
+    isFetchingNextPage,
+    isLoading,
+    isPending,
+    ref,
+    pageSize,
+  } = useHistory();
   console.log('history');
 
   return (
@@ -17,6 +32,18 @@ const History: React.FC = () => {
       <Main>
         <S.CategoryContainer>
           <H2>구매 내역</H2>
+          <S.OrderStatusContainer>
+            <H3>주문 상태 현황</H3>
+            <S.OrderStatusList>
+              {['주문 완료', '발송 대기', '발송 시작', '주문 취소'].map(
+                (status) => (
+                  <li>
+                    {status} : {orderStatusCount[status as KoreanOrderStatus]}
+                  </li>
+                ),
+              )}
+            </S.OrderStatusList>
+          </S.OrderStatusContainer>
           <nav>
             <S.OrderStatusMenuList>
               <li>

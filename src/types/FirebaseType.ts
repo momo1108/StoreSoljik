@@ -48,6 +48,13 @@ export enum OrderStatus {
   OrderCancelled = 'OrderCancelled', // 주문 취소
 }
 
+export type KoreanOrderStatus =
+  | '주문 생성'
+  | '주문 완료'
+  | '발송 대기'
+  | '발송 시작'
+  | '주문 취소';
+
 export type OrderSchema = {
   id: string; // 자동 생성된 id
   buyerId: string; // 구매자 id
