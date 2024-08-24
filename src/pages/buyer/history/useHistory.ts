@@ -34,7 +34,9 @@ const useHistory = () => {
     },
   });
 
-  const orderStatusCount = useMemo<Record<KoreanOrderStatus, number>>(() => {
+  const orderStatusCount = useMemo<
+    Record<KoreanOrderStatus | '전체', number>
+  >(() => {
     const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
       OrderCreated: '주문 생성',
       OrderCompleted: '주문 완료',
@@ -42,17 +44,19 @@ const useHistory = () => {
       ShipmentStarted: '발송 시작',
       OrderCancelled: '주문 취소',
     };
-    const countMap: Record<KoreanOrderStatus, number> = {
+    const countMap: Record<KoreanOrderStatus | '전체', number> = {
       '주문 생성': 0,
       '주문 완료': 0,
       '발송 대기': 0,
       '발송 시작': 0,
       '주문 취소': 0,
+      전체: 0,
     };
 
     if (allOrderData) {
       allOrderData.forEach((data) => {
         countMap[koreanOrderStatusMap[data.orderStatus]]++;
+        if (data.orderStatus !== OrderStatus.OrderCreated) countMap['전체']++;
       });
     }
 
