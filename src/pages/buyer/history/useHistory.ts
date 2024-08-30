@@ -65,6 +65,18 @@ const useHistory = () => {
 
   const [orderStatus, setOrderStatus] = useState<OrderStatus | 'All'>('All');
 
+  const orderStatusMapKrToEn: Record<
+    KoreanOrderStatus | '전체',
+    OrderStatus | 'All'
+  > = {
+    '주문 생성': OrderStatus.OrderCreated,
+    '주문 완료': OrderStatus.OrderCompleted,
+    '발송 대기': OrderStatus.AwaitingShipment,
+    '발송 시작': OrderStatus.ShipmentStarted,
+    '주문 취소': OrderStatus.OrderCancelled,
+    전체: 'All',
+  };
+
   // queryKey를 선택된 orderStatus 에 따라 동적으로 생성합니다.
   const queryKey = ['orders', orderStatus];
 
@@ -112,6 +124,21 @@ const useHistory = () => {
         : null,
   });
 
+  const dataCategorizedByDate = useMemo(() => {
+    if (data) {
+      const dataMap: Record<string, OrderSchema[]> = {};
+      data.pages.forEach((page) => {
+        page.dataArray.forEach((data) => {
+          const buyDate = data.createdAt.slice(0, 10);
+          if (dataMap[buyDate]) dataMap[buyDate].push(data);
+          else dataMap[buyDate] = [data];
+        });
+      });
+      return dataMap;
+    }
+    return undefined;
+  }, [data]);
+
   const { ref, inView } = useInView({
     /* options */
     threshold: 0.5, // 요소가 화면에 50% 이상 보일 때 감지
@@ -130,7 +157,9 @@ const useHistory = () => {
     orderStatusCount,
     orderStatus,
     setOrderStatus,
+    orderStatusMapKrToEn,
     data,
+    dataCategorizedByDate,
     status,
     error,
     isFetchingNextPage,

@@ -1,11 +1,12 @@
 // import media from '@/style/media';
+import Button from '@/components/ui/button/Button';
 import styled from 'styled-components';
 
 export const CategoryContainer = styled.div`
   display: flex;
   flex-direction: column;
-  width: 950px;
-  gap: 20px;
+  width: 800px;
+  gap: 32px;
 `;
 
 export const OrderStatusContainer = styled.div`
@@ -18,22 +19,23 @@ export const OrderStatusContainer = styled.div`
 
 export const OrderStatusList = styled.ul`
   display: flex;
-  justify-content: center;
+  width: 100%;
+  justify-content: space-between;
   align-items: center;
-  gap: 24px;
   font-size: ${({ theme }) => theme.fontSize.lg};
   font-weight: bold;
 
-  svg.greaterThanIcon {
+  svg {
+    stroke: #757e8f;
+    stroke-width: 3;
     padding: 5px;
-    stroke-linecap: round;
-    stroke-linejoin: round;
+  }
+  svg.greaterThanIcon {
     transform: scale(2, 2);
   }
 
   svg.verticalMinusIcon {
-    padding: 5px;
-    transform: scale(2, 4);
+    transform: scale(2, 7);
   }
 `;
 
@@ -61,21 +63,50 @@ export const OrderStatusListElement = styled.li`
     border-color: #ba2c2c;
     color: #be0000;
     p.statusCountP {
-      color: inherit;
+      color: #000000;
     }
   }
 `;
 
-export const OrderStatusMenuList = styled.ul`
+export const OrderListContainer = styled.div`
   display: flex;
-  gap: 64px;
-  width: 100%;
-  background: #1111;
-  border-bottom: 1px solid ${(props) => props.theme.color.brighterGray};
+  flex-direction: column;
+  gap: 16px;
+`;
 
-  li {
-    padding: 12px 16px;
-    font-size: ${(props) => props.theme.fontSize.lg};
-    font-weight: bold;
+export const OrderListMenu = styled.ul`
+  display: flex;
+  gap: 8px;
+  width: 100%;
+`;
+
+export const OrderListMenuButton = styled(Button)`
+  padding: 8px 16px;
+  min-width: 80px;
+  gap: 4px;
+
+  .countSpan {
+    font-size: ${(props) => props.theme.fontSize.sm};
   }
+`;
+
+export const OrderListInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+`;
+
+export const OrderInfoPerDateContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 0 0 8px;
+  border-left: 1px solid black;
+`;
+
+export const OrderInfoBox = styled.div`
+  display: flex;
+  padding: 12px;
+  gap: 8px;
+  border: 1px solid gray;
 `;

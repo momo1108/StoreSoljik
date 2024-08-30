@@ -14,7 +14,7 @@ import {
   rollbackPurchaseProducts,
 } from '@/services/productService';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
 import { updateOrderStatus } from '@/services/orderService';
 import { OrderStatus } from '@/types/FirebaseType';
@@ -32,6 +32,7 @@ const usePurchase = () => {
   const [isReadyToCheckout, setIsReadyToCheckout] = useState<boolean>(false);
   const navigate = useNavigate();
   const { state } = useLocation();
+  const queryClient = useQueryClient();
 
   const handlePurchaseCheckbox: ChangeEventHandler<HTMLInputElement> = (
     event,
@@ -79,6 +80,8 @@ const usePurchase = () => {
       toast.success(
         `"${paymentResultData.orderName}" 주문 건의 결제액 "${paymentResultData.totalAmount.toLocaleString()}원" 결제가 성공적으로 완료됐습니다.`,
       );
+
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
 
       clearCart();
 

@@ -1,15 +1,15 @@
 import Header from '@/components/layouts/header/Header';
 import Main from '@/components/layouts/main/Main';
 import * as S from './History.Style';
-import { H2, H3 } from '@/components/ui/header/Header.Style';
+import { H2, H3, H4 } from '@/components/ui/header/Header.Style';
 import useHistory from './useHistory';
 import { KoreanOrderStatus, OrderStatus } from '@/types/FirebaseType';
 import { Fragment, useState } from 'react';
 import { FaGreaterThan } from 'react-icons/fa';
 import { TbMinusVertical } from 'react-icons/tb';
+import Button from '@/components/ui/button/Button';
 
 const History: React.FC = () => {
-  const [selectedItem, setSelectedItem] = useState<OrderStatus | 'All'>('All');
   const {
     allOrderData,
     allOrderError,
@@ -17,7 +17,9 @@ const History: React.FC = () => {
     orderStatusCount,
     orderStatus,
     setOrderStatus,
+    orderStatusMapKrToEn,
     data,
+    dataCategorizedByDate,
     status,
     error,
     isFetchingNextPage,
@@ -26,7 +28,7 @@ const History: React.FC = () => {
     ref,
     pageSize,
   } = useHistory();
-  console.log('history');
+  console.log(dataCategorizedByDate);
 
   return (
     <>
@@ -35,7 +37,6 @@ const History: React.FC = () => {
         <S.CategoryContainer>
           <H2>구매 내역</H2>
           <S.OrderStatusContainer>
-            <H3>주문 현황</H3>
             <S.OrderStatusList>
               {['주문 완료', '발송 대기', '발송 시작', '주문 취소'].map(
                 (status) => (
@@ -58,10 +59,8 @@ const History: React.FC = () => {
                           viewBox='0 0 3 20'
                           width='3'
                           height='20'
-                          stroke='#2d3648'
-                          strokeWidth={3}
                         >
-                          <path d='M1.5,0 1.5,20' fill='none' />
+                          <path d='M1.5,0 1.5,20' strokeDasharray='2 1' />
                         </svg>
                       ) : (
                         <svg
@@ -69,8 +68,6 @@ const History: React.FC = () => {
                           viewBox='0 0 10 20'
                           width='10'
                           height='20'
-                          stroke='#2d3648'
-                          strokeWidth={3}
                         >
                           <path d='M0,0 10,10 0,20' fill='none' />
                         </svg>
@@ -83,39 +80,60 @@ const History: React.FC = () => {
               )}
             </S.OrderStatusList>
           </S.OrderStatusContainer>
-          <nav>
-            <S.OrderStatusMenuList>
-              <li>
-                <button onClick={() => setSelectedItem('All')}>메뉴 1</button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setSelectedItem(OrderStatus.OrderCompleted)}
-                >
-                  메뉴 2
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setSelectedItem(OrderStatus.AwaitingShipment)}
-                >
-                  메뉴 3
-                </button>
-              </li>
-              <li>
-                <button
-                  onClick={() => setSelectedItem(OrderStatus.ShipmentStarted)}
-                >
-                  메뉴 4
-                </button>
-              </li>
-            </S.OrderStatusMenuList>
-            {selectedItem}
-          </nav>
-          <H3>구매 내역 목록</H3>
-          <div>
-            <p>Selected Item: {selectedItem}</p>
-          </div>
+          <S.OrderListContainer>
+            <H3>구매 내역 목록</H3>
+            <S.OrderListMenu>
+              {['전체', '주문 완료', '발송 대기', '발송 시작', '주문 취소'].map(
+                (status) => (
+                  <li key={`orderMenu_${status}`}>
+                    <S.OrderListMenuButton
+                      onClick={() =>
+                        setOrderStatus(
+                          orderStatusMapKrToEn[
+                            status as KoreanOrderStatus | '전체'
+                          ],
+                        )
+                      }
+                      styleType={
+                        orderStatus ===
+                        orderStatusMapKrToEn[
+                          status as KoreanOrderStatus | '전체'
+                        ]
+                          ? 'primary'
+                          : 'normal'
+                      }
+                    >
+                      {status}
+                      <span className='countSpan'>
+                        (
+                        {orderStatusCount[status as KoreanOrderStatus | '전체']}
+                        )
+                      </span>
+                    </S.OrderListMenuButton>
+                  </li>
+                ),
+              )}
+            </S.OrderListMenu>
+            <S.OrderListInfoContainer>
+              {dataCategorizedByDate
+                ? Object.keys(dataCategorizedByDate)
+                    .sort()
+                    .reverse()
+                    .map((buyDate) => (
+                      <S.OrderInfoPerDateContainer
+                        key={`infoContainer_${buyDate}`}
+                      >
+                        <H4>{buyDate}</H4>
+                        {dataCategorizedByDate[buyDate].map((order) => (
+                          <S.OrderInfoBox>
+                            <p>{order.orderName}</p>
+                          </S.OrderInfoBox>
+                        ))}
+                      </S.OrderInfoPerDateContainer>
+                    ))
+                : ''}
+            </S.OrderListInfoContainer>
+          </S.OrderListContainer>
         </S.CategoryContainer>
       </Main>
     </>
