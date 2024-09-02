@@ -77,6 +77,18 @@ const useHistory = () => {
     전체: 'All',
   };
 
+  const orderStatusMapEnToKr: Record<
+    OrderStatus | 'All',
+    KoreanOrderStatus | '전체'
+  > = {
+    [OrderStatus.OrderCreated]: '주문 생성',
+    [OrderStatus.OrderCompleted]: '주문 완료',
+    [OrderStatus.AwaitingShipment]: '발송 대기',
+    [OrderStatus.ShipmentStarted]: '발송 시작',
+    [OrderStatus.OrderCancelled]: '주문 취소',
+    All: '전체',
+  };
+
   // queryKey를 선택된 orderStatus 에 따라 동적으로 생성합니다.
   const queryKey = ['orders', orderStatus];
 
@@ -158,6 +170,7 @@ const useHistory = () => {
     orderStatus,
     setOrderStatus,
     orderStatusMapKrToEn,
+    orderStatusMapEnToKr,
     data,
     dataCategorizedByDate,
     status,
