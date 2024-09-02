@@ -106,7 +106,17 @@ export const OrderInfoPerDateContainer = styled.div`
 
 export const OrderInfoBox = styled.div`
   display: flex;
+  flex-direction: column;
   padding: 12px;
   gap: 8px;
   border: 1px solid gray;
+  border-radius: 8px;
 `;
+
+export const OrderInfoMenuBox = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`;
+
+export const OrderInfoContentBox = styled.div``;

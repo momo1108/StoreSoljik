@@ -18,6 +18,7 @@ const History: React.FC = () => {
     orderStatus,
     setOrderStatus,
     orderStatusMapKrToEn,
+    orderStatusMapEnToKr,
     data,
     dataCategorizedByDate,
     status,
@@ -126,7 +127,32 @@ const History: React.FC = () => {
                         <H4>{buyDate}</H4>
                         {dataCategorizedByDate[buyDate].map((order) => (
                           <S.OrderInfoBox>
-                            <p>{order.orderName}</p>
+                            <S.OrderInfoMenuBox>
+                              <H4>{orderStatusMapEnToKr[order.orderStatus]}</H4>
+                              <Button
+                                styleType={
+                                  [
+                                    OrderStatus.ShipmentStarted,
+                                    OrderStatus.OrderCancelled,
+                                  ].includes(order.orderStatus)
+                                    ? 'disabled'
+                                    : 'primary'
+                                }
+                              >
+                                주문 취소
+                              </Button>
+                            </S.OrderInfoMenuBox>
+                            <S.OrderInfoContentBox>
+                              <img
+                                src={
+                                  order.cartItemsArray[0]
+                                    .productImageUrlArray[0]
+                                }
+                                alt={order.cartItemsArray[0].productName}
+                                width={200}
+                              />
+                              {order.orderName}
+                            </S.OrderInfoContentBox>
                           </S.OrderInfoBox>
                         ))}
                       </S.OrderInfoPerDateContainer>
