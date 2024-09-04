@@ -49,7 +49,7 @@ export const OrderStatusListElement = styled.li`
   height: 140px;
   border-radius: 50%;
   border: 10px solid #35528c;
-  color: #002c83;
+  color: ${({ theme }) => theme.color.active};
 
   p.statusCountP {
     color: #000000;
@@ -108,7 +108,6 @@ export const OrderInfoBox = styled.div`
   display: flex;
   flex-direction: column;
   padding: 12px;
-  gap: 8px;
   border: 1px solid gray;
   border-radius: 8px;
 `;
@@ -117,6 +116,86 @@ export const OrderInfoMenuBox = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed ${({ theme }) => theme.color.brighterGray};
+  margin-bottom: 12px;
+
+  h4 {
+    position: relative;
+    padding-top: 16px;
+    &::before {
+      position: absolute;
+      content: '주문 상태';
+      font-size: ${({ theme }) => theme.fontSize.sm};
+      line-height: ${({ theme }) => theme.fontSize.sm};
+      color: ${({ theme }) => theme.color.primary};
+      top: 0;
+      left: 0;
+    }
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .active {
+      color: ${({ theme }) => theme.color.active};
+    }
+    .activeCancel {
+      color: ${({ theme }) => theme.color.destructive};
+    }
+    .inactive {
+      color: ${({ theme }) => theme.color.brightGray};
+    }
+  }
+  svg {
+    stroke: ${({ theme }) => theme.color.brighterGray};
+    stroke-width: 3;
+    padding: 2px;
+    transform: scale(0.7);
+  }
 `;
 
-export const OrderInfoContentBox = styled.div``;
+export const OrderInfoContentBox = styled.div`
+  display: flex;
+  gap: 12px;
+`;
+
+export const OrderImage = styled.img`
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 8px;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+`;
+
+export const OrderContentBox = styled.div`
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+`;
+
+export const OrderDateP = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ theme }) => theme.color.gray};
+`;
+
+export const OrderDetailButton = styled(Button)`
+  border-width: 1px;
+  &:hover {
+    border-width: 1px;
+  }
+`;
+
+export const OrderDetailBox = styled.div`
+  height: 0px;
+  overflow: hidden;
+  transition: height 0.5s ease-in-out;
+
+  &.active {
+    height: auto;
+  }
+`;

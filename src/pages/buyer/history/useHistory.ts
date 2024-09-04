@@ -6,6 +6,7 @@ import {
   OrderStatus,
 } from '@/types/FirebaseType';
 import { FetchInfiniteQueryResult } from '@/types/ReactQueryType';
+import { getIsoDate } from '@/utils/utils';
 import {
   QueryFunction,
   QueryKey,
@@ -141,7 +142,7 @@ const useHistory = () => {
       const dataMap: Record<string, OrderSchema[]> = {};
       data.pages.forEach((page) => {
         page.dataArray.forEach((data) => {
-          const buyDate = data.createdAt.slice(0, 10);
+          const buyDate = getIsoDate(data.createdAt);
           if (dataMap[buyDate]) dataMap[buyDate].push(data);
           else dataMap[buyDate] = [data];
         });
