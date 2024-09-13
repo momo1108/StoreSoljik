@@ -52,7 +52,13 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 };
 
 export const useFirebaseAuth = () => {
-  return useContext(AuthContext);
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error(
+      'useFirebaseAuth 는 AuthProvider 내부에서만 사용이 가능합니다.',
+    );
+  }
+  return context;
 };
 
 /**
