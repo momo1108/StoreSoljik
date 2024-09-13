@@ -8,6 +8,7 @@ import { AuthProvider } from './hooks/useFirebaseAuth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
+import { ModalProvider } from './hooks/useModal.tsx';
 
 function App() {
   /**
@@ -61,7 +62,9 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
-            <MainRouter />
+            <ModalProvider>
+              <MainRouter />
+            </ModalProvider>
             <ReactQueryDevtools initialIsOpen={false} />
             <Toaster
               richColors
