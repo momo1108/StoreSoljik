@@ -1,15 +1,23 @@
 import { createPortal } from 'react-dom';
-import { ModalMain } from './Modal.Style';
+import * as S from './Modal.Style';
 import { Children } from '@/types/GlobalType';
+import { useModal } from '@/hooks/useModal';
 
-type ModalProps = Children & {
-  isOpen: boolean;
-};
+const Modal = ({ children }: Children) => {
+  const { closeModal } = useModal();
 
-const Modal = ({ children, isOpen }: ModalProps) => {
-  return isOpen
-    ? createPortal(<ModalMain>{children}</ModalMain>, document.body)
-    : null;
+  return createPortal(
+    <S.ModalWrapper onClick={() => closeModal()}>
+      <S.ModalContainer
+        onClick={(event) => {
+          event.stopPropagation();
+        }}
+      >
+        {children}
+      </S.ModalContainer>
+    </S.ModalWrapper>,
+    document.body,
+  );
 };
 
 export default Modal;
