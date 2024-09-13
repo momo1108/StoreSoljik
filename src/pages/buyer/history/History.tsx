@@ -8,9 +8,13 @@ import { Fragment } from 'react';
 import Button from '@/components/ui/button/Button';
 import { getIsoDate, getIsoTime } from '@/utils/utils';
 import { CgDetailsMore } from 'react-icons/cg';
+import Modal from '@/components/modal/Modal';
+import { useModal } from '@/hooks/useModal';
 
 const History: React.FC = () => {
   const {
+    selectedOrder,
+    setSelectedOrder,
     allOrderData,
     allOrderError,
     allOrderStatus,
@@ -29,6 +33,7 @@ const History: React.FC = () => {
     ref,
     pageSize,
   } = useHistory();
+  const { isOpen, openModal } = useModal();
 
   return (
     <>
@@ -126,7 +131,7 @@ const History: React.FC = () => {
                     >
                       <H4>{buyDate}</H4>
                       {dataCategorizedByDate[buyDate].map((order) => (
-                        <S.OrderInfoBox>
+                        <S.OrderInfoBox key={`order_${order.id}`}>
                           <S.OrderInfoMenuBox>
                             <H4>
                               {[
@@ -224,7 +229,12 @@ const History: React.FC = () => {
                                   원
                                 </strong>
                               </p>
-                              <S.OrderDetailButton>
+                              <S.OrderDetailButton
+                                onClick={() => {
+                                  setSelectedOrder(order);
+                                  openModal();
+                                }}
+                              >
                                 <CgDetailsMore /> 자세히 보기
                               </S.OrderDetailButton>
                             </S.OrderContentBox>
@@ -243,6 +253,7 @@ const History: React.FC = () => {
           </S.OrderListContainer>
         </S.CategoryContainer>
       </Main>
+      {selectedOrder && isOpen ? <Modal>Hello</Modal> : <></>}
     </>
   );
 };

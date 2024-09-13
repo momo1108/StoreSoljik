@@ -20,7 +20,13 @@ import { toast } from 'sonner';
 
 const useHistory = () => {
   const { userInfo } = useFirebaseAuth();
+  const [selectedOrder, setSelectedOrder] = useState<OrderSchema | undefined>(
+    undefined,
+  );
 
+  /**
+   * 화면 상단의 주문 현황을 위한 코드
+   */
   const {
     data: allOrderData,
     error: allOrderError,
@@ -64,6 +70,9 @@ const useHistory = () => {
     return countMap;
   }, [allOrderData]);
 
+  /**
+   * 구매 내역 목록 관련 코드
+   */
   const [orderStatus, setOrderStatus] = useState<OrderStatus | 'All'>('All');
 
   const orderStatusMapKrToEn: Record<
@@ -164,6 +173,8 @@ const useHistory = () => {
   }, [inView, fetchNextPage]);
 
   return {
+    selectedOrder,
+    setSelectedOrder,
     allOrderData,
     allOrderError,
     allOrderStatus,
