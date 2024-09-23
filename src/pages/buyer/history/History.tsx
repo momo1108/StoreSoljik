@@ -10,6 +10,8 @@ import { getIsoDate, getIsoTime } from '@/utils/utils';
 import { CgDetailsMore } from 'react-icons/cg';
 import Modal from '@/components/modal/Modal';
 import { useModal } from '@/hooks/useModal';
+import HR from '@/components/ui/hr/HR';
+import Carousel from '@/components/ui/carousel/Carousel';
 
 const History: React.FC = () => {
   const {
@@ -239,7 +241,6 @@ const History: React.FC = () => {
                               </S.OrderDetailButton>
                             </S.OrderContentBox>
                           </S.OrderInfoContentBox>
-                          <S.OrderDetailBox>hello</S.OrderDetailBox>
                         </S.OrderInfoBox>
                       ))}
                     </S.OrderInfoPerDateContainer>
@@ -253,7 +254,21 @@ const History: React.FC = () => {
           </S.OrderListContainer>
         </S.CategoryContainer>
       </Main>
-      {selectedOrder && isOpen ? <Modal>Hello</Modal> : <></>}
+      {selectedOrder && isOpen ? (
+        <Modal>
+          <Modal.Title>주문 상세 정보</Modal.Title>
+          <HR />
+          <Modal.Body>
+            {selectedOrder.cartItemsArray.map((cartItem) => (
+              <div>
+                <Carousel data={cartItem.productImageUrlArray} size={100} />
+              </div>
+            ))}
+          </Modal.Body>
+        </Modal>
+      ) : (
+        <></>
+      )}
     </>
   );
 };
