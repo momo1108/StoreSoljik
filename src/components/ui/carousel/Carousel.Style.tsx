@@ -39,6 +39,13 @@ export const CarouselImageContainer = styled.div<CarouselProps>`
   }
   ul.slick-dots {
     bottom: 0;
+    display: flex !important;
+    justify-content: center;
+    gap: 5%;
+
+    li {
+      margin: 0;
+    }
   }
 `;
 

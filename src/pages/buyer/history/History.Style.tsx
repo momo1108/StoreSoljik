@@ -189,13 +189,3 @@ export const OrderDetailButton = styled(Button)`
     border-width: 1px;
   }
 `;
-
-export const OrderDetailBox = styled.div`
-  height: 0px;
-  overflow: hidden;
-  transition: height 0.5s ease-in-out;
-
-  &.active {
-    height: auto;
-  }
-`;
