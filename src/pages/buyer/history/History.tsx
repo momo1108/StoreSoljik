@@ -260,10 +260,37 @@ const History: React.FC = () => {
           <HR />
           <Modal.Body>
             {selectedOrder.cartItemsArray.map((cartItem) => (
-              <div>
-                <Carousel data={cartItem.productImageUrlArray} size={100} />
-              </div>
+              <S.OrderDetailListItemBox
+                key={`${selectedOrder.id}_${cartItem.id}`}
+              >
+                <S.CarouselWrapperBox>
+                  <Carousel data={cartItem.productImageUrlArray} size={100} />
+                </S.CarouselWrapperBox>
+                <S.ItemInfoBox>
+                  <H4 className='hideTextOverflow'>{cartItem.productName}</H4>
+                  <strong>₩ {cartItem.productPrice.toLocaleString()}</strong>
+                </S.ItemInfoBox>
+                <S.ItemQuantityStrong>
+                  {cartItem.productQuantity.toLocaleString()} 개
+                </S.ItemQuantityStrong>
+              </S.OrderDetailListItemBox>
             ))}
+          </Modal.Body>
+          <HR />
+          <Modal.Body>
+            <S.OrderTotalPriceBox>
+              <H4>총 결제액</H4>
+              <strong>
+                ₩{' '}
+                {selectedOrder.cartItemsArray
+                  .reduce(
+                    (prev, cur) =>
+                      prev + cur.productPrice * cur.productQuantity,
+                    0,
+                  )
+                  .toLocaleString()}
+              </strong>
+            </S.OrderTotalPriceBox>
           </Modal.Body>
         </Modal>
       ) : (

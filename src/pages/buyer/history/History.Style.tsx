@@ -1,5 +1,6 @@
 // import media from '@/style/media';
 import Button from '@/components/ui/button/Button';
+import Carousel from '@/components/ui/carousel/Carousel';
 import styled from 'styled-components';
 
 export const CategoryContainer = styled.div`
@@ -188,4 +189,40 @@ export const OrderDetailButton = styled(Button)`
   &:hover {
     border-width: 1px;
   }
+`;
+
+export const OrderDetailListItemBox = styled.div`
+  display: flex;
+  width: 100%;
+  gap: 16px;
+  align-items: center;
+`;
+
+export const CarouselWrapperBox = styled.div`
+  border-radius: 8%;
+  overflow: hidden;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  flex-shrink: 0;
+`;
+
+export const ItemInfoBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  flex-shrink: 0;
+  gap: 8px;
+`;
+
+export const ItemQuantityStrong = styled.strong`
+  margin-left: auto;
+  width: 50px;
+  flex-shrink: 0;
+`;
+
+export const OrderTotalPriceBox = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 `;

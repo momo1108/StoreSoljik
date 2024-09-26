@@ -14,7 +14,7 @@ export const ModalWrapper = styled.div`
 export const ModalContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
   width: 400px;
   padding: 20px;
   background: white;
@@ -40,6 +40,11 @@ export const ModalTitleBox = styled.div`
 `;
 
 export const ModalBodyContainer = styled.div`
-  min-height: 300px;
-  max-height: 600px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 300px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding: 5px;
 `;
