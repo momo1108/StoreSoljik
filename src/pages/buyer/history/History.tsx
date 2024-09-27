@@ -12,6 +12,7 @@ import Modal from '@/components/modal/Modal';
 import { useModal } from '@/hooks/useModal';
 import HR from '@/components/ui/hr/HR';
 import Carousel from '@/components/ui/carousel/Carousel';
+import StatusBar from '@/components/ui/statusbar/StatusBar';
 
 const History: React.FC = () => {
   const {
@@ -135,7 +136,7 @@ const History: React.FC = () => {
                       {dataCategorizedByDate[buyDate].map((order) => (
                         <S.OrderInfoBox key={`order_${order.id}`}>
                           <S.OrderInfoMenuBox>
-                            <H4>
+                            <StatusBar>
                               {[
                                 '주문 완료',
                                 '발송 대기',
@@ -143,50 +144,36 @@ const History: React.FC = () => {
                                 '주문 취소',
                               ].map((status) => (
                                 <Fragment
-                                  key={`orderListElementMenu_${status}`}
+                                  key={`selectedOrderDetailStatus_${status}`}
                                 >
-                                  <span
-                                    className={
+                                  <StatusBar.Status
+                                    isActive={
                                       orderStatusMapKrToEn[
                                         status as KoreanOrderStatus
                                       ] === order.orderStatus
-                                        ? status === '주문 취소'
-                                          ? 'activeCancel'
-                                          : 'active'
-                                        : 'inactive'
+                                    }
+                                    statusType={
+                                      status === '주문 취소'
+                                        ? 'danger'
+                                        : 'normal'
                                     }
                                   >
                                     {status}
-                                  </span>
+                                  </StatusBar.Status>
                                   {status !== '주문 취소' ? (
-                                    status === '발송 시작' ? (
-                                      <svg
-                                        className='verticalMinusIcon'
-                                        viewBox='0 0 3 20'
-                                        width='3'
-                                        height='20'
-                                      >
-                                        <path
-                                          d='M1.5,0 1.5,20'
-                                          strokeDasharray='2 1'
-                                        />
-                                      </svg>
-                                    ) : (
-                                      <svg
-                                        className='greaterThanIcon'
-                                        viewBox='0 0 10 20'
-                                        width='10'
-                                        height='20'
-                                      >
-                                        <path d='M0,0 10,10 0,20' fill='none' />
-                                      </svg>
-                                    )
+                                    <StatusBar.Boundary
+                                      boundaryType={
+                                        status === '발송 시작'
+                                          ? 'line'
+                                          : 'bracket'
+                                      }
+                                    />
                                   ) : (
                                     <></>
                                   )}
                                 </Fragment>
                               ))}
-                            </H4>
+                            </StatusBar>
                             <Button
                               styleType={
                                 [
@@ -257,6 +244,32 @@ const History: React.FC = () => {
       {selectedOrder && isOpen ? (
         <Modal>
           <Modal.Title>주문 상세 정보</Modal.Title>
+          <HR />
+
+          <StatusBar>
+            {['주문 완료', '발송 대기', '발송 시작', '주문 취소'].map(
+              (status) => (
+                <Fragment key={`selectedOrderDetailStatus_${status}`}>
+                  <StatusBar.Status
+                    isActive={
+                      orderStatusMapKrToEn[status as KoreanOrderStatus] ===
+                      selectedOrder.orderStatus
+                    }
+                    statusType={status === '주문 취소' ? 'danger' : 'normal'}
+                  >
+                    {status}
+                  </StatusBar.Status>
+                  {status !== '주문 취소' ? (
+                    <StatusBar.Boundary
+                      boundaryType={status === '발송 시작' ? 'line' : 'bracket'}
+                    />
+                  ) : (
+                    <></>
+                  )}
+                </Fragment>
+              ),
+            )}
+          </StatusBar>
           <HR />
           <Modal.Body>
             {selectedOrder.cartItemsArray.map((cartItem) => (

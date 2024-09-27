@@ -1,6 +1,5 @@
 // import media from '@/style/media';
 import Button from '@/components/ui/button/Button';
-import Carousel from '@/components/ui/carousel/Carousel';
 import styled from 'styled-components';
 
 export const CategoryContainer = styled.div`
