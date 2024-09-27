@@ -2,7 +2,7 @@ import { Children, ClassName } from '@/types/GlobalType';
 import * as S from './Button.Style';
 import { ButtonHTMLAttributes } from 'react';
 
-export type ButtonProps = ClassName &
+type ButtonProps = ClassName &
   Children &
   ButtonHTMLAttributes<HTMLButtonElement> & {
     /**
