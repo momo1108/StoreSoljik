@@ -18,7 +18,7 @@ const useDetail = () => {
     }, 1000);
   }
 
-  // 구매 수량 state
+  // 구매 수량 state (input 의 value 로 사용되므로 string 타입 사용)
   const [cartItemQuantity, setCartItemQuantity] = useState<string>('1');
   /**
    * 구매 수량 input 태그의 onchange 이벤트 핸들러 함수.
@@ -113,7 +113,16 @@ const useDetail = () => {
   const { isOpen, toggleCart } = useCartUI();
   const { checkItemIsInCart, addItem } = useCartItems();
   const isProductInCart: boolean = checkItemIsInCart(data);
-  const handleClickPurchase = () => {};
+  const handleClickPurchase = () => {
+    if (data) {
+      if (!isProductInCart) addItem(data, parseInt(cartItemQuantity));
+      navigate('/purchase', {
+        state: {
+          prevRoute: window.location.pathname,
+        },
+      });
+    }
+  };
 
   useEffect(() => {
     // 여기서 추천상품 스크롤 초기화?
