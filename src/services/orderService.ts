@@ -59,7 +59,7 @@ export const getUnfinishedOrderData = async (
 
 /**
  * 결제 완료가 되지 않은 주문 정보들을 삭제하고, 상품 수량을 롤백합니다.
- * 삭제는 batch 를 사용하여 한번의 요청으로 여러 주문 정보를 삭제할 수 있도록 처리합니다.
+ * 삭제는 transaction 을 사용하여 여러 주문 정보를 삭제할 수 있도록 처리합니다.
  * @param orderIdArray 삭제할 주문 레코드의 id가 저장된 배열입니다.
  */
 export const rollbackUnfinishedOrderData = async (
