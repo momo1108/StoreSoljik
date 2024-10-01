@@ -219,6 +219,7 @@ export const purchaseProducts = async (
 export const rollbackPurchaseProducts = async (
   cartItemsArray: CartItem[],
   orderId: string,
+  isPurchasing: boolean = true,
 ) => {
   await runTransaction(db, async (transaction) => {
     const productRefs = cartItemsArray.map((product) =>
@@ -248,7 +249,7 @@ export const rollbackPurchaseProducts = async (
     });
 
     // 주문 레코드를 삭제합니다.
-    transaction.delete(doc(db, 'order', orderId));
+    if (isPurchasing) transaction.delete(doc(db, 'order', orderId));
   });
 };
 
