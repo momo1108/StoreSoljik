@@ -98,10 +98,10 @@ const Detail: React.FC = () => {
                       </Button>
                       <Button
                         styleType={isProductInCart ? 'disabled' : 'primary'}
+                        disabled={isProductInCart}
                         onClick={() =>
                           addItem(data, parseInt(cartItemQuantity))
                         }
-                        disabled={isProductInCart}
                       >
                         {isProductInCart ? (
                           <>
