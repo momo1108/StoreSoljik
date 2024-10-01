@@ -190,6 +190,17 @@ export const OrderDetailButton = styled(Button)`
   }
 `;
 
+export const EmptyOrderInfoBox = styled.div`
+  padding: 24px;
+  text-align: center;
+  border: 1px solid gray;
+  border-radius: 8px;
+`;
+
+export const InViewDiv = styled.div`
+  width: 100%;
+`;
+
 export const OrderDetailListItemBox = styled.div`
   display: flex;
   width: 100%;

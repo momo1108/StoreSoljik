@@ -18,12 +18,13 @@ const History: React.FC = () => {
   const {
     selectedOrder,
     setSelectedOrder,
+    getOrderTotalPrice,
     allOrderData,
     allOrderError,
     allOrderStatus,
     orderStatusCount,
-    orderStatus,
-    setOrderStatus,
+    orderStatusForList,
+    setOrderStatusForList,
     orderStatusMapKrToEn,
     orderStatusMapEnToKr,
     data,
@@ -35,6 +36,8 @@ const History: React.FC = () => {
     isPending,
     ref,
     pageSize,
+    isCancelingOrder,
+    cancelOrder,
   } = useHistory();
   const { isOpen, openModal } = useModal();
 
@@ -96,14 +99,14 @@ const History: React.FC = () => {
                   <li key={`orderMenu_${status}`}>
                     <S.OrderListMenuButton
                       onClick={() =>
-                        setOrderStatus(
+                        setOrderStatusForList(
                           orderStatusMapKrToEn[
                             status as KoreanOrderStatus | '전체'
                           ],
                         )
                       }
                       styleType={
-                        orderStatus ===
+                        orderStatusForList ===
                         orderStatusMapKrToEn[
                           status as KoreanOrderStatus | '전체'
                         ]
@@ -123,120 +126,124 @@ const History: React.FC = () => {
               )}
             </S.OrderListMenu>
             <S.OrderListInfoContainer>
-              {dataCategorizedByDate &&
-              Object.keys(dataCategorizedByDate).length ? (
-                Object.keys(dataCategorizedByDate)
-                  .sort()
-                  .reverse()
-                  .map((buyDate) => (
-                    <S.OrderInfoPerDateContainer
-                      key={`infoContainer_${buyDate}`}
-                    >
-                      <H4>{buyDate}</H4>
-                      {dataCategorizedByDate[buyDate].map((order) => (
-                        <S.OrderInfoBox key={`order_${order.id}`}>
-                          <S.OrderInfoMenuBox>
-                            <StatusBar>
-                              {[
-                                '주문 완료',
-                                '발송 대기',
-                                '발송 시작',
-                                '주문 취소',
-                              ].map((status) => (
-                                <Fragment
-                                  key={`selectedOrderDetailStatus_${status}`}
-                                >
-                                  <StatusBar.Status
-                                    isActive={
-                                      orderStatusMapKrToEn[
-                                        status as KoreanOrderStatus
-                                      ] === order.orderStatus
-                                    }
-                                    statusType={
-                                      status === '주문 취소'
-                                        ? 'danger'
-                                        : 'normal'
-                                    }
+              <S.OrderInfoPerDateContainer>
+                {dataCategorizedByDate &&
+                Object.keys(dataCategorizedByDate).length ? (
+                  Object.keys(dataCategorizedByDate)
+                    .sort()
+                    .reverse()
+                    .map((buyDate) => (
+                      <Fragment key={`infoContainer_${buyDate}`}>
+                        <H4>{buyDate}</H4>
+                        {dataCategorizedByDate[buyDate].map((order) => (
+                          <S.OrderInfoBox key={`order_${order.id}`}>
+                            <S.OrderInfoMenuBox>
+                              <StatusBar>
+                                {[
+                                  '주문 완료',
+                                  '발송 대기',
+                                  '발송 시작',
+                                  '주문 취소',
+                                ].map((status) => (
+                                  <Fragment
+                                    key={`selectedOrderDetailStatus_${status}`}
                                   >
-                                    {status}
-                                  </StatusBar.Status>
-                                  {status !== '주문 취소' ? (
-                                    <StatusBar.Boundary
-                                      boundaryType={
-                                        status === '발송 시작'
-                                          ? 'line'
-                                          : 'bracket'
+                                    <StatusBar.Status
+                                      isActive={
+                                        orderStatusMapKrToEn[
+                                          status as KoreanOrderStatus
+                                        ] === order.orderStatus
                                       }
-                                    />
-                                  ) : (
-                                    <></>
-                                  )}
-                                </Fragment>
-                              ))}
-                            </StatusBar>
-                            <Button
-                              styleType={
-                                [
-                                  OrderStatus.ShipmentStarted,
-                                  OrderStatus.OrderCancelled,
-                                ].includes(order.orderStatus)
-                                  ? 'disabled'
-                                  : 'primary'
-                              }
-                            >
-                              주문 취소
-                            </Button>
-                          </S.OrderInfoMenuBox>
-                          <S.OrderInfoContentBox>
-                            <S.OrderImage
-                              src={
-                                order.cartItemsArray[0].productImageUrlArray[0]
-                              }
-                              alt={order.cartItemsArray[0].productName}
-                            />
-                            <S.OrderContentBox>
-                              <div>
-                                <S.OrderDateP>
-                                  주문 일시 : {getIsoDate(order.createdAt)}{' '}
-                                  {getIsoTime(order.createdAt)}
-                                </S.OrderDateP>
-                                <H4 className='hideTextOverflow'>
-                                  {order.orderName}
-                                </H4>
-                              </div>
-                              <p>
-                                총 결제 가격 :{' '}
-                                <strong>
-                                  {order.cartItemsArray
-                                    .reduce(
-                                      (prev, cur) =>
-                                        prev +
-                                        cur.productPrice * cur.productQuantity,
-                                      0,
-                                    )
-                                    .toLocaleString()}{' '}
-                                  원
-                                </strong>
-                              </p>
-                              <S.OrderDetailButton
-                                onClick={() => {
-                                  setSelectedOrder(order);
-                                  openModal();
-                                }}
+                                      statusType={
+                                        status === '주문 취소'
+                                          ? 'danger'
+                                          : 'normal'
+                                      }
+                                    >
+                                      {status}
+                                    </StatusBar.Status>
+                                    {status !== '주문 취소' ? (
+                                      <StatusBar.Boundary
+                                        boundaryType={
+                                          status === '발송 시작'
+                                            ? 'line'
+                                            : 'bracket'
+                                        }
+                                      />
+                                    ) : (
+                                      <></>
+                                    )}
+                                  </Fragment>
+                                ))}
+                              </StatusBar>
+                              <Button
+                                styleType={
+                                  order.orderStatus ===
+                                    OrderStatus.ShipmentStarted ||
+                                  order.orderStatus ===
+                                    OrderStatus.OrderCancelled
+                                    ? 'disabled'
+                                    : 'primary'
+                                }
+                                disabled={
+                                  order.orderStatus ===
+                                    OrderStatus.ShipmentStarted ||
+                                  order.orderStatus ===
+                                    OrderStatus.OrderCancelled ||
+                                  isCancelingOrder
+                                }
+                                onClick={() => cancelOrder(order)}
                               >
-                                <CgDetailsMore /> 자세히 보기
-                              </S.OrderDetailButton>
-                            </S.OrderContentBox>
-                          </S.OrderInfoContentBox>
-                        </S.OrderInfoBox>
-                      ))}
-                    </S.OrderInfoPerDateContainer>
-                  ))
-              ) : (
-                <S.OrderInfoPerDateContainer>
-                  <H3>구매 내역 정보가 없습니다.</H3>
-                </S.OrderInfoPerDateContainer>
-              )}
+                                주문 취소
+                              </Button>
+                            </S.OrderInfoMenuBox>
+                            <S.OrderInfoContentBox>
+                              <S.OrderImage
+                                src={
+                                  order.cartItemsArray[0]
+                                    .productImageUrlArray[0]
+                                }
+                                alt={order.cartItemsArray[0].productName}
+                              />
+                              <S.OrderContentBox>
+                                <div>
+                                  <S.OrderDateP>
+                                    주문 일시 : {getIsoDate(order.createdAt)}{' '}
+                                    {getIsoTime(order.createdAt)}
+                                  </S.OrderDateP>
+                                  <H4 className='hideTextOverflow'>
+                                    {order.orderName}
+                                  </H4>
+                                </div>
+                                <p>
+                                  총 결제 가격 :{' '}
+                                  <strong>
+                                    {getOrderTotalPrice(order).toLocaleString()}{' '}
+                                    원
+                                  </strong>
+                                </p>
+                                <S.OrderDetailButton
+                                  onClick={() => {
+                                    setSelectedOrder(order);
+                                    openModal();
+                                  }}
+                                >
+                                  <CgDetailsMore /> 자세히 보기
+                                </S.OrderDetailButton>
+                              </S.OrderContentBox>
+                            </S.OrderInfoContentBox>
+                          </S.OrderInfoBox>
+                        ))}
+                      </Fragment>
+                    ))
+                ) : (
+                  <S.EmptyOrderInfoBox>
+                    <H3>구매 내역 정보가 없습니다.</H3>
+                  </S.EmptyOrderInfoBox>
+                )}
+              </S.OrderInfoPerDateContainer>
+
+              <S.InViewDiv ref={ref}></S.InViewDiv>
             </S.OrderListInfoContainer>
           </S.OrderListContainer>
         </S.CategoryContainer>
@@ -244,7 +251,7 @@ const History: React.FC = () => {
       {selectedOrder && isOpen ? (
         <Modal>
           <Modal.Title>주문 상세 정보</Modal.Title>
-          <HR />
+          <HR borderStyle='dashed' />
 
           <StatusBar>
             {['주문 완료', '발송 대기', '발송 시작', '주문 취소'].map(
@@ -270,7 +277,7 @@ const History: React.FC = () => {
               ),
             )}
           </StatusBar>
-          <HR />
+          <HR borderStyle='dashed' />
           <Modal.Body>
             {selectedOrder.cartItemsArray.map((cartItem) => (
               <S.OrderDetailListItemBox
@@ -289,19 +296,12 @@ const History: React.FC = () => {
               </S.OrderDetailListItemBox>
             ))}
           </Modal.Body>
-          <HR />
+          <HR borderStyle='dashed' />
           <Modal.Body>
             <S.OrderTotalPriceBox>
               <H4>총 결제액</H4>
               <strong>
-                ₩{' '}
-                {selectedOrder.cartItemsArray
-                  .reduce(
-                    (prev, cur) =>
-                      prev + cur.productPrice * cur.productQuantity,
-                    0,
-                  )
-                  .toLocaleString()}
+                ₩ {getOrderTotalPrice(selectedOrder).toLocaleString()}
               </strong>
             </S.OrderTotalPriceBox>
           </Modal.Body>

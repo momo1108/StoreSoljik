@@ -1,5 +1,10 @@
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
-import { fetchInfiniteOrders, fetchOrders } from '@/services/orderService';
+import {
+  fetchInfiniteOrders,
+  fetchOrders,
+  updateOrderStatus,
+} from '@/services/orderService';
+import { rollbackPurchaseProducts } from '@/services/productService';
 import {
   KoreanOrderStatus,
   OrderSchema,
@@ -23,6 +28,12 @@ const useHistory = () => {
   const [selectedOrder, setSelectedOrder] = useState<OrderSchema | undefined>(
     undefined,
   );
+
+  const getOrderTotalPrice = (order: OrderSchema) =>
+    order.cartItemsArray.reduce(
+      (prev, cur) => prev + cur.productPrice * cur.productQuantity,
+      0,
+    );
 
   /**
    * 화면 상단의 주문 현황을 위한 코드
@@ -73,7 +84,9 @@ const useHistory = () => {
   /**
    * 구매 내역 목록 관련 코드
    */
-  const [orderStatus, setOrderStatus] = useState<OrderStatus | 'All'>('All');
+  const [orderStatusForList, setOrderStatusForList] = useState<
+    OrderStatus | 'All'
+  >('All');
 
   const orderStatusMapKrToEn: Record<
     KoreanOrderStatus | '전체',
@@ -100,7 +113,7 @@ const useHistory = () => {
   };
 
   // queryKey를 선택된 orderStatus 에 따라 동적으로 생성합니다.
-  const queryKey = ['orders', orderStatus];
+  const queryKey = ['orders', orderStatusForList];
 
   const [pageSize] = useState<number>(8);
   const fetchOrdersWrapper = async ({ pageParam }: { pageParam: unknown }) => {
@@ -108,9 +121,9 @@ const useHistory = () => {
       return await fetchInfiniteOrders({
         pageParam,
         filters:
-          orderStatus !== 'All'
+          orderStatusForList !== 'All'
             ? [
-                where('orderStatus', '==', orderStatus),
+                where('orderStatus', '==', orderStatusForList),
                 where('buyerId', '==', userInfo!.uid),
               ]
             : [where('buyerId', '==', userInfo!.uid)],
@@ -172,15 +185,45 @@ const useHistory = () => {
     }
   }, [inView, fetchNextPage]);
 
+  /**
+   * 주문 취소 관련 코드
+   */
+  const [isCancelingOrder, setIsCancelingOrder] = useState<boolean>(false);
+  const cancelOrder = async (order: OrderSchema) => {
+    if (!confirm(`[${order.orderName}] 주문을 취소하시겠습니까?`)) return;
+
+    setIsCancelingOrder(true);
+    toast.promise(
+      async () => {
+        await updateOrderStatus({
+          orderId: order.id,
+          orderStatus: OrderStatus.OrderCancelled,
+        });
+        await rollbackPurchaseProducts(order.cartItemsArray, order.id, false);
+      },
+      {
+        loading: '주문 취소 요청을 처리중입니다...',
+        success: () => {
+          return `[${order.orderName}] 주문이 취소됐습니다.`;
+        },
+        error: '주문 취소 요청이 실패하였습니다. 다시 시도해주세요.',
+        finally: () => {
+          setIsCancelingOrder(false);
+        },
+      },
+    );
+  };
+
   return {
     selectedOrder,
     setSelectedOrder,
+    getOrderTotalPrice,
     allOrderData,
     allOrderError,
     allOrderStatus,
     orderStatusCount,
-    orderStatus,
-    setOrderStatus,
+    orderStatusForList,
+    setOrderStatusForList,
     orderStatusMapKrToEn,
     orderStatusMapEnToKr,
     data,
@@ -192,6 +235,8 @@ const useHistory = () => {
     isPending,
     ref,
     pageSize,
+    isCancelingOrder,
+    cancelOrder,
   };
 };
 
