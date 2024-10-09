@@ -18,8 +18,9 @@ const useRollbackUnfinishedTransactions = () => {
       !hasCheckedTransactions.current
     ) {
       getUnfinishedOrderData(userInfo.uid)
-        .then(async (orderArray) => {
-          if (orderArray.length) rollbackUnfinishedOrderData(orderArray);
+        .then(async (orderDocuments) => {
+          if (orderDocuments.docs.length)
+            rollbackUnfinishedOrderData(orderDocuments);
         })
         .catch((error) => {
           toast.error('사용자 계정의 구매 정보를 읽어오는데 실패했습니다.', {

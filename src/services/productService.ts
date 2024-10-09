@@ -1,12 +1,7 @@
 import { db, storage } from '@/firebase';
 import { CartItem } from '@/hooks/useCartItems';
 import { UserInfo } from '@/hooks/useFirebaseAuth';
-import {
-  OrderSchema,
-  OrderStatus,
-  ProductSchema,
-  QueryDocumentType,
-} from '@/types/FirebaseType';
+import { OrderSchema, OrderStatus, ProductSchema } from '@/types/FirebaseType';
 import { ProductFormData } from '@/types/FormType';
 import {
   FetchInfiniteQueryParams,
@@ -14,6 +9,7 @@ import {
   FetchQueryParams,
 } from '@/types/ReactQueryType';
 import { buildFirestoreQuery } from '@/utils/firebaseUtils';
+import { getKoreanIsoDatetime } from '@/utils/utils';
 import {
   collection,
   deleteDoc,
@@ -25,6 +21,7 @@ import {
   runTransaction,
   setDoc,
   startAt,
+  where,
 } from 'firebase/firestore';
 import {
   deleteObject,
@@ -33,6 +30,7 @@ import {
   ref,
   uploadBytes,
 } from 'firebase/storage';
+import { v4 as uuidv4 } from 'uuid';
 
 // const updateBatch = async () => {
 //   let productsQuery = query(collection(db, 'product'));
@@ -153,10 +151,12 @@ export const deleteProductDocument = async (id: string) => {
 
 export const purchaseProducts = async (
   cartItemsArray: CartItem[],
-  buyerId: string,
+  buyerInfo: UserInfo,
   orderName: string,
 ) => {
-  const orderId = await runTransaction(db, async (transaction) => {
+  let batchOrderId = `${buyerInfo.email}_${getKoreanIsoDatetime()}`;
+
+  await runTransaction(db, async (transaction) => {
     const productRefs = cartItemsArray.map((product) =>
       doc(db, 'product', product.id),
     );
@@ -194,62 +194,86 @@ export const purchaseProducts = async (
       });
     });
 
-    const timeOffset = new Date().getTimezoneOffset() * 60000;
-    const isoTime = new Date(Date.now() - timeOffset).toISOString();
+    const isoTime = batchOrderId.split('_')[1];
 
-    // 주문 정보를 DB에 저장합니다.
-    const orderRef = doc(collection(db, 'order'));
-    const orderData: OrderSchema = {
-      id: orderRef.id,
-      buyerId,
-      orderName,
-      orderStatus: OrderStatus.OrderCreated,
-      cartItemsArray,
-      createdAt: isoTime,
-      updatedAt: isoTime,
-    };
-    transaction.set(orderRef, orderData);
-
-    return orderRef.id;
+    // 각 상품들에 대해 주문 정보를 DB에 저장한다.
+    cartItemsArray.forEach((item) => {
+      const orderRef = doc(collection(db, 'order'));
+      const orderData: OrderSchema = {
+        batchOrderId,
+        buyerId: buyerInfo.uid,
+        orderName,
+        orderData: item,
+        orderStatus: OrderStatus.OrderCreated,
+        createdAt: isoTime,
+        updatedAt: isoTime,
+      };
+      transaction.set(orderRef, orderData);
+    });
   });
 
-  return orderId;
+  return batchOrderId;
 };
 
-export const rollbackPurchaseProducts = async (
-  cartItemsArray: CartItem[],
-  orderId: string,
-  isPurchasing: boolean = true,
-) => {
+/**
+ * 한 주문에 포함된 모든 상품들의 구매 과정을 롤백하는 함수입니다.
+ * 주문의 상태가 OrderStatus.OrderCreated(구매 후 결제 전)
+ * 개선안) purchaseProducts 메서드에서 트랜잭션을 통해 저장된 order 테이블의 레코드들의 모든 정보를 return 하면 그대로 가져와서 활용 가능할듯
+ * @param batchOrderId 삭제할 주문의 batchOrderId 필드
+ * @param shoudDelete 주문 레코드의 삭제 여부. 결제 전인 주문은 삭제되어야 합니다.
+ */
+type RollbackBatchOrderParam = {
+  batchOrderId: string;
+  shouldDelete?: boolean;
+};
+export const rollbackBatchOrder = async ({
+  batchOrderId,
+  shouldDelete = true,
+}: RollbackBatchOrderParam) => {
+  const orderDocuments = await getDocs(
+    buildFirestoreQuery(db, 'order', [
+      where('batchOrderId', '==', batchOrderId),
+    ]),
+  );
+  const orderDataArray: OrderSchema[] = orderDocuments.docs.map(
+    (doc) => doc.data() as OrderSchema,
+  );
+  const productRefs = orderDataArray.map((order) =>
+    doc(db, 'product', order.orderData.id),
+  );
+
   await runTransaction(db, async (transaction) => {
-    const productRefs = cartItemsArray.map((product) =>
-      doc(db, 'product', product.id),
-    );
     const productSnapshots = await Promise.all(
       productRefs.map((ref) => transaction.get(ref)),
     );
 
-    const purchaseErrorInstance = new Error();
+    const errorInstance = new Error();
 
-    // 상품의 재고를 복구합니다.
     productSnapshots.forEach((snapshot, index) => {
       if (!snapshot.exists()) {
-        purchaseErrorInstance.name = 'firebase.store.product.read';
-        purchaseErrorInstance.message = `상품 "${cartItemsArray[index].productName}" 의 정보를 읽어오는데 실패했습니다.`;
-        throw purchaseErrorInstance;
+        errorInstance.name = 'firebase.store.product.read';
+        errorInstance.message = `상품 "${orderDataArray[index].orderData.productName}" 의 정보를 읽어오는데 실패했습니다.`;
+        throw errorInstance;
       }
 
       const productData = snapshot.data();
+
       transaction.update(productRefs[index], {
         productQuantity:
-          productData!.productQuantity + cartItemsArray[index].productQuantity,
+          productData!.productQuantity +
+          orderDataArray[index].orderData.productQuantity,
         productSalesrate:
-          productData!.productSalesrate - cartItemsArray[index].productQuantity,
+          productData!.productSalesrate -
+          orderDataArray[index].orderData.productQuantity,
       });
     });
 
-    // 주문 레코드를 삭제합니다.
-    if (isPurchasing) transaction.delete(doc(db, 'order', orderId));
+    // 주문에 맞는 레코드들을 삭제합니다.
+    if (shouldDelete) {
+      orderDocuments.forEach((orderDocument) =>
+        transaction.delete(orderDocument.ref),
+      );
+    }
   });
 };
 

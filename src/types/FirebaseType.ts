@@ -55,14 +55,25 @@ export type KoreanOrderStatus =
   | '발송 시작'
   | '주문 취소';
 
+/**
+ * 주문 DB 에 저장될 스키마. 같은 주문에 대해서 각 상품별로 따로 저장되기 때문에
+ * 같은 주문의 각 상품들은 orderId 필드가 같은 값을 가진다.
+ * @property {string} batchOrderId 주문 롤백 시 사용할 조건으로 필요. buyerEmail_isoString 형태(같은 주문끼리 중복가능)
+ * @property {string} buyerId 구매자 id
+ * @property {string} orderName 주문명(Ex. 파란색 티셔츠 외 7건)
+ * @property {CartItem} orderData 주문에 포함된 각 상품 목록.(id 항목을 통해 상품 상페 정보를 불러온다.)
+ * @property {OrderStatus} orderStatus 주문 상태
+ * @property {string} createdAt 생성 날짜
+ * @property {string} updatedAt 수정 날짜
+ */
 export type OrderSchema = {
-  id: string; // 자동 생성된 id
-  buyerId: string; // 구매자 id
-  orderName: string; // 주문명(Ex. 파란색 티셔츠 외 7건)
-  cartItemsArray: CartItem[]; // 주문에 포함된 각 상품 목록.(id 항목을 통해 상품 상페 정보를 불러온다.)
-  orderStatus: OrderStatus; // 주문상태
-  createdAt: string; // 생성 날짜
-  updatedAt: string; // 수정 날짜
+  batchOrderId: string;
+  buyerId: string;
+  orderName: string;
+  orderData: CartItem;
+  orderStatus: OrderStatus;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type QueryDocumentType = QueryDocumentSnapshot<
