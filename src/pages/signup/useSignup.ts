@@ -13,6 +13,7 @@ import { MouseEventHandler } from 'react';
 import { toast } from 'sonner';
 import { UserSchema } from '@/types/FirebaseType';
 import { SignupFormDataType } from '@/types/FormType';
+import { getKoreanIsoDatetime } from '@/utils/utils';
 
 const useSignup = () => {
   const navigate = useNavigate();
@@ -35,8 +36,7 @@ const useSignup = () => {
         data.password,
       );
 
-      const timeOffset = new Date().getTimezoneOffset() * 60000;
-      const isoTime = new Date(Date.now() - timeOffset).toISOString();
+      const isoTime = getKoreanIsoDatetime();
       const documentData: UserSchema = {
         uid: userCreateResult.user.uid,
         email: data.email,

@@ -14,6 +14,7 @@ import { ProductFormData } from '@/types/FormType';
 import { ProductSchema } from '@/types/FirebaseType';
 import { createProductRegisterObject } from '@/utils/createRegisterObject';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { getKoreanIsoDatetime } from '@/utils/utils';
 
 const useUpdate = () => {
   const navigate = useNavigate();
@@ -94,8 +95,7 @@ const useUpdate = () => {
   }, [watchImages, isUpdatingImage]);
 
   const updateItemFromDB = async (data: ProductFormData) => {
-    const timeOffset = new Date().getTimezoneOffset() * 60000;
-    const isoTime = new Date(Date.now() - timeOffset).toISOString();
+    const isoTime = getKoreanIsoDatetime();
 
     try {
       /**

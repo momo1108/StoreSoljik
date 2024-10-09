@@ -8,6 +8,12 @@ export const checkPathIsActive: (path: string) => boolean = (path) => {
   }
 };
 
+export const getKoreanIsoDatetime = () => {
+  const timeOffset = new Date().getTimezoneOffset() * 60000;
+  const koreanDatetime = new Date(Date.now() - timeOffset).toISOString();
+  return koreanDatetime;
+};
+
 export const getIsoDate: (isoString: string) => string = (isoString) =>
   isoString.slice(0, 10);
 
