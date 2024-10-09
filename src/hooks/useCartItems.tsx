@@ -11,6 +11,7 @@ import { ProductSchema } from '@/types/FirebaseType';
 
 export interface CartItem {
   id: string;
+  sellerEmail: string;
   productName: string;
   productPrice: number;
   productQuantity: number;
@@ -94,6 +95,7 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
       ...prevItems,
       {
         id: product.id,
+        sellerEmail: product.sellerEmail,
         productName: product.productName,
         productPrice: product.productPrice,
         productQuantity,
@@ -108,12 +110,10 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
     maxQuantity: number = 200,
   ) => {
     if (isNaN(productQuantity)) return;
-    productQuantity =
-      productQuantity > maxQuantity
-        ? maxQuantity
-        : productQuantity < 1
-          ? 1
-          : productQuantity;
+
+    if (productQuantity < 1) productQuantity = 1;
+    else if (productQuantity > maxQuantity) productQuantity = maxQuantity;
+
     setItems((prevItems) =>
       prevItems.map(
         (item): CartItem =>
