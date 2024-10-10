@@ -4,7 +4,7 @@ import {
   fetchOrders,
   updateOrderStatus,
 } from '@/services/orderService';
-import { rollbackPurchaseProducts } from '@/services/productService';
+import { rollbackBatchOrder } from '@/services/productService';
 import {
   KoreanOrderStatus,
   OrderSchema,
@@ -23,15 +23,26 @@ import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { toast } from 'sonner';
 
+type BatchOrderData = Record<string, OrderSchema[]>;
+type OrderStatusCountMap = Record<KoreanOrderStatus | '전체', number>;
+const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
+  OrderCreated: '주문 생성',
+  OrderCompleted: '주문 완료',
+  AwaitingShipment: '발송 대기',
+  ShipmentStarted: '발송 시작',
+  OrderCancelled: '주문 취소',
+};
+
 const useHistory = () => {
   const { userInfo } = useFirebaseAuth();
   const [selectedOrder, setSelectedOrder] = useState<OrderSchema | undefined>(
     undefined,
   );
 
-  const getOrderTotalPrice = (order: OrderSchema) =>
-    order.cartItemsArray.reduce(
-      (prev, cur) => prev + cur.productPrice * cur.productQuantity,
+  const getGroupedOrderTotalPrice = (orderArray: OrderSchema[]) =>
+    orderArray.reduce(
+      (prev, cur) =>
+        prev + cur.orderData.productPrice * cur.orderData.productQuantity,
       0,
     );
 
@@ -52,17 +63,8 @@ const useHistory = () => {
     },
   });
 
-  const orderStatusCount = useMemo<
-    Record<KoreanOrderStatus | '전체', number>
-  >(() => {
-    const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
-      OrderCreated: '주문 생성',
-      OrderCompleted: '주문 완료',
-      AwaitingShipment: '발송 대기',
-      ShipmentStarted: '발송 시작',
-      OrderCancelled: '주문 취소',
-    };
-    const countMap: Record<KoreanOrderStatus | '전체', number> = {
+  const orderStatusCountMap = useMemo<OrderStatusCountMap>(() => {
+    const orderStatusCountMap: OrderStatusCountMap = {
       '주문 생성': 0,
       '주문 완료': 0,
       '발송 대기': 0,
@@ -72,13 +74,15 @@ const useHistory = () => {
     };
 
     if (allOrderData) {
-      allOrderData.forEach((data) => {
-        countMap[koreanOrderStatusMap[data.orderStatus]]++;
-        if (data.orderStatus !== OrderStatus.OrderCreated) countMap['전체']++;
+      allOrderData.forEach((orderData) => {
+        // 주문 상태를 key, key 에 해당하는 주문 건수를 value 로 매핑합니다.
+        orderStatusCountMap[koreanOrderStatusMap[orderData.orderStatus]]++;
+        if (orderData.orderStatus !== OrderStatus.OrderCreated)
+          orderStatusCountMap['전체']++; // 혹시라도 rollback 되지 않은 결제 미완료주문을 제외합니다.
       });
     }
 
-    return countMap;
+    return orderStatusCountMap;
   }, [allOrderData]);
 
   /**
@@ -159,17 +163,19 @@ const useHistory = () => {
         : null,
   });
 
-  const dataCategorizedByDate = useMemo(() => {
+  const batchOrderData = useMemo<BatchOrderData | undefined>(() => {
     if (data) {
-      const dataMap: Record<string, OrderSchema[]> = {};
+      const batchOrderData: BatchOrderData = {};
       data.pages.forEach((page) => {
-        page.dataArray.forEach((data) => {
-          const buyDate = getIsoDate(data.createdAt);
-          if (dataMap[buyDate]) dataMap[buyDate].push(data);
-          else dataMap[buyDate] = [data];
+        page.dataArray.forEach((orderData) => {
+          const buyDate = getIsoDate(orderData.createdAt);
+
+          // 주문의 createdAt 필드를 key, 같은 batch 에 해당하는 주문 레코드들을 배열 형태로 value 로 사용해 그룹핑합니다.
+          if (batchOrderData[buyDate]) batchOrderData[buyDate].push(orderData);
+          else batchOrderData[buyDate] = [orderData];
         });
       });
-      return dataMap;
+      return batchOrderData;
     }
     return undefined;
   }, [data]);
@@ -196,10 +202,13 @@ const useHistory = () => {
     toast.promise(
       async () => {
         await updateOrderStatus({
-          orderId: order.id,
+          orderId: order.batchOrderId,
           orderStatus: OrderStatus.OrderCancelled,
         });
-        await rollbackPurchaseProducts(order.cartItemsArray, order.id, false);
+        await rollbackBatchOrder({
+          batchOrderId: order.batchOrderId,
+          shouldDelete: false,
+        });
       },
       {
         loading: '주문 취소 요청을 처리중입니다...',
@@ -217,17 +226,17 @@ const useHistory = () => {
   return {
     selectedOrder,
     setSelectedOrder,
-    getOrderTotalPrice,
+    getGroupedOrderTotalPrice,
     allOrderData,
     allOrderError,
     allOrderStatus,
-    orderStatusCount,
+    batchOrderData,
+    orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,
     orderStatusMapKrToEn,
     orderStatusMapEnToKr,
     data,
-    dataCategorizedByDate,
     status,
     error,
     isFetchingNextPage,

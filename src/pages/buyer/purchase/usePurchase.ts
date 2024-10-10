@@ -4,20 +4,21 @@ import { PurchaseFormData } from '@/types/FormType';
 import { ChangeEventHandler, MouseEventHandler, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useCartItems } from '@/hooks/useCartItems';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { useFirebaseAuth, UserInfo } from '@/hooks/useFirebaseAuth';
 import { toast } from 'sonner';
 import { confirmPayment, processPayment } from '@/services/paymentService';
 import { createPurchaseRegisterObject } from '@/utils/createRegisterObject';
 import {
   fetchProducts,
   purchaseProducts,
-  rollbackPurchaseProducts,
+  rollbackBatchOrder,
 } from '@/services/productService';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
-import { updateOrderStatus } from '@/services/orderService';
+import { updateBatchOrderStatus } from '@/services/orderService';
 import { OrderStatus } from '@/types/FirebaseType';
+import { v4 as uuidv4 } from 'uuid';
 
 const usePurchase = () => {
   const {
@@ -50,12 +51,12 @@ const usePurchase = () => {
 
     refetchProductQuantityArray();
 
-    let orderId: string = '';
+    let batchOrderId = '';
 
     try {
-      orderId = await purchaseProducts(
+      batchOrderId = await purchaseProducts(
         items,
-        userInfo!.uid,
+        userInfo as UserInfo,
         `${items[0].productName}${items.length > 1 ? ` 외 ${items.length - 1}건` : ''}`,
       );
 
@@ -64,7 +65,7 @@ const usePurchase = () => {
        */
       const confirmData = await processPayment({
         totalPrice,
-        orderId,
+        orderId: uuidv4(),
         items,
         email: data.buyerEmail,
         name: data.buyerName,
@@ -72,8 +73,8 @@ const usePurchase = () => {
       });
 
       const paymentResultData = await confirmPayment({ confirmData });
-      await updateOrderStatus({
-        orderId,
+      await updateBatchOrderStatus({
+        batchOrderId,
         orderStatus: OrderStatus.OrderCompleted,
       });
 
@@ -90,7 +91,7 @@ const usePurchase = () => {
       else navigate('/');
     } catch (error: unknown) {
       console.log(error);
-      if (orderId) await rollbackPurchaseProducts(items, orderId);
+      if (batchOrderId) await rollbackBatchOrder({ batchOrderId });
       toast.error('구매 도중 에러가 발생했습니다.', {
         description: (error as Error).message,
       });
@@ -160,6 +161,7 @@ const usePurchase = () => {
 
       return productData;
     },
+    refetchOnMount: 'always',
   });
 
   return {
