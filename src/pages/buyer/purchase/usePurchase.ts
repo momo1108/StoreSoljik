@@ -18,6 +18,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
 import { updateBatchOrderStatus } from '@/services/orderService';
 import { OrderStatus } from '@/types/FirebaseType';
+import { v4 as uuidv4 } from 'uuid';
 
 const usePurchase = () => {
   const {
@@ -64,7 +65,7 @@ const usePurchase = () => {
        */
       const confirmData = await processPayment({
         totalPrice,
-        orderId: batchOrderId,
+        orderId: uuidv4(),
         items,
         email: data.buyerEmail,
         name: data.buyerName,
@@ -160,6 +161,7 @@ const usePurchase = () => {
 
       return productData;
     },
+    refetchOnMount: 'always',
   });
 
   return {
