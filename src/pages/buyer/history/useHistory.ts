@@ -23,7 +23,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { toast } from 'sonner';
 
-type BatchOrderData = Record<string, OrderSchema[]>;
+type BatchOrderDataMap = Record<string, OrderSchema[]>;
 type OrderStatusCountMap = Record<KoreanOrderStatus | '전체', number>;
 const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
   OrderCreated: '주문 생성',
@@ -35,9 +35,9 @@ const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
 
 const useHistory = () => {
   const { userInfo } = useFirebaseAuth();
-  const [selectedOrder, setSelectedOrder] = useState<OrderSchema | undefined>(
-    undefined,
-  );
+  const [selectedBatchOrder, setSelectedBatchOrder] = useState<
+    OrderSchema[] | undefined
+  >(undefined);
 
   const getGroupedOrderTotalPrice = (orderArray: OrderSchema[]) =>
     orderArray.reduce(
@@ -163,19 +163,20 @@ const useHistory = () => {
         : null,
   });
 
-  const batchOrderData = useMemo<BatchOrderData | undefined>(() => {
+  const batchOrderDataMap = useMemo<BatchOrderDataMap | undefined>(() => {
     if (data) {
-      const batchOrderData: BatchOrderData = {};
+      const batchOrderDataMap: BatchOrderDataMap = {};
       data.pages.forEach((page) => {
         page.dataArray.forEach((orderData) => {
           const buyDate = getIsoDate(orderData.createdAt);
 
           // 주문의 createdAt 필드를 key, 같은 batch 에 해당하는 주문 레코드들을 배열 형태로 value 로 사용해 그룹핑합니다.
-          if (batchOrderData[buyDate]) batchOrderData[buyDate].push(orderData);
-          else batchOrderData[buyDate] = [orderData];
+          if (batchOrderDataMap[buyDate])
+            batchOrderDataMap[buyDate].push(orderData);
+          else batchOrderDataMap[buyDate] = [orderData];
         });
       });
-      return batchOrderData;
+      return batchOrderDataMap;
     }
     return undefined;
   }, [data]);
@@ -224,13 +225,13 @@ const useHistory = () => {
   };
 
   return {
-    selectedOrder,
-    setSelectedOrder,
+    selectedBatchOrder,
+    setSelectedBatchOrder,
     getGroupedOrderTotalPrice,
     allOrderData,
     allOrderError,
     allOrderStatus,
-    batchOrderData,
+    batchOrderDataMap,
     orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,

@@ -16,19 +16,19 @@ import StatusBar from '@/components/ui/statusbar/StatusBar';
 
 const History: React.FC = () => {
   const {
-    selectedOrder,
-    setSelectedOrder,
-    getOrderTotalPrice,
+    selectedBatchOrder,
+    setSelectedBatchOrder,
+    getGroupedOrderTotalPrice,
     allOrderData,
     allOrderError,
     allOrderStatus,
-    orderStatusCount,
+    batchOrderDataMap,
+    orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,
     orderStatusMapKrToEn,
     orderStatusMapEnToKr,
     data,
-    dataCategorizedByDate,
     status,
     error,
     isFetchingNextPage,
@@ -57,7 +57,7 @@ const History: React.FC = () => {
                     >
                       <p className='statusCountP'>
                         <span className='statusCountSpan'>
-                          {orderStatusCount[status as KoreanOrderStatus]}
+                          {orderStatusCountMap[status as KoreanOrderStatus]}
                         </span>{' '}
                         건
                       </p>
@@ -117,7 +117,11 @@ const History: React.FC = () => {
                       {status}
                       <span className='countSpan'>
                         (
-                        {orderStatusCount[status as KoreanOrderStatus | '전체']}
+                        {
+                          orderStatusCountMap[
+                            status as KoreanOrderStatus | '전체'
+                          ]
+                        }
                         )
                       </span>
                     </S.OrderListMenuButton>
@@ -127,16 +131,17 @@ const History: React.FC = () => {
             </S.OrderListMenu>
             <S.OrderListInfoContainer>
               <S.OrderInfoPerDateContainer>
-                {dataCategorizedByDate &&
-                Object.keys(dataCategorizedByDate).length ? (
-                  Object.keys(dataCategorizedByDate)
-                    .sort()
+                {batchOrderDataMap && Object.keys(batchOrderDataMap).length ? (
+                  Object.entries(batchOrderDataMap)
+                    .sort(([date1], [date2]) => (date1 < date2 ? -1 : 1))
                     .reverse()
-                    .map((buyDate) => (
+                    .map(([buyDate, batchOrderData]) => (
                       <Fragment key={`infoContainer_${buyDate}`}>
                         <H4>{buyDate}</H4>
-                        {dataCategorizedByDate[buyDate].map((order) => (
-                          <S.OrderInfoBox key={`order_${order.id}`}>
+                        {batchOrderData.map((order) => (
+                          <S.OrderInfoBox
+                            key={`${order.batchOrderId}_${order.orderData.id}`}
+                          >
                             <S.OrderInfoMenuBox>
                               <StatusBar>
                                 {[
@@ -199,11 +204,8 @@ const History: React.FC = () => {
                             </S.OrderInfoMenuBox>
                             <S.OrderInfoContentBox>
                               <S.OrderImage
-                                src={
-                                  order.cartItemsArray[0]
-                                    .productImageUrlArray[0]
-                                }
-                                alt={order.cartItemsArray[0].productName}
+                                src={order.orderData.productImageUrlArray[0]}
+                                alt={order.orderData.productName}
                               />
                               <S.OrderContentBox>
                                 <div>
@@ -218,13 +220,15 @@ const History: React.FC = () => {
                                 <p>
                                   총 결제 가격 :{' '}
                                   <strong>
-                                    {getOrderTotalPrice(order).toLocaleString()}{' '}
+                                    {getGroupedOrderTotalPrice(
+                                      batchOrderData,
+                                    ).toLocaleString()}{' '}
                                     원
                                   </strong>
                                 </p>
                                 <S.OrderDetailButton
                                   onClick={() => {
-                                    setSelectedOrder(order);
+                                    setSelectedBatchOrder(batchOrderData);
                                     openModal();
                                   }}
                                 >
@@ -248,19 +252,19 @@ const History: React.FC = () => {
           </S.OrderListContainer>
         </S.CategoryContainer>
       </Main>
-      {selectedOrder && isOpen ? (
+      {selectedBatchOrder && isOpen ? (
         <Modal>
           <Modal.Title>주문 상세 정보</Modal.Title>
           <HR borderStyle='dashed' />
 
-          <StatusBar>
+          {/* <StatusBar>
             {['주문 완료', '발송 대기', '발송 시작', '주문 취소'].map(
               (status) => (
                 <Fragment key={`selectedOrderDetailStatus_${status}`}>
                   <StatusBar.Status
                     isActive={
                       orderStatusMapKrToEn[status as KoreanOrderStatus] ===
-                      selectedOrder.orderStatus
+                      selectedBatchOrder.orderStatus
                     }
                     statusType={status === '주문 취소' ? 'danger' : 'normal'}
                   >
@@ -276,22 +280,22 @@ const History: React.FC = () => {
                 </Fragment>
               ),
             )}
-          </StatusBar>
+          </StatusBar> */}
           <HR borderStyle='dashed' />
           <Modal.Body>
-            {selectedOrder.cartItemsArray.map((cartItem) => (
+            {selectedBatchOrder.map(({ batchOrderId, orderData }) => (
               <S.OrderDetailListItemBox
-                key={`${selectedOrder.id}_${cartItem.id}`}
+                key={`${batchOrderId}_${orderData.productName}`}
               >
                 <S.CarouselWrapperBox>
-                  <Carousel data={cartItem.productImageUrlArray} size={100} />
+                  <Carousel data={orderData.productImageUrlArray} size={100} />
                 </S.CarouselWrapperBox>
                 <S.ItemInfoBox>
-                  <H4 className='hideTextOverflow'>{cartItem.productName}</H4>
-                  <strong>₩ {cartItem.productPrice.toLocaleString()}</strong>
+                  <H4 className='hideTextOverflow'>{orderData.productName}</H4>
+                  <strong>₩ {orderData.productPrice.toLocaleString()}</strong>
                 </S.ItemInfoBox>
                 <S.ItemQuantityStrong>
-                  {cartItem.productQuantity.toLocaleString()} 개
+                  {orderData.productQuantity.toLocaleString()} 개
                 </S.ItemQuantityStrong>
               </S.OrderDetailListItemBox>
             ))}
@@ -301,7 +305,8 @@ const History: React.FC = () => {
             <S.OrderTotalPriceBox>
               <H4>총 결제액</H4>
               <strong>
-                ₩ {getOrderTotalPrice(selectedOrder).toLocaleString()}
+                ₩{' '}
+                {getGroupedOrderTotalPrice(selectedBatchOrder).toLocaleString()}
               </strong>
             </S.OrderTotalPriceBox>
           </Modal.Body>
