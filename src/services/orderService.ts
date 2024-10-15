@@ -87,6 +87,7 @@ export const rollbackUnfinishedOrderData = async (
 
       const productData = snapshot.data();
 
+      // 재고 정보를 롤백합니다.
       transaction.update(productRefs[index], {
         productQuantity:
           productData!.productQuantity +
@@ -97,9 +98,7 @@ export const rollbackUnfinishedOrderData = async (
       });
 
       // 재고 정보의 롤백을 마친 후 주문 정보를 삭제합니다.
-      orderDocuments.forEach((orderDocument) =>
-        transaction.delete(orderDocument.ref),
-      );
+      transaction.delete(orderDocuments.docs[index].ref);
     });
   });
 
