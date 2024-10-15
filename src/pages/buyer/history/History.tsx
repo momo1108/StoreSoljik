@@ -16,13 +16,11 @@ import StatusBar from '@/components/ui/statusbar/StatusBar';
 
 const History: React.FC = () => {
   const {
-    selectedBatchOrder,
-    setSelectedBatchOrder,
     getGroupedOrderTotalPrice,
     allOrderData,
     allOrderError,
     allOrderStatus,
-    batchOrderDataMap,
+    batchOrderDataEntries,
     orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,
@@ -39,7 +37,6 @@ const History: React.FC = () => {
     isCancelingOrder,
     cancelOrder,
   } = useHistory();
-  const { isOpen, openModal } = useModal();
 
   return (
     <>
@@ -131,115 +128,114 @@ const History: React.FC = () => {
             </S.OrderListMenu>
             <S.OrderListInfoContainer>
               <S.OrderInfoPerDateContainer>
-                {batchOrderDataMap && Object.keys(batchOrderDataMap).length ? (
-                  Object.entries(batchOrderDataMap)
-                    .sort(([date1], [date2]) => (date1 < date2 ? -1 : 1))
-                    .reverse()
-                    .map(([buyDate, batchOrderData]) => (
-                      <Fragment key={`infoContainer_${buyDate}`}>
-                        <H4>{buyDate}</H4>
+                {batchOrderDataEntries ? (
+                  batchOrderDataEntries.map(([buyDate, batchOrderData]) => (
+                    <Fragment key={`infoContainer_${buyDate}`}>
+                      <H4>{buyDate}</H4>
+                      <S.OrderInfoBox>
+                        <div>
+                          <S.OrderDateP>
+                            주문 일시 :{' '}
+                            {getIsoDate(batchOrderData[0].createdAt)}{' '}
+                            {getIsoTime(batchOrderData[0].createdAt)}
+                          </S.OrderDateP>
+                          <H4 className='hideTextOverflow'>
+                            {batchOrderData[0].orderName}
+                          </H4>
+                        </div>
                         {batchOrderData.map((order) => (
-                          <S.OrderInfoBox
+                          <Fragment
                             key={`${order.batchOrderId}_${order.orderData.id}`}
                           >
-                            <S.OrderInfoMenuBox>
-                              <StatusBar>
-                                {[
-                                  '주문 완료',
-                                  '발송 대기',
-                                  '발송 시작',
-                                  '주문 취소',
-                                ].map((status) => (
-                                  <Fragment
-                                    key={`selectedOrderDetailStatus_${status}`}
-                                  >
-                                    <StatusBar.Status
-                                      isActive={
-                                        orderStatusMapKrToEn[
-                                          status as KoreanOrderStatus
-                                        ] === order.orderStatus
-                                      }
-                                      statusType={
-                                        status === '주문 취소'
-                                          ? 'danger'
-                                          : 'normal'
-                                      }
-                                    >
-                                      {status}
-                                    </StatusBar.Status>
-                                    {status !== '주문 취소' ? (
-                                      <StatusBar.Boundary
-                                        boundaryType={
-                                          status === '발송 시작'
-                                            ? 'line'
-                                            : 'bracket'
-                                        }
-                                      />
-                                    ) : (
-                                      <></>
-                                    )}
-                                  </Fragment>
-                                ))}
-                              </StatusBar>
-                              <Button
-                                styleType={
-                                  order.orderStatus ===
-                                    OrderStatus.ShipmentStarted ||
-                                  order.orderStatus ===
-                                    OrderStatus.OrderCancelled
-                                    ? 'disabled'
-                                    : 'primary'
-                                }
-                                disabled={
-                                  order.orderStatus ===
-                                    OrderStatus.ShipmentStarted ||
-                                  order.orderStatus ===
-                                    OrderStatus.OrderCancelled ||
-                                  isCancelingOrder
-                                }
-                                onClick={() => cancelOrder(order)}
-                              >
-                                주문 취소
-                              </Button>
-                            </S.OrderInfoMenuBox>
                             <S.OrderInfoContentBox>
                               <S.OrderImage
                                 src={order.orderData.productImageUrlArray[0]}
                                 alt={order.orderData.productName}
                               />
                               <S.OrderContentBox>
-                                <div>
-                                  <S.OrderDateP>
-                                    주문 일시 : {getIsoDate(order.createdAt)}{' '}
-                                    {getIsoTime(order.createdAt)}
-                                  </S.OrderDateP>
-                                  <H4 className='hideTextOverflow'>
-                                    {order.orderName}
-                                  </H4>
-                                </div>
-                                <p>
-                                  총 결제 가격 :{' '}
-                                  <strong>
-                                    {getGroupedOrderTotalPrice(
-                                      batchOrderData,
-                                    ).toLocaleString()}{' '}
-                                    원
-                                  </strong>
-                                </p>
-                                <S.OrderDetailButton
-                                  onClick={() => {
-                                    setSelectedBatchOrder(batchOrderData);
-                                    openModal();
-                                  }}
-                                >
-                                  <CgDetailsMore /> 자세히 보기
-                                </S.OrderDetailButton>
+                                <S.OrderContentMenuBox>
+                                  <StatusBar>
+                                    {[
+                                      '주문 완료',
+                                      '발송 대기',
+                                      '발송 시작',
+                                      '주문 취소',
+                                    ].map((status) => (
+                                      <Fragment
+                                        key={`selectedOrderDetailStatus_${status}`}
+                                      >
+                                        <StatusBar.Status
+                                          isActive={
+                                            orderStatusMapKrToEn[
+                                              status as KoreanOrderStatus
+                                            ] === order.orderStatus
+                                          }
+                                          statusType={
+                                            status === '주문 취소'
+                                              ? 'danger'
+                                              : 'normal'
+                                          }
+                                        >
+                                          {status}
+                                        </StatusBar.Status>
+                                        {status !== '주문 취소' ? (
+                                          <StatusBar.Boundary
+                                            boundaryType={
+                                              status === '발송 시작'
+                                                ? 'line'
+                                                : 'bracket'
+                                            }
+                                          />
+                                        ) : (
+                                          <></>
+                                        )}
+                                      </Fragment>
+                                    ))}
+                                  </StatusBar>
+                                  <Button
+                                    styleType={
+                                      order.orderStatus ===
+                                        OrderStatus.ShipmentStarted ||
+                                      order.orderStatus ===
+                                        OrderStatus.OrderCancelled
+                                        ? 'disabled'
+                                        : 'primary'
+                                    }
+                                    disabled={
+                                      order.orderStatus ===
+                                        OrderStatus.ShipmentStarted ||
+                                      order.orderStatus ===
+                                        OrderStatus.OrderCancelled ||
+                                      isCancelingOrder
+                                    }
+                                    onClick={() => cancelOrder(order)}
+                                  >
+                                    주문 취소
+                                  </Button>
+                                </S.OrderContentMenuBox>
+                                <S.OrderContentDescrBox>
+                                  <H4>{order.orderData.productName}</H4>
+                                  <p>
+                                    {order.orderData.productPrice.toLocaleString()}{' '}
+                                    원 ㆍ{' '}
+                                    {order.orderData.productQuantity.toLocaleString()}{' '}
+                                    개 ={' '}
+                                    <span>
+                                      {(
+                                        order.orderData.productPrice *
+                                        order.orderData.productQuantity
+                                      ).toLocaleString()}{' '}
+                                      원
+                                    </span>
+                                  </p>
+                                </S.OrderContentDescrBox>
                               </S.OrderContentBox>
                             </S.OrderInfoContentBox>
-                          </S.OrderInfoBox>
+                          </Fragment>
                         ))}
-                      </Fragment>
-                    ))
+                      </S.OrderInfoBox>
+                    </Fragment>
+                  ))
                 ) : (
                   <S.EmptyOrderInfoBox>
                     <H3>구매 내역 정보가 없습니다.</H3>
@@ -252,68 +248,6 @@ const History: React.FC = () => {
           </S.OrderListContainer>
         </S.CategoryContainer>
       </Main>
-      {selectedBatchOrder && isOpen ? (
-        <Modal>
-          <Modal.Title>주문 상세 정보</Modal.Title>
-          <HR borderStyle='dashed' />
-
-          {/* <StatusBar>
-            {['주문 완료', '발송 대기', '발송 시작', '주문 취소'].map(
-              (status) => (
-                <Fragment key={`selectedOrderDetailStatus_${status}`}>
-                  <StatusBar.Status
-                    isActive={
-                      orderStatusMapKrToEn[status as KoreanOrderStatus] ===
-                      selectedBatchOrder.orderStatus
-                    }
-                    statusType={status === '주문 취소' ? 'danger' : 'normal'}
-                  >
-                    {status}
-                  </StatusBar.Status>
-                  {status !== '주문 취소' ? (
-                    <StatusBar.Boundary
-                      boundaryType={status === '발송 시작' ? 'line' : 'bracket'}
-                    />
-                  ) : (
-                    <></>
-                  )}
-                </Fragment>
-              ),
-            )}
-          </StatusBar> */}
-          <HR borderStyle='dashed' />
-          <Modal.Body>
-            {selectedBatchOrder.map(({ batchOrderId, orderData }) => (
-              <S.OrderDetailListItemBox
-                key={`${batchOrderId}_${orderData.productName}`}
-              >
-                <S.CarouselWrapperBox>
-                  <Carousel data={orderData.productImageUrlArray} size={100} />
-                </S.CarouselWrapperBox>
-                <S.ItemInfoBox>
-                  <H4 className='hideTextOverflow'>{orderData.productName}</H4>
-                  <strong>₩ {orderData.productPrice.toLocaleString()}</strong>
-                </S.ItemInfoBox>
-                <S.ItemQuantityStrong>
-                  {orderData.productQuantity.toLocaleString()} 개
-                </S.ItemQuantityStrong>
-              </S.OrderDetailListItemBox>
-            ))}
-          </Modal.Body>
-          <HR borderStyle='dashed' />
-          <Modal.Body>
-            <S.OrderTotalPriceBox>
-              <H4>총 결제액</H4>
-              <strong>
-                ₩{' '}
-                {getGroupedOrderTotalPrice(selectedBatchOrder).toLocaleString()}
-              </strong>
-            </S.OrderTotalPriceBox>
-          </Modal.Body>
-        </Modal>
-      ) : (
-        <></>
-      )}
     </>
   );
 };

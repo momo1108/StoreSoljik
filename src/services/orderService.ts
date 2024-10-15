@@ -109,13 +109,13 @@ export const rollbackUnfinishedOrderData = async (
 };
 
 export const updateOrderStatus = async ({
-  orderId,
+  order,
   orderStatus,
 }: {
-  orderId: string;
+  order: OrderSchema;
   orderStatus: OrderStatus;
 }) => {
-  await updateDoc(doc(db, 'order', orderId), { orderStatus });
+  await updateDoc(doc(db, 'order', order.orderId), { orderStatus });
 };
 
 export const updateBatchOrderStatus = async ({

@@ -4,7 +4,7 @@ import {
   fetchOrders,
   updateOrderStatus,
 } from '@/services/orderService';
-import { rollbackBatchOrder } from '@/services/productService';
+import { rollbackSingleOrder } from '@/services/productService';
 import {
   KoreanOrderStatus,
   OrderSchema,
@@ -17,13 +17,14 @@ import {
   QueryKey,
   useInfiniteQuery,
   useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { toast } from 'sonner';
 
-type BatchOrderDataMap = Record<string, OrderSchema[]>;
+type BatchOrderDataMap = Record<string, (OrderSchema & { orderId: string })[]>;
 type OrderStatusCountMap = Record<KoreanOrderStatus | '전체', number>;
 const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
   OrderCreated: '주문 생성',
@@ -35,9 +36,7 @@ const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
 
 const useHistory = () => {
   const { userInfo } = useFirebaseAuth();
-  const [selectedBatchOrder, setSelectedBatchOrder] = useState<
-    OrderSchema[] | undefined
-  >(undefined);
+  const queryClient = useQueryClient();
 
   const getGroupedOrderTotalPrice = (orderArray: OrderSchema[]) =>
     orderArray.reduce(
@@ -163,8 +162,10 @@ const useHistory = () => {
         : null,
   });
 
-  const batchOrderDataMap = useMemo<BatchOrderDataMap | undefined>(() => {
-    if (data) {
+  const batchOrderDataEntries = useMemo<
+    [string, OrderSchema[]][] | undefined
+  >(() => {
+    if (data && data.pages[0].dataArray.length) {
       const batchOrderDataMap: BatchOrderDataMap = {};
       data.pages.forEach((page) => {
         page.dataArray.forEach((orderData) => {
@@ -176,7 +177,10 @@ const useHistory = () => {
           else batchOrderDataMap[buyDate] = [orderData];
         });
       });
-      return batchOrderDataMap;
+      const batchOrderDataEntries = Object.entries(batchOrderDataMap)
+        .sort(([date1], [date2]) => (date1 < date2 ? -1 : 1))
+        .reverse();
+      return batchOrderDataEntries;
     }
     return undefined;
   }, [data]);
@@ -197,26 +201,24 @@ const useHistory = () => {
    */
   const [isCancelingOrder, setIsCancelingOrder] = useState<boolean>(false);
   const cancelOrder = async (order: OrderSchema) => {
-    if (!confirm(`[${order.orderName}] 주문을 취소하시겠습니까?`)) return;
+    if (!confirm(`[${order.orderData.productName}] 주문을 취소하시겠습니까?`))
+      return;
 
     setIsCancelingOrder(true);
     toast.promise(
       async () => {
-        await updateOrderStatus({
-          orderId: order.batchOrderId,
-          orderStatus: OrderStatus.OrderCancelled,
-        });
-        await rollbackBatchOrder({
-          batchOrderId: order.batchOrderId,
-          shouldDelete: false,
-        });
+        await rollbackSingleOrder(order);
       },
       {
         loading: '주문 취소 요청을 처리중입니다...',
         success: () => {
+          queryClient.invalidateQueries({ queryKey: ['orders'] });
           return `[${order.orderName}] 주문이 취소됐습니다.`;
         },
-        error: '주문 취소 요청이 실패하였습니다. 다시 시도해주세요.',
+        error: (error) => {
+          console.log(error);
+          return '주문 취소 요청이 실패하였습니다. 다시 시도해주세요.';
+        },
         finally: () => {
           setIsCancelingOrder(false);
         },
@@ -225,13 +227,11 @@ const useHistory = () => {
   };
 
   return {
-    selectedBatchOrder,
-    setSelectedBatchOrder,
     getGroupedOrderTotalPrice,
     allOrderData,
     allOrderError,
     allOrderStatus,
-    batchOrderDataMap,
+    batchOrderDataEntries,
     orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,

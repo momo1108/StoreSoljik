@@ -58,7 +58,8 @@ export type KoreanOrderStatus =
 /**
  * 주문 DB 에 저장될 스키마. 같은 주문에 대해서 각 상품별로 따로 저장되기 때문에
  * 같은 주문의 각 상품들은 orderId 필드가 같은 값을 가진다.
- * @property {string} batchOrderId 주문 롤백 시 사용할 조건으로 필요. buyerEmail_isoString 형태(같은 주문끼리 중복가능)
+ * @property {string} orderId 단일 주문 롤백 시 사용할 조건으로 필요. firestore 자동 생성된 값을 저장.
+ * @property {string} batchOrderId 배치 주문 롤백 시 사용할 조건으로 필요. buyerEmail_isoString 형태(같은 주문끼리 중복가능)
  * @property {string} buyerId 구매자 id
  * @property {string} orderName 주문명(Ex. 파란색 티셔츠 외 7건)
  * @property {CartItem} orderData 주문에 포함된 각 상품 목록.(id 항목을 통해 상품 상페 정보를 불러온다.)
@@ -67,6 +68,7 @@ export type KoreanOrderStatus =
  * @property {string} updatedAt 수정 날짜
  */
 export type OrderSchema = {
+  orderId: string;
   batchOrderId: string;
   buyerId: string;
   orderName: string;
