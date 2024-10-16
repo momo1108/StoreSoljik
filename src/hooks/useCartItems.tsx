@@ -62,8 +62,8 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
   const [ready, setReady] = useState<boolean>(false);
 
   useEffect(() => {
-    const savedCartItems = localStorage.getItem(`cartItems_${userInfo?.uid}`);
-    if (savedCartItems) setItems(JSON.parse(savedCartItems) as CartItem[]);
+    loadCartInfo();
+    window.addEventListener('focus', loadCartInfo);
   }, []);
 
   useEffect(() => {
@@ -90,7 +90,14 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
     0,
   );
 
+  const loadCartInfo = () => {
+    const savedCartItems = localStorage.getItem(`cartItems_${userInfo?.uid}`);
+    if (savedCartItems) setItems(JSON.parse(savedCartItems) as CartItem[]);
+  };
+
   const addItem = (product: ProductSchema, productQuantity: number) => {
+    loadCartInfo();
+
     setItems((prevItems) => [
       ...prevItems,
       {
@@ -109,6 +116,8 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
     productQuantity: number,
     maxQuantity: number = 200,
   ) => {
+    loadCartInfo();
+
     if (isNaN(productQuantity)) return;
 
     if (productQuantity < 1) productQuantity = 1;
@@ -123,6 +132,7 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
   };
 
   const removeItem = (product: ProductSchema) => {
+    loadCartInfo();
     setItems((prevItems) => prevItems.filter((item) => item.id !== product.id));
   };
 

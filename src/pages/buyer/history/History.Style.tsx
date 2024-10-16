@@ -93,7 +93,7 @@ export const OrderListMenuButton = styled(Button)`
 export const OrderListInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 32px;
 `;
 
 export const OrderInfoPerDateContainer = styled.div`
@@ -185,6 +185,9 @@ export const OrderContentDescrBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
+  .productNameHeader:hover {
+    color: ${({ theme }) => theme.color.darkBlue};
+  }
   p {
     color: ${({ theme }) => theme.color.gray};
     span {

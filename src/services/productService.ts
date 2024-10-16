@@ -342,9 +342,9 @@ export const fetchInfiniteProducts = async ({
 
   const productsQuery = buildFirestoreQuery(db, 'product', constraints);
   const productDocuments = await getDocs(productsQuery);
-  const dataArray: ProductSchema[] = productDocuments.docs.map(
-    (doc) => doc.data() as ProductSchema,
-  );
+  const dataArray: ProductSchema[] = productDocuments.docs
+    .slice(0, pageSize)
+    .map((doc) => doc.data() as ProductSchema);
 
   return {
     dataArray,

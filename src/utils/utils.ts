@@ -17,8 +17,11 @@ export const getKoreanIsoDatetime = () => {
 export const getIsoDate: (isoString: string) => string = (isoString) =>
   isoString.slice(0, 10);
 
-export const getIsoTime: (isoString: string) => string = (isoString) =>
-  isoString.slice(11, 16);
+export const getIsoTime: (
+  isoString: string,
+  includeSecond?: boolean,
+) => string = (isoString, includeSecond = false) =>
+  includeSecond ? isoString.slice(11, 19) : isoString.slice(11, 16);
 
 export function compareArray<T>(array1: Array<T>, array2: Array<T>): boolean {
   if (array1.length === array2.length) {

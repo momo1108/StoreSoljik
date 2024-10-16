@@ -176,9 +176,9 @@ export const fetchInfiniteOrders = async ({
 
   const ordersQuery = buildFirestoreQuery(db, 'order', constraints);
   const orderDocuments = await getDocs(ordersQuery);
-  const dataArray: OrderSchema[] = orderDocuments.docs.map(
-    (doc) => doc.data() as OrderSchema,
-  );
+  const dataArray: OrderSchema[] = orderDocuments.docs
+    .slice(0, pageSize)
+    .map((doc) => doc.data() as OrderSchema);
 
   return {
     dataArray,

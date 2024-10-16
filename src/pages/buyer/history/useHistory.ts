@@ -11,7 +11,7 @@ import {
   OrderStatus,
 } from '@/types/FirebaseType';
 import { FetchInfiniteQueryResult } from '@/types/ReactQueryType';
-import { getIsoDate } from '@/utils/utils';
+import { getIsoDate, getIsoTime } from '@/utils/utils';
 import {
   QueryFunction,
   QueryKey,
@@ -24,7 +24,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { toast } from 'sonner';
 
-type BatchOrderDataMap = Record<string, (OrderSchema & { orderId: string })[]>;
+type DateOrderDataEntries = Array<[string, Array<[string, OrderSchema[]]>]>;
 type OrderStatusCountMap = Record<KoreanOrderStatus | '전체', number>;
 const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
   OrderCreated: '주문 생성',
@@ -131,7 +131,7 @@ const useHistory = () => {
               ]
             : [where('buyerId', '==', userInfo!.uid)],
         sortOrders: [orderBy('createdAt', 'desc')],
-        pageSize: pageSize,
+        pageSize,
       });
     } catch (error) {
       toast.error(`데이터 로딩에 실패했습니다.\n${(error as Error).message}`);
@@ -162,25 +162,33 @@ const useHistory = () => {
         : null,
   });
 
-  const batchOrderDataEntries = useMemo<
-    [string, OrderSchema[]][] | undefined
-  >(() => {
+  const dateOrderDataEntries = useMemo<DateOrderDataEntries | undefined>(() => {
     if (data && data.pages[0].dataArray.length) {
-      const batchOrderDataMap: BatchOrderDataMap = {};
+      const tmpEntries: DateOrderDataEntries = [];
+
       data.pages.forEach((page) => {
         page.dataArray.forEach((orderData) => {
           const buyDate = getIsoDate(orderData.createdAt);
+          const buyTime = getIsoTime(orderData.createdAt, true);
 
-          // 주문의 createdAt 필드를 key, 같은 batch 에 해당하는 주문 레코드들을 배열 형태로 value 로 사용해 그룹핑합니다.
-          if (batchOrderDataMap[buyDate])
-            batchOrderDataMap[buyDate].push(orderData);
-          else batchOrderDataMap[buyDate] = [orderData];
+          if (tmpEntries.length) {
+            const lastDateIndex = tmpEntries.length - 1;
+            if (tmpEntries[lastDateIndex][0] != buyDate)
+              tmpEntries.push([buyDate, [[buyTime, [orderData]]]]);
+            else {
+              const lastTimeIndex = tmpEntries[lastDateIndex][1].length - 1;
+              if (tmpEntries[lastDateIndex][1][lastTimeIndex][0] != buyTime)
+                tmpEntries[lastDateIndex][1].push([buyTime, [orderData]]);
+              else
+                tmpEntries[lastDateIndex][1][lastTimeIndex][1].push(orderData);
+            }
+          } else {
+            tmpEntries.push([buyDate, [[buyTime, [orderData]]]]);
+          }
         });
       });
-      const batchOrderDataEntries = Object.entries(batchOrderDataMap)
-        .sort(([date1], [date2]) => (date1 < date2 ? -1 : 1))
-        .reverse();
-      return batchOrderDataEntries;
+      console.log(tmpEntries);
+      return tmpEntries;
     }
     return undefined;
   }, [data]);
@@ -231,7 +239,7 @@ const useHistory = () => {
     allOrderData,
     allOrderError,
     allOrderStatus,
-    batchOrderDataEntries,
+    dateOrderDataEntries,
     orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,

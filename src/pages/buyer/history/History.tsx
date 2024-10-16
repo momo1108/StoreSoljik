@@ -13,6 +13,7 @@ import { useModal } from '@/hooks/useModal';
 import HR from '@/components/ui/hr/HR';
 import Carousel from '@/components/ui/carousel/Carousel';
 import StatusBar from '@/components/ui/statusbar/StatusBar';
+import { Link } from 'react-router-dom';
 
 const History: React.FC = () => {
   const {
@@ -20,7 +21,7 @@ const History: React.FC = () => {
     allOrderData,
     allOrderError,
     allOrderStatus,
-    batchOrderDataEntries,
+    dateOrderDataEntries,
     orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,
@@ -127,23 +128,21 @@ const History: React.FC = () => {
               )}
             </S.OrderListMenu>
             <S.OrderListInfoContainer>
-              <S.OrderInfoPerDateContainer>
-                {batchOrderDataEntries ? (
-                  batchOrderDataEntries.map(([buyDate, batchOrderData]) => (
-                    <Fragment key={`infoContainer_${buyDate}`}>
-                      <H4>{buyDate}</H4>
+              {dateOrderDataEntries ? (
+                dateOrderDataEntries.map(([buyDate, timeOrderDataEntries]) => (
+                  <S.OrderInfoPerDateContainer key={`infoContainer_${buyDate}`}>
+                    <H4>{buyDate}</H4>
+                    {timeOrderDataEntries.map(([buyTime, orderDataArray]) => (
                       <S.OrderInfoBox>
                         <div>
                           <S.OrderDateP>
-                            주문 일시 :{' '}
-                            {getIsoDate(batchOrderData[0].createdAt)}{' '}
-                            {getIsoTime(batchOrderData[0].createdAt)}
+                            주문 일시 : {`${buyDate} ${buyTime}`}
                           </S.OrderDateP>
                           <H4 className='hideTextOverflow'>
-                            {batchOrderData[0].orderName}
+                            {orderDataArray[0].orderName}
                           </H4>
                         </div>
-                        {batchOrderData.map((order) => (
+                        {orderDataArray.map((order) => (
                           <Fragment
                             key={`${order.batchOrderId}_${order.orderData.id}`}
                           >
@@ -194,18 +193,18 @@ const History: React.FC = () => {
                                   </StatusBar>
                                   <Button
                                     styleType={
-                                      order.orderStatus ===
-                                        OrderStatus.ShipmentStarted ||
-                                      order.orderStatus ===
-                                        OrderStatus.OrderCancelled
+                                      [
+                                        OrderStatus.ShipmentStarted,
+                                        OrderStatus.OrderCancelled,
+                                      ].includes(order.orderStatus)
                                         ? 'disabled'
                                         : 'primary'
                                     }
                                     disabled={
-                                      order.orderStatus ===
-                                        OrderStatus.ShipmentStarted ||
-                                      order.orderStatus ===
-                                        OrderStatus.OrderCancelled ||
+                                      [
+                                        OrderStatus.ShipmentStarted,
+                                        OrderStatus.OrderCancelled,
+                                      ].includes(order.orderStatus) ||
                                       isCancelingOrder
                                     }
                                     onClick={() => cancelOrder(order)}
@@ -214,7 +213,11 @@ const History: React.FC = () => {
                                   </Button>
                                 </S.OrderContentMenuBox>
                                 <S.OrderContentDescrBox>
-                                  <H4>{order.orderData.productName}</H4>
+                                  <Link to={`/detail/${order.orderData.id}`}>
+                                    <H4 className='productNameHeader'>
+                                      {order.orderData.productName}
+                                    </H4>
+                                  </Link>
                                   <p>
                                     {order.orderData.productPrice.toLocaleString()}{' '}
                                     원 ㆍ{' '}
@@ -234,14 +237,16 @@ const History: React.FC = () => {
                           </Fragment>
                         ))}
                       </S.OrderInfoBox>
-                    </Fragment>
-                  ))
-                ) : (
+                    ))}
+                  </S.OrderInfoPerDateContainer>
+                ))
+              ) : (
+                <S.OrderInfoPerDateContainer>
                   <S.EmptyOrderInfoBox>
                     <H3>구매 내역 정보가 없습니다.</H3>
                   </S.EmptyOrderInfoBox>
-                )}
-              </S.OrderInfoPerDateContainer>
+                </S.OrderInfoPerDateContainer>
+              )}
 
               <S.InViewDiv ref={ref}></S.InViewDiv>
             </S.OrderListInfoContainer>

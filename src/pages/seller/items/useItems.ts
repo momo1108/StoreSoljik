@@ -42,7 +42,7 @@ const useItems = () => {
       pageParam,
       filters: [where('sellerEmail', '==', userInfo?.email)],
       sortOrders: [orderBy('createdAt', 'desc')],
-      pageSize: pageSize,
+      pageSize,
     });
 
   const { data, status, error, fetchNextPage, isFetchingNextPage, isLoading } =
@@ -193,7 +193,6 @@ const useItems = () => {
     isLoading,
     navigateToUpdate,
     deleteItem,
-    pageSize,
   };
 };
 
