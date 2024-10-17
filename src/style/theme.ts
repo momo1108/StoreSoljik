@@ -74,6 +74,8 @@ const light = {
   brighterGray: '#DDD',
   beige: '#F2F0EA',
   active: '#083ca3',
+  darkBlue: '#002369',
+  skyBlue: '#237fdb',
 };
 
 const dark = {
@@ -109,6 +111,8 @@ const dark = {
   brighterGray: '#333',
   beige: '#F2F0EA',
   active: '#3670e3',
+  darkBlue: '#002369',
+  skyBlue: '#237fdb',
 };
 
 const theme = {

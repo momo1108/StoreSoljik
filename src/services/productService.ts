@@ -78,6 +78,7 @@ export const createProductData = async ({
 }: CreateProductDataParam) => {
   const documentData: ProductSchema = {
     id,
+    sellerId: userInfo.uid,
     sellerEmail: userInfo.email,
     sellerNickname: userInfo.nickname,
     productName: formData.productName,
@@ -110,23 +111,18 @@ export const uploadProductImage = async (path: string, imageFile: File) => {
 
 export const updateProductData = async ({
   originalProductData,
-  userInfo,
   formData,
   productImageUrlArray,
   isoTime,
 }: UpdateProductDataParam) => {
   const documentData: ProductSchema = {
-    id: originalProductData.id,
-    sellerEmail: userInfo.email,
-    sellerNickname: userInfo.nickname,
+    ...originalProductData,
     productName: formData.productName,
     productDescription: formData.productDescription,
     productPrice: parseInt(formData.productPrice),
     productQuantity: parseInt(formData.productQuantity),
     productCategory: formData.productCategory,
     productImageUrlArray,
-    productSalesrate: originalProductData.productSalesrate,
-    createdAt: originalProductData.createdAt,
     updatedAt: isoTime,
   };
 
@@ -200,8 +196,10 @@ export const purchaseProducts = async (
     cartItemsArray.forEach((item) => {
       const orderRef = doc(collection(db, 'order'));
       const orderData: OrderSchema = {
+        orderId: orderRef.id,
         batchOrderId,
         buyerId: buyerInfo.uid,
+        sellerId: item.sellerId,
         orderName,
         orderData: item,
         orderStatus: OrderStatus.OrderCreated,
@@ -213,6 +211,32 @@ export const purchaseProducts = async (
   });
 
   return batchOrderId;
+};
+
+export const rollbackSingleOrder = async (order: OrderSchema) => {
+  const orderRef = doc(db, 'order', order.orderId);
+  const productRef = doc(db, 'product', order.orderData.id);
+  await runTransaction(db, async (transaction) => {
+    const productSnapshot = await transaction.get(productRef);
+
+    const errorInstance = new Error();
+
+    if (!productSnapshot.exists()) {
+      errorInstance.name = 'firebase.store.product.read';
+      errorInstance.message = `상품 "${order.orderData.productName}" 의 정보를 읽어오는데 실패했습니다.`;
+      throw errorInstance;
+    }
+
+    const productData = productSnapshot.data();
+
+    transaction.update(orderRef, { orderStatus: OrderStatus.OrderCancelled });
+    transaction.update(productRef, {
+      productQuantity:
+        productData!.productQuantity + order.orderData.productQuantity,
+      productSalesrate:
+        productData!.productSalesrate - order.orderData.productQuantity,
+    });
+  });
 };
 
 /**
@@ -315,9 +339,9 @@ export const fetchInfiniteProducts = async ({
 
   const productsQuery = buildFirestoreQuery(db, 'product', constraints);
   const productDocuments = await getDocs(productsQuery);
-  const dataArray: ProductSchema[] = productDocuments.docs.map(
-    (doc) => doc.data() as ProductSchema,
-  );
+  const dataArray: ProductSchema[] = productDocuments.docs
+    .slice(0, pageSize)
+    .map((doc) => doc.data() as ProductSchema);
 
   return {
     dataArray,

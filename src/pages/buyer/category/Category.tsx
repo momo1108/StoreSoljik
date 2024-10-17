@@ -19,7 +19,6 @@ const Category: React.FC = () => {
     isLoading,
     isPending,
     ref,
-    pageSize,
   } = useCategory();
 
   return (
@@ -85,14 +84,12 @@ const Category: React.FC = () => {
               </S.ErrorBox>
             ) : (
               data?.pages.map((page, pageIndex) =>
-                page.dataArray
-                  .slice(0, pageSize)
-                  .map((product, productIndex) => (
-                    <VerticalCard
-                      key={`page${pageIndex}_product${productIndex}`}
-                      data={product}
-                    />
-                  )),
+                page.dataArray.map((product, productIndex) => (
+                  <VerticalCard
+                    key={`page${pageIndex}_product${productIndex}`}
+                    data={product}
+                  />
+                )),
               )
             )}
             {!isLoading && isFetchingNextPage && (

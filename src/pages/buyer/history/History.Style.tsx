@@ -2,7 +2,7 @@
 import Button from '@/components/ui/button/Button';
 import styled from 'styled-components';
 
-export const CategoryContainer = styled.div`
+export const HistoryContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 800px;
@@ -93,7 +93,7 @@ export const OrderListMenuButton = styled(Button)`
 export const OrderListInfoContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 32px;
 `;
 
 export const OrderInfoPerDateContainer = styled.div`
@@ -108,17 +108,44 @@ export const OrderInfoBox = styled.div`
   display: flex;
   flex-direction: column;
   padding: 12px;
+  gap: 12px;
   border: 1px solid gray;
   border-radius: 8px;
 `;
 
-export const OrderInfoMenuBox = styled.div`
+export const OrderDateP = styled.p`
+  font-size: ${({ theme }) => theme.fontSize.sm};
+  color: ${({ theme }) => theme.color.gray};
+`;
+
+export const OrderInfoContentBox = styled.div`
+  display: flex;
+  gap: 12px;
+`;
+
+export const OrderImage = styled.img`
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border-radius: 8px;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+`;
+
+export const OrderContentBox = styled.div`
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+`;
+
+export const OrderContentMenuBox = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 12px;
-  border-bottom: 1px dashed ${({ theme }) => theme.color.brighterGray};
-  margin-bottom: 12px;
 
   h4 {
     position: relative;
@@ -154,33 +181,19 @@ export const OrderInfoMenuBox = styled.div`
   }
 `;
 
-export const OrderInfoContentBox = styled.div`
+export const OrderContentDescrBox = styled.div`
   display: flex;
-  gap: 12px;
-`;
-
-export const OrderImage = styled.img`
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  flex-shrink: 0;
-  border-radius: 8px;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
-`;
-
-export const OrderContentBox = styled.div`
-  display: flex;
-  flex-grow: 1;
   flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-`;
-
-export const OrderDateP = styled.p`
-  font-size: ${({ theme }) => theme.fontSize.sm};
-  color: ${({ theme }) => theme.color.gray};
+  gap: 6px;
+  .productNameHeader:hover {
+    color: ${({ theme }) => theme.color.darkBlue};
+  }
+  p {
+    color: ${({ theme }) => theme.color.gray};
+    span {
+      color: black;
+    }
+  }
 `;
 
 export const OrderDetailButton = styled(Button)`

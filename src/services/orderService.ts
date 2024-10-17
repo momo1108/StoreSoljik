@@ -87,6 +87,7 @@ export const rollbackUnfinishedOrderData = async (
 
       const productData = snapshot.data();
 
+      // 재고 정보를 롤백합니다.
       transaction.update(productRefs[index], {
         productQuantity:
           productData!.productQuantity +
@@ -97,9 +98,7 @@ export const rollbackUnfinishedOrderData = async (
       });
 
       // 재고 정보의 롤백을 마친 후 주문 정보를 삭제합니다.
-      orderDocuments.forEach((orderDocument) =>
-        transaction.delete(orderDocument.ref),
-      );
+      transaction.delete(orderDocuments.docs[index].ref);
     });
   });
 
@@ -109,13 +108,13 @@ export const rollbackUnfinishedOrderData = async (
 };
 
 export const updateOrderStatus = async ({
-  orderId,
+  order,
   orderStatus,
 }: {
-  orderId: string;
+  order: OrderSchema;
   orderStatus: OrderStatus;
 }) => {
-  await updateDoc(doc(db, 'order', orderId), { orderStatus });
+  await updateDoc(doc(db, 'order', order.orderId), { orderStatus });
 };
 
 export const updateBatchOrderStatus = async ({
@@ -177,9 +176,9 @@ export const fetchInfiniteOrders = async ({
 
   const ordersQuery = buildFirestoreQuery(db, 'order', constraints);
   const orderDocuments = await getDocs(ordersQuery);
-  const dataArray: OrderSchema[] = orderDocuments.docs.map(
-    (doc) => doc.data() as OrderSchema,
-  );
+  const dataArray: OrderSchema[] = orderDocuments.docs
+    .slice(0, pageSize)
+    .map((doc) => doc.data() as OrderSchema);
 
   return {
     dataArray,

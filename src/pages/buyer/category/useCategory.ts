@@ -69,7 +69,7 @@ const useCategory = () => {
                 ['createdAt', 'desc'],
               ]) as [string, 'asc' | 'desc'][]
         ).map((order) => orderBy(...order)),
-        pageSize: pageSize,
+        pageSize,
       });
     } catch (error) {
       toast.error(`데이터 로딩에 실패했습니다.\n${(error as Error).message}`);
@@ -135,7 +135,6 @@ const useCategory = () => {
     isLoading,
     isPending,
     ref,
-    pageSize,
   };
 };
 

@@ -1,29 +1,26 @@
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
-import {
-  fetchInfiniteOrders,
-  fetchOrders,
-  updateOrderStatus,
-} from '@/services/orderService';
-import { rollbackBatchOrder } from '@/services/productService';
+import { fetchInfiniteOrders, fetchOrders } from '@/services/orderService';
+import { rollbackSingleOrder } from '@/services/productService';
 import {
   KoreanOrderStatus,
   OrderSchema,
   OrderStatus,
 } from '@/types/FirebaseType';
 import { FetchInfiniteQueryResult } from '@/types/ReactQueryType';
-import { getIsoDate } from '@/utils/utils';
+import { getIsoDate, getIsoTime } from '@/utils/utils';
 import {
   QueryFunction,
   QueryKey,
   useInfiniteQuery,
   useQuery,
+  useQueryClient,
 } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { toast } from 'sonner';
 
-type BatchOrderDataMap = Record<string, OrderSchema[]>;
+type DateOrderDataEntries = Array<[string, Array<[string, OrderSchema[]]>]>;
 type OrderStatusCountMap = Record<KoreanOrderStatus | '전체', number>;
 const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
   OrderCreated: '주문 생성',
@@ -35,25 +32,12 @@ const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
 
 const useHistory = () => {
   const { userInfo } = useFirebaseAuth();
-  const [selectedBatchOrder, setSelectedBatchOrder] = useState<
-    OrderSchema[] | undefined
-  >(undefined);
-
-  const getGroupedOrderTotalPrice = (orderArray: OrderSchema[]) =>
-    orderArray.reduce(
-      (prev, cur) =>
-        prev + cur.orderData.productPrice * cur.orderData.productQuantity,
-      0,
-    );
+  const queryClient = useQueryClient();
 
   /**
    * 화면 상단의 주문 현황을 위한 코드
    */
-  const {
-    data: allOrderData,
-    error: allOrderError,
-    status: allOrderStatus,
-  } = useQuery({
+  const { data: allOrderData, status: allOrderStatus } = useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
       return await fetchOrders({
@@ -104,18 +88,6 @@ const useHistory = () => {
     전체: 'All',
   };
 
-  const orderStatusMapEnToKr: Record<
-    OrderStatus | 'All',
-    KoreanOrderStatus | '전체'
-  > = {
-    [OrderStatus.OrderCreated]: '주문 생성',
-    [OrderStatus.OrderCompleted]: '주문 완료',
-    [OrderStatus.AwaitingShipment]: '발송 대기',
-    [OrderStatus.ShipmentStarted]: '발송 시작',
-    [OrderStatus.OrderCancelled]: '주문 취소',
-    All: '전체',
-  };
-
   // queryKey를 선택된 orderStatus 에 따라 동적으로 생성합니다.
   const queryKey = ['orders', orderStatusForList];
 
@@ -132,7 +104,7 @@ const useHistory = () => {
               ]
             : [where('buyerId', '==', userInfo!.uid)],
         sortOrders: [orderBy('createdAt', 'desc')],
-        pageSize: pageSize,
+        pageSize,
       });
     } catch (error) {
       toast.error(`데이터 로딩에 실패했습니다.\n${(error as Error).message}`);
@@ -140,15 +112,9 @@ const useHistory = () => {
     }
   };
 
-  const {
-    data,
-    status,
-    error,
-    fetchNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isPending,
-  } = useInfiniteQuery<FetchInfiniteQueryResult<OrderSchema>>({
+  const { data, status, fetchNextPage } = useInfiniteQuery<
+    FetchInfiniteQueryResult<OrderSchema>
+  >({
     queryKey,
     queryFn: (({ pageParam }) =>
       fetchOrdersWrapper({ pageParam })) as QueryFunction<
@@ -163,20 +129,33 @@ const useHistory = () => {
         : null,
   });
 
-  const batchOrderDataMap = useMemo<BatchOrderDataMap | undefined>(() => {
-    if (data) {
-      const batchOrderDataMap: BatchOrderDataMap = {};
+  const dateOrderDataEntries = useMemo<DateOrderDataEntries | undefined>(() => {
+    if (data && data.pages[0].dataArray.length) {
+      const tmpEntries: DateOrderDataEntries = [];
+
       data.pages.forEach((page) => {
         page.dataArray.forEach((orderData) => {
           const buyDate = getIsoDate(orderData.createdAt);
+          const buyTime = getIsoTime(orderData.createdAt, true);
 
-          // 주문의 createdAt 필드를 key, 같은 batch 에 해당하는 주문 레코드들을 배열 형태로 value 로 사용해 그룹핑합니다.
-          if (batchOrderDataMap[buyDate])
-            batchOrderDataMap[buyDate].push(orderData);
-          else batchOrderDataMap[buyDate] = [orderData];
+          if (tmpEntries.length) {
+            const lastDateIndex = tmpEntries.length - 1;
+            if (tmpEntries[lastDateIndex][0] != buyDate)
+              tmpEntries.push([buyDate, [[buyTime, [orderData]]]]);
+            else {
+              const lastTimeIndex = tmpEntries[lastDateIndex][1].length - 1;
+              if (tmpEntries[lastDateIndex][1][lastTimeIndex][0] != buyTime)
+                tmpEntries[lastDateIndex][1].push([buyTime, [orderData]]);
+              else
+                tmpEntries[lastDateIndex][1][lastTimeIndex][1].push(orderData);
+            }
+          } else {
+            tmpEntries.push([buyDate, [[buyTime, [orderData]]]]);
+          }
         });
       });
-      return batchOrderDataMap;
+      console.log(tmpEntries);
+      return tmpEntries;
     }
     return undefined;
   }, [data]);
@@ -197,26 +176,24 @@ const useHistory = () => {
    */
   const [isCancelingOrder, setIsCancelingOrder] = useState<boolean>(false);
   const cancelOrder = async (order: OrderSchema) => {
-    if (!confirm(`[${order.orderName}] 주문을 취소하시겠습니까?`)) return;
+    if (!confirm(`[${order.orderData.productName}] 주문을 취소하시겠습니까?`))
+      return;
 
     setIsCancelingOrder(true);
     toast.promise(
       async () => {
-        await updateOrderStatus({
-          orderId: order.batchOrderId,
-          orderStatus: OrderStatus.OrderCancelled,
-        });
-        await rollbackBatchOrder({
-          batchOrderId: order.batchOrderId,
-          shouldDelete: false,
-        });
+        await rollbackSingleOrder(order);
       },
       {
         loading: '주문 취소 요청을 처리중입니다...',
         success: () => {
+          queryClient.invalidateQueries({ queryKey: ['orders'] });
           return `[${order.orderName}] 주문이 취소됐습니다.`;
         },
-        error: '주문 취소 요청이 실패하였습니다. 다시 시도해주세요.',
+        error: (error) => {
+          console.log(error);
+          return '주문 취소 요청이 실패하였습니다. 다시 시도해주세요.';
+        },
         finally: () => {
           setIsCancelingOrder(false);
         },
@@ -225,26 +202,14 @@ const useHistory = () => {
   };
 
   return {
-    selectedBatchOrder,
-    setSelectedBatchOrder,
-    getGroupedOrderTotalPrice,
-    allOrderData,
-    allOrderError,
     allOrderStatus,
-    batchOrderDataMap,
+    dateOrderDataEntries,
     orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,
     orderStatusMapKrToEn,
-    orderStatusMapEnToKr,
-    data,
     status,
-    error,
-    isFetchingNextPage,
-    isLoading,
-    isPending,
     ref,
-    pageSize,
     isCancelingOrder,
     cancelOrder,
   };
