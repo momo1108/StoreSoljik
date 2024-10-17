@@ -2,7 +2,7 @@
 import Button from '@/components/ui/button/Button';
 import styled from 'styled-components';
 
-export const CategoryContainer = styled.div`
+export const HistoryContainer = styled.div`
   display: flex;
   flex-direction: column;
   width: 800px;

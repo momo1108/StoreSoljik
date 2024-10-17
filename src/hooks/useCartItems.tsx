@@ -11,6 +11,7 @@ import { ProductSchema } from '@/types/FirebaseType';
 
 export interface CartItem {
   id: string;
+  sellerId: string;
   sellerEmail: string;
   productName: string;
   productPrice: number;
@@ -102,6 +103,7 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
       ...prevItems,
       {
         id: product.id,
+        sellerId: product.sellerId,
         sellerEmail: product.sellerEmail,
         productName: product.productName,
         productPrice: product.productPrice,

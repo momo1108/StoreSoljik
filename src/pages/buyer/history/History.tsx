@@ -6,35 +6,19 @@ import useHistory from './useHistory';
 import { KoreanOrderStatus, OrderStatus } from '@/types/FirebaseType';
 import { Fragment } from 'react';
 import Button from '@/components/ui/button/Button';
-import { getIsoDate, getIsoTime } from '@/utils/utils';
-import { CgDetailsMore } from 'react-icons/cg';
-import Modal from '@/components/modal/Modal';
-import { useModal } from '@/hooks/useModal';
-import HR from '@/components/ui/hr/HR';
-import Carousel from '@/components/ui/carousel/Carousel';
 import StatusBar from '@/components/ui/statusbar/StatusBar';
 import { Link } from 'react-router-dom';
 
 const History: React.FC = () => {
   const {
-    getGroupedOrderTotalPrice,
-    allOrderData,
-    allOrderError,
     allOrderStatus,
     dateOrderDataEntries,
     orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,
     orderStatusMapKrToEn,
-    orderStatusMapEnToKr,
-    data,
     status,
-    error,
-    isFetchingNextPage,
-    isLoading,
-    isPending,
     ref,
-    pageSize,
     isCancelingOrder,
     cancelOrder,
   } = useHistory();
@@ -43,7 +27,7 @@ const History: React.FC = () => {
     <>
       <Header userType={'buyer'}></Header>
       <Main>
-        <S.CategoryContainer>
+        <S.HistoryContainer>
           <H2>구매 내역</H2>
           <S.OrderStatusContainer>
             <S.OrderStatusList>
@@ -251,7 +235,7 @@ const History: React.FC = () => {
               <S.InViewDiv ref={ref}></S.InViewDiv>
             </S.OrderListInfoContainer>
           </S.OrderListContainer>
-        </S.CategoryContainer>
+        </S.HistoryContainer>
       </Main>
     </>
   );

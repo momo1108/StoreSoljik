@@ -20,6 +20,7 @@ export type UserSchema = {
 
 export type ProductSchema = {
   id: string; // 사용자 uid + uuid
+  sellerId: string;
   sellerEmail: string;
   sellerNickname: string;
   productName: string;
@@ -71,6 +72,7 @@ export type OrderSchema = {
   orderId: string;
   batchOrderId: string;
   buyerId: string;
+  sellerId: string;
   orderName: string;
   orderData: CartItem;
   orderStatus: OrderStatus;

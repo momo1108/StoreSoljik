@@ -1,9 +1,5 @@
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
-import {
-  fetchInfiniteOrders,
-  fetchOrders,
-  updateOrderStatus,
-} from '@/services/orderService';
+import { fetchInfiniteOrders, fetchOrders } from '@/services/orderService';
 import { rollbackSingleOrder } from '@/services/productService';
 import {
   KoreanOrderStatus,
@@ -38,21 +34,10 @@ const useHistory = () => {
   const { userInfo } = useFirebaseAuth();
   const queryClient = useQueryClient();
 
-  const getGroupedOrderTotalPrice = (orderArray: OrderSchema[]) =>
-    orderArray.reduce(
-      (prev, cur) =>
-        prev + cur.orderData.productPrice * cur.orderData.productQuantity,
-      0,
-    );
-
   /**
    * 화면 상단의 주문 현황을 위한 코드
    */
-  const {
-    data: allOrderData,
-    error: allOrderError,
-    status: allOrderStatus,
-  } = useQuery({
+  const { data: allOrderData, status: allOrderStatus } = useQuery({
     queryKey: ['orders'],
     queryFn: async () => {
       return await fetchOrders({
@@ -103,18 +88,6 @@ const useHistory = () => {
     전체: 'All',
   };
 
-  const orderStatusMapEnToKr: Record<
-    OrderStatus | 'All',
-    KoreanOrderStatus | '전체'
-  > = {
-    [OrderStatus.OrderCreated]: '주문 생성',
-    [OrderStatus.OrderCompleted]: '주문 완료',
-    [OrderStatus.AwaitingShipment]: '발송 대기',
-    [OrderStatus.ShipmentStarted]: '발송 시작',
-    [OrderStatus.OrderCancelled]: '주문 취소',
-    All: '전체',
-  };
-
   // queryKey를 선택된 orderStatus 에 따라 동적으로 생성합니다.
   const queryKey = ['orders', orderStatusForList];
 
@@ -139,15 +112,9 @@ const useHistory = () => {
     }
   };
 
-  const {
-    data,
-    status,
-    error,
-    fetchNextPage,
-    isFetchingNextPage,
-    isLoading,
-    isPending,
-  } = useInfiniteQuery<FetchInfiniteQueryResult<OrderSchema>>({
+  const { data, status, fetchNextPage } = useInfiniteQuery<
+    FetchInfiniteQueryResult<OrderSchema>
+  >({
     queryKey,
     queryFn: (({ pageParam }) =>
       fetchOrdersWrapper({ pageParam })) as QueryFunction<
@@ -235,24 +202,14 @@ const useHistory = () => {
   };
 
   return {
-    getGroupedOrderTotalPrice,
-    allOrderData,
-    allOrderError,
     allOrderStatus,
     dateOrderDataEntries,
     orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,
     orderStatusMapKrToEn,
-    orderStatusMapEnToKr,
-    data,
     status,
-    error,
-    isFetchingNextPage,
-    isLoading,
-    isPending,
     ref,
-    pageSize,
     isCancelingOrder,
     cancelOrder,
   };
