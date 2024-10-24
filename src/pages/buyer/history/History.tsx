@@ -82,29 +82,19 @@ const History: React.FC = () => {
                     <S.OrderListMenuButton
                       onClick={() =>
                         setOrderStatusForList(
-                          orderStatusMapKrToEn[
-                            status as KoreanOrderStatus | '전체'
-                          ],
+                          orderStatusMapKrToEn[status as KoreanOrderStatus],
                         )
                       }
                       styleType={
                         orderStatusForList ===
-                        orderStatusMapKrToEn[
-                          status as KoreanOrderStatus | '전체'
-                        ]
+                        orderStatusMapKrToEn[status as KoreanOrderStatus]
                           ? 'primary'
                           : 'normal'
                       }
                     >
                       {status}
                       <span className='countSpan'>
-                        (
-                        {
-                          orderStatusCountMap[
-                            status as KoreanOrderStatus | '전체'
-                          ]
-                        }
-                        )
+                        ({orderStatusCountMap[status as KoreanOrderStatus]})
                       </span>
                     </S.OrderListMenuButton>
                   </li>
