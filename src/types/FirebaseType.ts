@@ -42,6 +42,7 @@ export type ProductSchema = {
 };
 
 export enum OrderStatus {
+  All = 'All', // 전체 주문
   OrderCreated = 'OrderCreated', // 주문 생성 후 결제 전
   OrderCompleted = 'OrderCompleted', // 주문 완료
   AwaitingShipment = 'AwaitingShipment', // 발송 대기
@@ -50,6 +51,7 @@ export enum OrderStatus {
 }
 
 export type KoreanOrderStatus =
+  | '전체'
   | '주문 생성'
   | '주문 완료'
   | '발송 대기'

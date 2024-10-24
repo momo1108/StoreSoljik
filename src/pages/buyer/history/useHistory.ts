@@ -21,8 +21,9 @@ import { useInView } from 'react-intersection-observer';
 import { toast } from 'sonner';
 
 type DateOrderDataEntries = Array<[string, Array<[string, OrderSchema[]]>]>;
-type OrderStatusCountMap = Record<KoreanOrderStatus | '전체', number>;
+type OrderStatusCountMap = Record<KoreanOrderStatus, number>;
 const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
+  All: '전체',
   OrderCreated: '주문 생성',
   OrderCompleted: '주문 완료',
   AwaitingShipment: '발송 대기',
@@ -72,20 +73,17 @@ const useHistory = () => {
   /**
    * 구매 내역 목록 관련 코드
    */
-  const [orderStatusForList, setOrderStatusForList] = useState<
-    OrderStatus | 'All'
-  >('All');
+  const [orderStatusForList, setOrderStatusForList] = useState<OrderStatus>(
+    OrderStatus.All,
+  );
 
-  const orderStatusMapKrToEn: Record<
-    KoreanOrderStatus | '전체',
-    OrderStatus | 'All'
-  > = {
+  const orderStatusMapKrToEn: Record<KoreanOrderStatus, OrderStatus> = {
     '주문 생성': OrderStatus.OrderCreated,
     '주문 완료': OrderStatus.OrderCompleted,
     '발송 대기': OrderStatus.AwaitingShipment,
     '발송 시작': OrderStatus.ShipmentStarted,
     '주문 취소': OrderStatus.OrderCancelled,
-    전체: 'All',
+    전체: OrderStatus.All,
   };
 
   // queryKey를 선택된 orderStatus 에 따라 동적으로 생성합니다.
