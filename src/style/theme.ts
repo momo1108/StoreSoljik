@@ -39,6 +39,16 @@ const lineHeight: Record<FontSizes, string> = {
   xxxxl: '4rem',
 };
 
+const width: Record<string, string> = {
+  w1: '400px',
+  w2: '600px',
+  w3: '800px',
+  w4: '900px',
+  w5: '950px',
+  w6: '1140px',
+  w7: '1240px',
+};
+
 export type Themes = 'light' | 'dark';
 
 const light = {
@@ -118,6 +128,7 @@ const dark = {
 const theme = {
   fontSize,
   lineHeight,
+  width,
   light,
   dark,
 };
