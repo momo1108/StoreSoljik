@@ -30,7 +30,6 @@ import {
   ref,
   uploadBytes,
 } from 'firebase/storage';
-import { v4 as uuidv4 } from 'uuid';
 
 // const updateBatch = async () => {
 //   let productsQuery = query(collection(db, 'product'));
@@ -99,6 +98,18 @@ export const getProductData = async (productId: string) => {
   const productDocument = await getDoc(doc(db, 'product', productId));
   if (productDocument.exists()) {
     return productDocument.data();
+  } else return undefined;
+};
+
+export const getProductList = async (sellerId: string) => {
+  const productListDocument = await getDocs(
+    buildFirestoreQuery(db, 'product', [where('sellerId', '==', sellerId)]),
+  );
+
+  if (productListDocument.docs.length) {
+    return productListDocument.docs.map(
+      (document) => document.data() as ProductSchema,
+    );
   } else return undefined;
 };
 
