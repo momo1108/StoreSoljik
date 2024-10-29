@@ -1,9 +1,9 @@
 import Header from '@/components/layouts/header/Header';
 import Main from '@/components/layouts/main/Main';
 import useCategory from './useCategory';
-import VerticalCard from '@/components/ui/productcard/verticalcard/VerticalCard';
+import VerticalCard from '@/components/ui/productcard/vertical/VerticalCard';
 import * as S from './Category.Style';
-import VerticalSelect from '@/components/ui/filter/VerticalSelect';
+import HorizontalSelect from '@/components/ui/filter/horizontal/HorizontalSelect';
 import Spinner from '@/components/ui/spinner/Spinner';
 import { H2 } from '@/components/ui/header/Header.Style';
 
@@ -60,7 +60,7 @@ const Category: React.FC = () => {
                 ],
               },
             ].map((filterInfo) => (
-              <VerticalSelect
+              <HorizontalSelect
                 title={filterInfo.title}
                 type={filterInfo.type as 'field' | 'direction' | 'category'}
                 options={filterInfo.options}

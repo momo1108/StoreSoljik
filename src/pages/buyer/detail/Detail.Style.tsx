@@ -1,6 +1,6 @@
 // import media from '@/style/media';
 import StateInput from '@/components/form/stateinput/StateInput';
-import VerticalCard from '@/components/ui/productcard/verticalcard/VerticalCard';
+import VerticalCard from '@/components/ui/productcard/vertical/VerticalCard';
 import Spinner from '@/components/ui/spinner/Spinner';
 import styled from 'styled-components';
 

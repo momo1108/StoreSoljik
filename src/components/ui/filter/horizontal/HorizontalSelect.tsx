@@ -1,5 +1,5 @@
-import * as S from './VerticalSelect.Style';
-import Spinner from '../spinner/Spinner';
+import * as S from './HorizontalSelect.Style';
+import Spinner from '../../spinner/Spinner';
 import {
   ProductDirection,
   ProductField,

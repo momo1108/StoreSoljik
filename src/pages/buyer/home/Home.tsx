@@ -1,7 +1,7 @@
 import Header from '@/components/layouts/header/Header';
 import Main from '@/components/layouts/main/Main';
 import { defaultSetiing } from '@/components/ui/carousel/Carousel';
-import VerticalCard from '@/components/ui/productcard/verticalcard/VerticalCard';
+import VerticalCard from '@/components/ui/productcard/vertical/VerticalCard';
 import * as S from './Home.Style';
 import { FaFire } from 'react-icons/fa6';
 import { FiPlus } from 'react-icons/fi';
