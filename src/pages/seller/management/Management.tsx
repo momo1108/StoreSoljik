@@ -4,9 +4,10 @@ import useManagement from './useManagement';
 import * as S from './Management.Style';
 import { IoMdSettings } from 'react-icons/io';
 import { BsTable } from 'react-icons/bs';
+import VerticalSelect from '@/components/ui/filter/vertical/VerticalSelect';
 
 const Management: React.FC = () => {
-  const { productList } = useManagement();
+  const { productList, selectedProduct, setSelectedProduct } = useManagement();
 
   // https://dribbble.com/search/information-table
   return (
@@ -27,6 +28,21 @@ const Management: React.FC = () => {
             </S.ManagementBodyHeader>
             <S.ManagementOrderListFilter>
               {/* 주문 상태, 상품을 사용한 필터 */}
+              <VerticalSelect>
+                <VerticalSelect.State state={selectedProduct?.productName} />
+                <VerticalSelect.OptionList
+                  handleChangeOption={setSelectedProduct}
+                >
+                  {productList.map((product) => (
+                    <VerticalSelect.OptionItem
+                      key={product.id}
+                      value={product}
+                      text={product.productName}
+                      isActive={product.id === selectedProduct?.id}
+                    />
+                  ))}
+                </VerticalSelect.OptionList>
+              </VerticalSelect>
             </S.ManagementOrderListFilter>
           </S.ManagementBodyContainer>
         </S.ManagementContainer>

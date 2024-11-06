@@ -12,6 +12,7 @@ const useManagement = () => {
     OrderStatus.All,
   );
   const [productList, setProductList] = useState<ProductSchema[]>([]);
+  const [selectedProduct, setSelectedProduct] = useState<ProductSchema>();
 
   useEffect(() => {
     if (userInfo) {
@@ -40,7 +41,14 @@ const useManagement = () => {
     },
   });
 
-  return { selectedOrderStatus, productList, timeOrderData, timeOrderStatus };
+  return {
+    selectedOrderStatus,
+    productList,
+    selectedProduct,
+    setSelectedProduct,
+    timeOrderData,
+    timeOrderStatus,
+  };
 };
 
 export default useManagement;
