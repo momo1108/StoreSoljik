@@ -68,7 +68,7 @@ const Update: React.FC = () => {
                   description='이미지를 수정합니다.'
                   onChange={handleCheckboxUpdate}
                 />
-                <S.UpdateContentImagePreviewBox>
+                <S.UpdateContentImagePreviewBox className='hideScrollbar'>
                   {imagePreviewUrls && imagePreviewUrls[0] ? (
                     imagePreviewUrls.map((imgUrl, index) => (
                       <S.ImagePreviewItemBox
