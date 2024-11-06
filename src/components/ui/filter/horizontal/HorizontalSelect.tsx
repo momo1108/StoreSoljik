@@ -6,7 +6,7 @@ import {
   ProductFilter,
 } from '@/services/productService';
 
-type VerticalSelectProps = {
+type HorizontalSelectProps = {
   title: string;
   type: 'category' | 'field' | 'direction';
   options: { name: string; value: string }[];
@@ -14,7 +14,7 @@ type VerticalSelectProps = {
   setter: React.Dispatch<React.SetStateAction<ProductFilter>>;
   disabled: boolean;
 };
-const VerticalSelect: React.FC<VerticalSelectProps> = ({
+const HorizontalSelect: React.FC<HorizontalSelectProps> = ({
   title,
   type,
   options,
@@ -69,4 +69,4 @@ const VerticalSelect: React.FC<VerticalSelectProps> = ({
   );
 };
 
-export default VerticalSelect;
+export default HorizontalSelect;
