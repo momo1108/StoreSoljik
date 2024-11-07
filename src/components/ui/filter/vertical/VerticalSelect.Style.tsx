@@ -5,6 +5,11 @@ export const SelectContainer = styled.div`
   position: relative;
 `;
 
+export const Title = styled.h4`
+  padding: 0 0 2px 4px;
+  font-size: ${({ theme }) => theme.fontSize.sm};
+`;
+
 export const StateP = styled.p`
   position: relative;
   width: 120px;
@@ -46,13 +51,6 @@ export const OptionItem = styled.li`
   &:hover {
     background: #ddd;
   }
-`;
-
-export const Title = styled.b`
-  width: 85px;
-  font-size: ${(props) => props.theme.fontSize.md};
-  color: #333;
-  border-right: 2px solid black;
 `;
 
 export const OptionButton = styled(Button)`

@@ -29,6 +29,7 @@ const Management: React.FC = () => {
             <S.ManagementOrderListFilter>
               {/* 주문 상태, 상품을 사용한 필터 */}
               <VerticalSelect>
+                <VerticalSelect.Title>상품 목록</VerticalSelect.Title>
                 <VerticalSelect.State state={selectedProduct?.productName} />
                 <VerticalSelect.OptionList
                   handleChangeOption={setSelectedProduct}

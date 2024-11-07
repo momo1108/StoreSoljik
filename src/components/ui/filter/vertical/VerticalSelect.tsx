@@ -19,6 +19,10 @@ const VerticalSelectContext = createContext<VerticalSelectContextProps>({
   setIsListOpen: () => {},
 });
 
+const VerticalSelectTitle = ({ children }: Children) => {
+  return <S.Title>{children}</S.Title>;
+};
+
 const VerticalSelectOptionList = ({
   children,
   handleChangeOption,
@@ -72,10 +76,8 @@ const VerticalSelectState = ({
   return (
     <S.StateP
       className='hideTextOverflow'
-      tabIndex={0}
       title={state}
       onClick={() => setIsListOpen((s) => !s)}
-      onBlur={() => setIsListOpen(false)}
     >
       <span>{state || '선택해주세요'}</span>
       <MdOutlineExpandMore size={20} className={isListOpen ? 'flip' : ''} />
@@ -88,12 +90,20 @@ const VerticalSelectWrapper = ({ children }: Children) => {
 
   return (
     <VerticalSelectContext.Provider value={{ isListOpen, setIsListOpen }}>
-      <S.SelectContainer>{children}</S.SelectContainer>
+      <S.SelectContainer
+        tabIndex={0}
+        onBlur={() => {
+          setIsListOpen(false);
+        }}
+      >
+        {children}
+      </S.SelectContainer>
     </VerticalSelectContext.Provider>
   );
 };
 
 const VerticalSelect = Object.assign(VerticalSelectWrapper, {
+  Title: VerticalSelectTitle,
   OptionList: VerticalSelectOptionList,
   OptionItem: VerticalSelectOptionItem,
   State: VerticalSelectState,
