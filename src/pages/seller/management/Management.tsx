@@ -30,8 +30,12 @@ const Management: React.FC = () => {
               {/* 주문 상태, 상품을 사용한 필터 */}
               <VerticalSelect>
                 <VerticalSelect.Title>상품 목록</VerticalSelect.Title>
-                <VerticalSelect.State state={selectedProduct?.productName} />
+                <VerticalSelect.State
+                  title={selectedProduct?.productName}
+                  useSearch
+                />
                 <VerticalSelect.OptionList
+                  state={selectedProduct}
                   handleChangeOption={setSelectedProduct}
                 >
                   {productList.map((product) => (
@@ -39,7 +43,6 @@ const Management: React.FC = () => {
                       key={product.id}
                       value={product}
                       text={product.productName}
-                      isActive={product.id === selectedProduct?.id}
                     />
                   ))}
                 </VerticalSelect.OptionList>
