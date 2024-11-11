@@ -11,6 +11,7 @@ import { Children } from '@/types/GlobalType';
 import { MdOutlineExpandMore } from 'react-icons/md';
 
 type VerticalSelectContextProps = {
+  useSearch: boolean;
   isListOpen: boolean;
   setIsListOpen: React.Dispatch<React.SetStateAction<boolean>>;
   preventBlur: boolean;
@@ -19,6 +20,7 @@ type VerticalSelectContextProps = {
   setSearchKeyword: React.Dispatch<React.SetStateAction<string>>;
 };
 const VerticalSelectContext = createContext<VerticalSelectContextProps>({
+  useSearch: false,
   isListOpen: false,
   setIsListOpen: () => {},
   preventBlur: false,
@@ -63,20 +65,22 @@ const VerticalSelectOptionItem = ({
   handleChangeOption?: (value: any) => void;
   state?: any;
 }) => {
-  const { setIsListOpen, searchKeyword, setSearchKeyword } = useContext(
-    VerticalSelectContext,
-  );
+  const { useSearch, setIsListOpen, searchKeyword, setSearchKeyword } =
+    useContext(VerticalSelectContext);
   const isActive = value === state || Object.is(value, state);
   const isValidItem = searchKeyword ? text.includes(searchKeyword) : true;
 
-  return (
+  // 검색 사용 - isValidItem 으로 필터링해야됨. 검색 미사용 - 필터링하면 안됨
+  // null 인 경우 : 검색 사용 and isValidItem 이 false 인 경우만
+  // JSX.Element : 1. 검색 사용 and isValidItem 이 true      2. 검색 미사용
+  return useSearch && !isValidItem ? null : (
     <S.OptionItem
-      className={`hideTextOverflow${isActive ? ' active' : ''}${!isValidItem ? ' hidden' : ''}`}
+      className={`hideTextOverflow${isActive ? ' active' : ''}`}
       title={text}
       onClick={() => {
         if (!isActive) {
           handleChangeOption(value);
-          setSearchKeyword(text);
+          if (useSearch) setSearchKeyword(text);
         }
         setIsListOpen(false);
       }}
@@ -87,19 +91,22 @@ const VerticalSelectOptionItem = ({
 };
 
 const VerticalSelectState = ({
-  title = '',
-  useSearch = false,
+  placeholder = '검색',
 }: {
-  title?: string;
+  placeholder?: string;
   width?: number;
-  useSearch?: boolean;
 }) => {
-  const { isListOpen, setIsListOpen, searchKeyword, setSearchKeyword } =
-    useContext(VerticalSelectContext);
+  const {
+    useSearch,
+    isListOpen,
+    setIsListOpen,
+    searchKeyword,
+    setSearchKeyword,
+  } = useContext(VerticalSelectContext);
 
   return useSearch ? (
     <S.StateInput
-      placeholder='검색'
+      placeholder={placeholder}
       type='text'
       value={searchKeyword}
       onFocus={() => {
@@ -110,10 +117,10 @@ const VerticalSelectState = ({
   ) : (
     <S.StateP
       className='hideTextOverflow'
-      title={title}
+      title={searchKeyword}
       onClick={() => setIsListOpen((s) => !s)}
     >
-      <span>{title || '선택해주세요'}</span>
+      <span>{searchKeyword || '선택하기'}</span>
       <MdOutlineExpandMore size={20} className={isListOpen ? 'flip' : ''} />
     </S.StateP>
   );
@@ -122,7 +129,8 @@ const VerticalSelectState = ({
 const VerticalSelectWrapper = ({
   children,
   width = 150,
-}: Children & { width?: number }) => {
+  useSearch = false,
+}: Children & { width?: number; useSearch?: boolean }) => {
   const [isListOpen, setIsListOpen] = useState<boolean>(false);
   const [preventBlur, setPreventBlur] = useState<boolean>(false);
   const [searchKeyword, setSearchKeyword] = useState<string>('');
@@ -133,6 +141,7 @@ const VerticalSelectWrapper = ({
     setSearchKeyword,
     preventBlur,
     setPreventBlur,
+    useSearch,
   };
 
   return (

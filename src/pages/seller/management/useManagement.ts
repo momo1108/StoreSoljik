@@ -4,14 +4,14 @@ import { getProductList } from '@/services/productService';
 import { OrderStatus, ProductSchema } from '@/types/FirebaseType';
 import { useQuery } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 const useManagement = () => {
   const { userInfo } = useFirebaseAuth();
+  const [productList, setProductList] = useState<ProductSchema[]>([]);
   const [selectedOrderStatus, setSelectedOrderStatus] = useState<OrderStatus>(
     OrderStatus.All,
   );
-  const [productList, setProductList] = useState<ProductSchema[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<ProductSchema>();
 
   useEffect(() => {
@@ -41,13 +41,32 @@ const useManagement = () => {
     },
   });
 
+  const filteredOrderData = useMemo(() => {
+    let filteredOrderData = timeOrderData;
+    if (filteredOrderData) {
+      if (selectedOrderStatus !== OrderStatus.All)
+        filteredOrderData = filteredOrderData.filter(
+          (order) => order.orderStatus === selectedOrderStatus,
+        );
+      if (selectedProduct) {
+        filteredOrderData = filteredOrderData.filter(
+          (order) => order.orderData.id === selectedProduct.id,
+        );
+      }
+    }
+    return filteredOrderData;
+  }, [selectedOrderStatus, selectedProduct, timeOrderData]);
+
+  console.log(timeOrderData);
+
   return {
     selectedOrderStatus,
+    setSelectedOrderStatus,
     productList,
     selectedProduct,
     setSelectedProduct,
-    timeOrderData,
     timeOrderStatus,
+    filteredOrderData,
   };
 };
 

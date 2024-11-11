@@ -58,6 +58,24 @@ export type KoreanOrderStatus =
   | '발송 시작'
   | '주문 취소';
 
+export const allOrderStatusArray = [
+  OrderStatus.All,
+  OrderStatus.OrderCreated,
+  OrderStatus.OrderCompleted,
+  OrderStatus.AwaitingShipment,
+  OrderStatus.ShipmentStarted,
+  OrderStatus.OrderCancelled,
+];
+
+export const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
+  All: '전체',
+  OrderCreated: '주문 생성',
+  OrderCompleted: '주문 완료',
+  AwaitingShipment: '발송 대기',
+  ShipmentStarted: '발송 시작',
+  OrderCancelled: '주문 취소',
+};
+
 /**
  * 주문 DB 에 저장될 스키마. 같은 주문에 대해서 각 상품별로 따로 저장되기 때문에
  * 같은 주문의 각 상품들은 orderId 필드가 같은 값을 가진다.

@@ -8,33 +8,35 @@ export const ManagementContainer = styled.div`
   gap: 32px;
 `;
 
-export const ManagementTitleBox = styled.div`
+export const TitleBox = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
 `;
 
-export const ManagementTitleHeader = styled(H2)`
+export const TitleHeader = styled(H2)`
   display: flex;
   align-items: center;
   gap: 12px;
   padding: 0 10px;
 `;
 
-export const ManagementBodyContainer = styled.div`
+export const BodyContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
 `;
 
-export const ManagementBodyHeader = styled(H3)`
+export const BodyHeader = styled(H3)`
   display: flex;
   align-items: center;
   gap: 12px;
 `;
 
-export const ManagementOrderListFilter = styled.div`
+export const OrderListFilter = styled.div`
   display: flex;
   align-items: center;
   gap: 12px;
 `;
+
+export const OrderListTable = styled.div``;

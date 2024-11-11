@@ -3,6 +3,7 @@ import { fetchInfiniteOrders, fetchOrders } from '@/services/orderService';
 import { rollbackSingleOrder } from '@/services/productService';
 import {
   KoreanOrderStatus,
+  koreanOrderStatusMap,
   OrderSchema,
   OrderStatus,
 } from '@/types/FirebaseType';
@@ -22,14 +23,6 @@ import { toast } from 'sonner';
 
 type DateOrderDataEntries = Array<[string, Array<[string, OrderSchema[]]>]>;
 type OrderStatusCountMap = Record<KoreanOrderStatus, number>;
-const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
-  All: '전체',
-  OrderCreated: '주문 생성',
-  OrderCompleted: '주문 완료',
-  AwaitingShipment: '발송 대기',
-  ShipmentStarted: '발송 시작',
-  OrderCancelled: '주문 취소',
-};
 
 const useHistory = () => {
   const { userInfo } = useFirebaseAuth();
