@@ -9,6 +9,7 @@ import {
 import * as S from './VerticalSelect.Style';
 import { Children } from '@/types/GlobalType';
 import { MdOutlineExpandMore } from 'react-icons/md';
+import { isEqual } from '@/utils/utils';
 
 type VerticalSelectContextProps = {
   useSearch: boolean;
@@ -35,9 +36,9 @@ const VerticalSelectTitle = ({ children }: Children) => {
 
 const VerticalSelectOptionList = ({
   children,
-  handleChangeOption,
+  handleChangeOption = () => {},
   state,
-}: Children & { handleChangeOption: (value: any) => void; state: any }) => {
+}: Children & { handleChangeOption?: (value: any) => void; state: any }) => {
   const { isListOpen, setPreventBlur } = useContext(VerticalSelectContext);
   return (
     isListOpen && (
@@ -67,7 +68,7 @@ const VerticalSelectOptionItem = ({
 }) => {
   const { useSearch, setIsListOpen, searchKeyword, setSearchKeyword } =
     useContext(VerticalSelectContext);
-  const isActive = value === state || Object.is(value, state);
+  const isActive = isEqual(state, value);
   const isValidItem = searchKeyword ? text.includes(searchKeyword) : true;
 
   // 검색 사용 - isValidItem 으로 필터링해야됨. 검색 미사용 - 필터링하면 안됨

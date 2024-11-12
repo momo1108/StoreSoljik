@@ -9,6 +9,8 @@ import {
   allOrderStatusArray,
   koreanOrderStatusMap,
 } from '@/types/FirebaseType';
+import { MdFilterList } from 'react-icons/md';
+import HorizontalSelect from '@/components/ui/filter/horizontal/HorizontalSelect';
 
 const Management: React.FC = () => {
   const {
@@ -40,22 +42,16 @@ const Management: React.FC = () => {
             </S.BodyHeader>
             <S.OrderListFilter>
               {/* 주문 상태, 상품을 사용한 필터 */}
-              <VerticalSelect>
-                <VerticalSelect.Title>주문 상태</VerticalSelect.Title>
-                <VerticalSelect.State />
-                <VerticalSelect.OptionList
-                  state={selectedOrderStatus}
-                  handleChangeOption={setSelectedOrderStatus}
-                >
-                  {allOrderStatusArray.map((status) => (
-                    <VerticalSelect.OptionItem
-                      key={status}
-                      value={status}
-                      text={koreanOrderStatusMap[status]}
-                    />
-                  ))}
-                </VerticalSelect.OptionList>
-              </VerticalSelect>
+              <HorizontalSelect
+                options={allOrderStatusArray.map((status) => ({
+                  name: koreanOrderStatusMap[status],
+                  value: status,
+                }))}
+                state={selectedOrderStatus}
+                handleChangeOption={(option) =>
+                  setSelectedOrderStatus(option.value)
+                }
+              />
               <VerticalSelect useSearch>
                 <VerticalSelect.Title>상품 목록</VerticalSelect.Title>
                 <VerticalSelect.State placeholder='상품을 검색해주세요' />
@@ -78,6 +74,7 @@ const Management: React.FC = () => {
               </VerticalSelect>
             </S.OrderListFilter>
             <S.OrderListTable>
+              {/* 날짜 | 주문시간, 주문상품 | 주문 수량, 상품 금액 + 총 금액 */}
               {filteredOrderData?.map((order) => order.orderName)}
             </S.OrderListTable>
           </S.BodyContainer>

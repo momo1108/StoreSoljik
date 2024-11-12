@@ -35,8 +35,8 @@ export const BodyHeader = styled(H3)`
 
 export const OrderListFilter = styled.div`
   display: flex;
-  align-items: center;
-  gap: 12px;
+  align-items: end;
+  justify-content: space-between;
 `;
 
 export const OrderListTable = styled.div``;

@@ -76,3 +76,6 @@ export const loadScript: LoadScript = (src, successMessages, errorMessages) => {
     }
   });
 };
+
+export const isEqual = (obj1: unknown, obj2: unknown) =>
+  obj1 === obj2 || Object.is(obj1, obj2);
