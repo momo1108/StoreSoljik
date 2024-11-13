@@ -31,8 +31,9 @@ const useManagement = () => {
    * 화면 상단의 주문 현황을 위한 코드
    */
   const { data: timeOrderData, status: timeOrderStatus } = useQuery({
-    queryKey: ['orders'],
+    queryKey: ['orders', 'seller', 'All'],
     queryFn: async () => {
+      console.log('query called');
       const filters = [where('sellerId', '==', userInfo!.uid)];
       return await fetchOrders({
         filters,

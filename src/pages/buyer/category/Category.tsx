@@ -46,7 +46,7 @@ const Category: React.FC = () => {
                 state={filterOptions.category}
                 handleChangeOption={(option) =>
                   setFilterOptions({
-                    category: option.value,
+                    category: option.value as string,
                     field: 'createdAt',
                     direction: 'desc',
                   })

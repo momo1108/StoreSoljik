@@ -3,11 +3,17 @@ import Main from '@/components/layouts/main/Main';
 import * as S from './History.Style';
 import { H2, H3, H4 } from '@/components/ui/header/Header.Style';
 import useHistory from './useHistory';
-import { KoreanOrderStatus, OrderStatus } from '@/types/FirebaseType';
+import {
+  allOrderStatusArray,
+  KoreanOrderStatus,
+  koreanOrderStatusMap,
+  OrderStatus,
+} from '@/types/FirebaseType';
 import { Fragment } from 'react';
 import Button from '@/components/ui/button/Button';
 import StatusBar from '@/components/ui/statusbar/StatusBar';
 import { Link } from 'react-router-dom';
+import HorizontalSelect from '@/components/ui/filter/horizontal/HorizontalSelect';
 
 const History: React.FC = () => {
   const {
@@ -75,39 +81,29 @@ const History: React.FC = () => {
           </S.OrderStatusContainer>
           <S.OrderListContainer>
             <H3>구매 내역 목록</H3>
-            <S.OrderListMenu>
-              {['전체', '주문 완료', '발송 대기', '발송 시작', '주문 취소'].map(
-                (status) => (
-                  <li key={`orderMenu_${status}`}>
-                    <S.OrderListMenuButton
-                      onClick={() =>
-                        setOrderStatusForList(
-                          orderStatusMapKrToEn[status as KoreanOrderStatus],
-                        )
-                      }
-                      styleType={
-                        orderStatusForList ===
-                        orderStatusMapKrToEn[status as KoreanOrderStatus]
-                          ? 'primary'
-                          : 'normal'
-                      }
-                    >
-                      {status}
-                      <span className='countSpan'>
-                        ({orderStatusCountMap[status as KoreanOrderStatus]})
-                      </span>
-                    </S.OrderListMenuButton>
-                  </li>
-                ),
-              )}
-            </S.OrderListMenu>
+            <div style={{ alignSelf: 'flex-start' }}>
+              <HorizontalSelect
+                options={allOrderStatusArray
+                  .filter((status) => status !== OrderStatus.OrderCreated)
+                  .map((status) => ({
+                    name: `${koreanOrderStatusMap[status]} (${orderStatusCountMap[koreanOrderStatusMap[status]]})`,
+                    value: status,
+                  }))}
+                state={orderStatusForList}
+                handleChangeOption={(option) =>
+                  setOrderStatusForList(option.value as OrderStatus)
+                }
+              />
+            </div>
             <S.OrderListInfoContainer>
               {dateOrderDataEntries ? (
                 dateOrderDataEntries.map(([buyDate, timeOrderDataEntries]) => (
                   <S.OrderInfoPerDateContainer key={`infoContainer_${buyDate}`}>
                     <H4>{buyDate}</H4>
                     {timeOrderDataEntries.map(([buyTime, orderDataArray]) => (
-                      <S.OrderInfoBox>
+                      <S.OrderInfoBox
+                        key={`infoContainer_${buyDate}_${buyTime}`}
+                      >
                         <div>
                           <S.OrderDateP>
                             주문 일시 : {`${buyDate} ${buyTime}`}

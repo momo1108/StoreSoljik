@@ -8,9 +8,11 @@ import VerticalSelect from '@/components/ui/filter/vertical/VerticalSelect';
 import {
   allOrderStatusArray,
   koreanOrderStatusMap,
+  OrderStatus,
 } from '@/types/FirebaseType';
 import { MdFilterList } from 'react-icons/md';
 import HorizontalSelect from '@/components/ui/filter/horizontal/HorizontalSelect';
+import { H4 } from '@/components/ui/header/Header.Style';
 
 const Management: React.FC = () => {
   const {
@@ -49,7 +51,7 @@ const Management: React.FC = () => {
                 }))}
                 state={selectedOrderStatus}
                 handleChangeOption={(option) =>
-                  setSelectedOrderStatus(option.value)
+                  setSelectedOrderStatus(option.value as OrderStatus)
                 }
               />
               <VerticalSelect useSearch>
@@ -73,10 +75,12 @@ const Management: React.FC = () => {
                 </VerticalSelect.OptionList>
               </VerticalSelect>
             </S.OrderListFilter>
-            <S.OrderListTable>
-              {/* 날짜 | 주문시간, 주문상품 | 주문 수량, 상품 금액 + 총 금액 */}
-              {filteredOrderData?.map((order) => order.orderName)}
-            </S.OrderListTable>
+            <S.OrderListContainer>
+              <S.OrderPerMonthContainer>
+                {/* 날짜 | 주문시간, 주문상품 | 주문 수량, 상품 금액 + 총 금액 */}
+                {filteredOrderData?.map((order) => <H4>몇월</H4>)}
+              </S.OrderPerMonthContainer>
+            </S.OrderListContainer>
           </S.BodyContainer>
         </S.ManagementContainer>
       </Main>

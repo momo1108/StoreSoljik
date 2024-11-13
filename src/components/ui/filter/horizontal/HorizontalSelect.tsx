@@ -2,10 +2,14 @@ import * as S from './HorizontalSelect.Style';
 import Spinner from '../../spinner/Spinner';
 import { isEqual } from '@/utils/utils';
 
+type OptionType = {
+  name: string;
+  value: unknown;
+};
 type HorizontalSelectProps = {
-  options: { name: string; value: unknown }[];
+  options: OptionType[];
   state: unknown;
-  handleChangeOption: React.Dispatch<React.SetStateAction<any>>;
+  handleChangeOption: (option: OptionType) => void;
   disabled?: boolean;
 };
 const HorizontalSelect: React.FC<HorizontalSelectProps> = ({

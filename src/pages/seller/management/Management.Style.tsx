@@ -39,4 +39,16 @@ export const OrderListFilter = styled.div`
   justify-content: space-between;
 `;
 
-export const OrderListTable = styled.div``;
+export const OrderListContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+`;
+
+export const OrderPerMonthContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 0 0 0 8px;
+  border-left: 1px solid black;
+`;

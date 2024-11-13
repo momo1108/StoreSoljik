@@ -199,6 +199,7 @@ export const fetchOrders = async ({
   sortOrders = [],
   pageSize = 0,
 }: FetchQueryParams): Promise<OrderSchema[]> => {
+  console.log('fetch called');
   const ordersQuery = buildFirestoreQuery(
     db,
     'order',
@@ -206,7 +207,9 @@ export const fetchOrders = async ({
     sortOrders,
     pageSize,
   );
+  console.log('query', ordersQuery);
   const orderDocuments = await getDocs(ordersQuery);
+  console.log('docs', orderDocuments);
 
   const documentArray: OrderSchema[] = [];
 
