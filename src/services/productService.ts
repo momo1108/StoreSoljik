@@ -17,6 +17,7 @@ import {
   getDoc,
   getDocs,
   limit,
+  orderBy,
   QueryConstraint,
   runTransaction,
   setDoc,
@@ -103,7 +104,12 @@ export const getProductData = async (productId: string) => {
 
 export const getProductList = async (sellerId: string) => {
   const productListDocument = await getDocs(
-    buildFirestoreQuery(db, 'product', [where('sellerId', '==', sellerId)]),
+    buildFirestoreQuery({
+      db,
+      collectionName: 'product',
+      filters: [where('sellerId', '==', sellerId)],
+      sortOrders: [orderBy('createdAt', 'desc')],
+    }),
   );
 
   if (productListDocument.docs.length) {
@@ -266,9 +272,11 @@ export const rollbackBatchOrder = async ({
   shouldDelete = true,
 }: RollbackBatchOrderParam) => {
   const orderDocuments = await getDocs(
-    buildFirestoreQuery(db, 'order', [
-      where('batchOrderId', '==', batchOrderId),
-    ]),
+    buildFirestoreQuery({
+      db,
+      collectionName: 'order',
+      filters: [where('batchOrderId', '==', batchOrderId)],
+    }),
   );
   const orderDataArray: OrderSchema[] = orderDocuments.docs.map(
     (doc) => doc.data() as OrderSchema,
@@ -348,7 +356,11 @@ export const fetchInfiniteProducts = async ({
     constraints.push(startAt(pageParam));
   }
 
-  const productsQuery = buildFirestoreQuery(db, 'product', constraints);
+  const productsQuery = buildFirestoreQuery({
+    db,
+    collectionName: 'product',
+    constraints,
+  });
   const productDocuments = await getDocs(productsQuery);
   const dataArray: ProductSchema[] = productDocuments.docs
     .slice(0, pageSize)
@@ -373,13 +385,13 @@ export const fetchProducts = async ({
   sortOrders = [],
   pageSize = 0,
 }: FetchQueryParams): Promise<ProductSchema[]> => {
-  const productsQuery = buildFirestoreQuery(
+  const productsQuery = buildFirestoreQuery({
     db,
-    'product',
+    collectionName: 'product',
     filters,
     sortOrders,
     pageSize,
-  );
+  });
   const productDocuments = await getDocs(productsQuery);
 
   const documentArray: ProductSchema[] = [];

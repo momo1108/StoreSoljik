@@ -67,6 +67,15 @@ export const allOrderStatusArray = [
   OrderStatus.OrderCancelled,
 ];
 
+export const orderStatusLevel: Record<OrderStatus, number> = {
+  All: 0,
+  OrderCreated: 0,
+  OrderCancelled: 0,
+  OrderCompleted: -3,
+  AwaitingShipment: -2,
+  ShipmentStarted: -1,
+};
+
 export const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
   All: '전체',
   OrderCreated: '주문 생성',

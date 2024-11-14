@@ -125,9 +125,11 @@ export const updateBatchOrderStatus = async ({
   orderStatus: OrderStatus;
 }) => {
   const orderDocuments = await getDocs(
-    buildFirestoreQuery(db, 'order', [
-      where('batchOrderId', '==', batchOrderId),
-    ]),
+    buildFirestoreQuery({
+      db,
+      collectionName: 'order',
+      filters: [where('batchOrderId', '==', batchOrderId)],
+    }),
   );
   const batch = writeBatch(db);
 
@@ -174,7 +176,11 @@ export const fetchInfiniteOrders = async ({
     constraints.push(startAt(pageParam));
   }
 
-  const ordersQuery = buildFirestoreQuery(db, 'order', constraints);
+  const ordersQuery = buildFirestoreQuery({
+    db,
+    collectionName: 'order',
+    constraints,
+  });
   const orderDocuments = await getDocs(ordersQuery);
   const dataArray: OrderSchema[] = orderDocuments.docs
     .slice(0, pageSize)
@@ -199,17 +205,14 @@ export const fetchOrders = async ({
   sortOrders = [],
   pageSize = 0,
 }: FetchQueryParams): Promise<OrderSchema[]> => {
-  console.log('fetch called');
-  const ordersQuery = buildFirestoreQuery(
+  const ordersQuery = buildFirestoreQuery({
     db,
-    'order',
+    collectionName: 'order',
     filters,
     sortOrders,
     pageSize,
-  );
-  console.log('query', ordersQuery);
+  });
   const orderDocuments = await getDocs(ordersQuery);
-  console.log('docs', orderDocuments);
 
   const documentArray: OrderSchema[] = [];
 
@@ -217,8 +220,6 @@ export const fetchOrders = async ({
     orderDocuments.docs.forEach((doc) => {
       documentArray.push(doc.data() as OrderSchema);
     });
-
-  console.log(documentArray);
 
   return documentArray;
 };

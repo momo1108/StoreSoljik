@@ -10,9 +10,11 @@ import {
   koreanOrderStatusMap,
   OrderStatus,
 } from '@/types/FirebaseType';
-import { MdFilterList } from 'react-icons/md';
 import HorizontalSelect from '@/components/ui/filter/horizontal/HorizontalSelect';
-import { H4 } from '@/components/ui/header/Header.Style';
+import { H3, H4 } from '@/components/ui/header/Header.Style';
+import { getIsoDate, getIsoDay, getIsoTime } from '@/utils/utils';
+import { FaBox, FaClock } from 'react-icons/fa6';
+import { IoReceipt } from 'react-icons/io5';
 
 const Management: React.FC = () => {
   const {
@@ -22,7 +24,9 @@ const Management: React.FC = () => {
     selectedProduct,
     setSelectedProduct,
     timeOrderStatus,
-    filteredOrderData,
+    orderDataPerDate,
+    handleChangeOptionOrderStatus,
+    ref,
   } = useManagement();
 
   // https://dribbble.com/search/information-table
@@ -45,10 +49,12 @@ const Management: React.FC = () => {
             <S.OrderListFilter>
               {/* 주문 상태, 상품을 사용한 필터 */}
               <HorizontalSelect
-                options={allOrderStatusArray.map((status) => ({
-                  name: koreanOrderStatusMap[status],
-                  value: status,
-                }))}
+                options={allOrderStatusArray
+                  .filter((status) => status !== OrderStatus.OrderCreated)
+                  .map((status) => ({
+                    name: koreanOrderStatusMap[status],
+                    value: status,
+                  }))}
                 state={selectedOrderStatus}
                 handleChangeOption={(option) =>
                   setSelectedOrderStatus(option.value as OrderStatus)
@@ -61,6 +67,7 @@ const Management: React.FC = () => {
                   state={selectedProduct}
                   handleChangeOption={setSelectedProduct}
                 >
+                  <VerticalSelect.OptionItem value={undefined} text={'전체'} />
                   {productList
                     .sort((p1, p2) =>
                       p1.productName > p2.productName ? 1 : -1,
@@ -76,10 +83,88 @@ const Management: React.FC = () => {
               </VerticalSelect>
             </S.OrderListFilter>
             <S.OrderListContainer>
-              <S.OrderPerMonthContainer>
-                {/* 날짜 | 주문시간, 주문상품 | 주문 수량, 상품 금액 + 총 금액 */}
-                {filteredOrderData?.map((order) => <H4>몇월</H4>)}
-              </S.OrderPerMonthContainer>
+              {Object.entries(orderDataPerDate)
+                .sort((e1, e2) => (e1[0] > e2[0] ? -1 : 1))
+                .map(([month, orderDataArray]) => (
+                  <S.OrderPerMonthContainer key={`orderContainer_${month}`}>
+                    <H4>{month}</H4>
+                    {/* 날짜 | 주문시간, 주문상품 | 주문 수량, 상품 금액 + 총 금액 */}
+                    {orderDataArray.map((order) => (
+                      <S.OrderInfoBox key={`order_${order.orderId}`}>
+                        <S.DayBox>
+                          <strong>{getIsoDay(order.createdAt)}</strong>
+                          <H3>{getIsoDate(order.createdAt).split('-')[2]}</H3>
+                        </S.DayBox>
+                        <S.ProductBox>
+                          <div className='date'>
+                            <FaClock />
+                            <span>
+                              {getIsoDate(order.createdAt)}{' '}
+                              {getIsoTime(order.createdAt)}
+                            </span>
+                          </div>
+                          <div className='product'>
+                            <FaBox />
+                            <p
+                              className='hideTextOverflow'
+                              title={order.orderData.productName}
+                            >
+                              {order.orderData.productName}
+                            </p>
+                          </div>
+                        </S.ProductBox>
+                        <S.PaymentBox>
+                          <div className='totalPrice'>
+                            <IoReceipt />
+                            <p>
+                              {(
+                                order.orderData.productPrice *
+                                order.orderData.productQuantity
+                              ).toLocaleString()}{' '}
+                              원
+                            </p>
+                          </div>
+                          <p className='priceAndCount'>
+                            ( {order.orderData.productPrice.toLocaleString()} 원
+                            * {order.orderData.productQuantity.toLocaleString()}{' '}
+                            개 )
+                          </p>
+                        </S.PaymentBox>
+                        <S.StatusSelectBox>
+                          <VerticalSelect>
+                            <VerticalSelect.Title>
+                              주문 상태 변경
+                            </VerticalSelect.Title>
+                            <VerticalSelect.State />
+                            <VerticalSelect.OptionList
+                              state={order.orderStatus}
+                              handleChangeOption={(value) =>
+                                handleChangeOptionOrderStatus(value, order)
+                              }
+                            >
+                              {allOrderStatusArray
+                                .filter(
+                                  (status) =>
+                                    ![
+                                      OrderStatus.All,
+                                      OrderStatus.OrderCreated,
+                                    ].includes(status),
+                                )
+                                .map((status) => (
+                                  <VerticalSelect.OptionItem
+                                    key={status}
+                                    text={koreanOrderStatusMap[status]}
+                                    value={status}
+                                  />
+                                ))}
+                            </VerticalSelect.OptionList>
+                          </VerticalSelect>
+                        </S.StatusSelectBox>
+                      </S.OrderInfoBox>
+                    ))}
+                  </S.OrderPerMonthContainer>
+                ))}
+              <div ref={ref}></div>
             </S.OrderListContainer>
           </S.BodyContainer>
         </S.ManagementContainer>

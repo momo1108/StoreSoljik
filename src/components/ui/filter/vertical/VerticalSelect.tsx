@@ -95,7 +95,6 @@ const VerticalSelectState = ({
   placeholder = '검색',
 }: {
   placeholder?: string;
-  width?: number;
 }) => {
   const {
     useSearch,
