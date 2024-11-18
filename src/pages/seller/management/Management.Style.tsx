@@ -68,6 +68,12 @@ export const DayBox = styled.div`
   border-right: 1px solid ${({ theme }) => theme.color.brightGray};
 `;
 
+export const PreviewImg = styled.img`
+  width: 52px;
+  height: 52px;
+  object-fit: cover;
+`;
+
 export const ProductBox = styled.div`
   display: flex;
   flex-direction: column;
@@ -116,4 +122,11 @@ export const PaymentBox = styled.div`
 
 export const StatusSelectBox = styled.div`
   margin-left: auto;
+`;
+
+export const EmptyOrderInfoBox = styled.div`
+  padding: 24px;
+  text-align: center;
+  border: 1px solid gray;
+  border-radius: 8px;
 `;

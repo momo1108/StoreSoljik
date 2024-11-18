@@ -61,10 +61,10 @@ const VerticalSelectOptionItem = ({
   handleChangeOption = () => {},
   state,
 }: {
-  value: any;
+  value: unknown;
   text: string;
-  handleChangeOption?: (value: any) => void;
-  state?: any;
+  handleChangeOption?: (value: unknown) => void;
+  state?: unknown;
 }) => {
   const { useSearch, setIsListOpen, searchKeyword, setSearchKeyword } =
     useContext(VerticalSelectContext);
@@ -81,7 +81,7 @@ const VerticalSelectOptionItem = ({
       onClick={() => {
         if (!isActive) {
           handleChangeOption(value);
-          if (useSearch) setSearchKeyword(text);
+          setSearchKeyword(text);
         }
         setIsListOpen(false);
       }}
@@ -93,8 +93,10 @@ const VerticalSelectOptionItem = ({
 
 const VerticalSelectState = ({
   placeholder = '검색',
+  stateText = '',
 }: {
   placeholder?: string;
+  stateText?: string;
 }) => {
   const {
     useSearch,
@@ -117,10 +119,10 @@ const VerticalSelectState = ({
   ) : (
     <S.StateP
       className='hideTextOverflow'
-      title={searchKeyword}
+      title={stateText}
       onClick={() => setIsListOpen((s) => !s)}
     >
-      <span>{searchKeyword || '선택하기'}</span>
+      <span>{stateText || '선택하기'}</span>
       <MdOutlineExpandMore size={20} className={isListOpen ? 'flip' : ''} />
     </S.StateP>
   );

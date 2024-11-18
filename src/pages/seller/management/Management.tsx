@@ -83,9 +83,8 @@ const Management: React.FC = () => {
               </VerticalSelect>
             </S.OrderListFilter>
             <S.OrderListContainer>
-              {Object.entries(orderDataPerDate)
-                .sort((e1, e2) => (e1[0] > e2[0] ? -1 : 1))
-                .map(([month, orderDataArray]) => (
+              {orderDataPerDate.length ? (
+                orderDataPerDate.map(([month, orderDataArray]) => (
                   <S.OrderPerMonthContainer key={`orderContainer_${month}`}>
                     <H4>{month}</H4>
                     {/* 날짜 | 주문시간, 주문상품 | 주문 수량, 상품 금액 + 총 금액 */}
@@ -95,6 +94,10 @@ const Management: React.FC = () => {
                           <strong>{getIsoDay(order.createdAt)}</strong>
                           <H3>{getIsoDate(order.createdAt).split('-')[2]}</H3>
                         </S.DayBox>
+                        <S.PreviewImg
+                          src={order.orderData.productImageUrlArray[0]}
+                          alt={`${order.orderData.productName}_이미지`}
+                        />
                         <S.ProductBox>
                           <div className='date'>
                             <FaClock />
@@ -135,7 +138,11 @@ const Management: React.FC = () => {
                             <VerticalSelect.Title>
                               주문 상태 변경
                             </VerticalSelect.Title>
-                            <VerticalSelect.State />
+                            <VerticalSelect.State
+                              stateText={
+                                koreanOrderStatusMap[order.orderStatus]
+                              }
+                            />
                             <VerticalSelect.OptionList
                               state={order.orderStatus}
                               handleChangeOption={(value) =>
@@ -163,8 +170,15 @@ const Management: React.FC = () => {
                       </S.OrderInfoBox>
                     ))}
                   </S.OrderPerMonthContainer>
-                ))}
-              <div ref={ref}></div>
+                ))
+              ) : (
+                <S.OrderPerMonthContainer>
+                  <S.EmptyOrderInfoBox>
+                    <H4>해당하는 주문 정보가 없습니다.</H4>
+                  </S.EmptyOrderInfoBox>
+                </S.OrderPerMonthContainer>
+              )}
+              <div ref={ref} />
             </S.OrderListContainer>
           </S.BodyContainer>
         </S.ManagementContainer>

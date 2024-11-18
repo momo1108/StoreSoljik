@@ -24,7 +24,7 @@ export const RegistrationTitleBox = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  width: 1140px;
+  width: 1040px;
   padding: 0 10px;
   box-sizing: border-box;
 `;
@@ -72,7 +72,7 @@ export const WarningMessageP = styled.p`
 
 export const RegistrationContentContainer = styled.div`
   display: grid;
-  width: 1140px;
+  width: 1040px;
   flex-grow: 1;
   grid-template-columns: 40% 1fr;
   gap: 25px;
