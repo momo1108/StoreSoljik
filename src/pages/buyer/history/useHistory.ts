@@ -3,6 +3,7 @@ import { fetchInfiniteOrders, fetchOrders } from '@/services/orderService';
 import { rollbackSingleOrder } from '@/services/productService';
 import {
   KoreanOrderStatus,
+  koreanOrderStatusMap,
   OrderSchema,
   OrderStatus,
 } from '@/types/FirebaseType';
@@ -22,14 +23,6 @@ import { toast } from 'sonner';
 
 type DateOrderDataEntries = Array<[string, Array<[string, OrderSchema[]]>]>;
 type OrderStatusCountMap = Record<KoreanOrderStatus, number>;
-const koreanOrderStatusMap: Record<OrderStatus, KoreanOrderStatus> = {
-  All: '전체',
-  OrderCreated: '주문 생성',
-  OrderCompleted: '주문 완료',
-  AwaitingShipment: '발송 대기',
-  ShipmentStarted: '발송 시작',
-  OrderCancelled: '주문 취소',
-};
 
 const useHistory = () => {
   const { userInfo } = useFirebaseAuth();
@@ -39,7 +32,7 @@ const useHistory = () => {
    * 화면 상단의 주문 현황을 위한 코드
    */
   const { data: allOrderData, status: allOrderStatus } = useQuery({
-    queryKey: ['orders'],
+    queryKey: ['orders', 'buyer', 'All'],
     queryFn: async () => {
       return await fetchOrders({
         filters: [where('buyerId', '==', userInfo!.uid)],
@@ -87,7 +80,7 @@ const useHistory = () => {
   };
 
   // queryKey를 선택된 orderStatus 에 따라 동적으로 생성합니다.
-  const queryKey = ['orders', orderStatusForList];
+  const queryKey = ['orders', 'buyer', 'infinite', orderStatusForList];
 
   const [pageSize] = useState<number>(8);
   const fetchOrdersWrapper = async ({ pageParam }: { pageParam: unknown }) => {
@@ -152,7 +145,6 @@ const useHistory = () => {
           }
         });
       });
-      console.log(tmpEntries);
       return tmpEntries;
     }
     return undefined;

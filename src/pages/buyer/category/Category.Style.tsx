@@ -8,13 +8,24 @@ export const CategoryContainer = styled.div`
   gap: 20px;
 `;
 
-export const FilterBox = styled.div`
+export const FilterConatiner = styled.div`
   display: flex;
   flex-direction: column;
   gap: 10px;
   border-top: 3px double ${(props) => props.theme.color.gray};
   border-bottom: 3px double ${(props) => props.theme.color.gray};
   padding: 20px 0;
+`;
+
+export const FilterBox = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 16px;
+`;
+
+export const Title = styled.b`
+  font-size: ${(props) => props.theme.fontSize.lg};
+  color: #333;
 `;
 
 export const ProductCardList = styled.ul`

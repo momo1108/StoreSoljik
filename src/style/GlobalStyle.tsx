@@ -145,6 +145,14 @@ input::placeholder {
   white-space: nowrap;
 }
 
+/* 스크롤바 숨기기 */
+.hideScrollbar {
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+}
+
 /* a 링크 색깔 초기화 */
 a { 
   color: inherit; 

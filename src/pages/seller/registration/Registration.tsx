@@ -60,7 +60,7 @@ const Registration: React.FC = () => {
                 ) : (
                   <></>
                 )}
-                <S.RegistrationContentImagePreviewBox>
+                <S.RegistrationContentImagePreviewBox className='hideScrollbar'>
                   {imagePreviewUrls && imagePreviewUrls[0] ? (
                     imagePreviewUrls.map((imgUrl, index) => (
                       <S.ImagePreviewItemBox

@@ -14,16 +14,28 @@ import {
  * @param constraints 적용할 조건
  * @returns 완성된 쿼리(getDocs 메서드에 사용 가능)
  */
-export const buildFirestoreQuery = (
-  db: Firestore,
-  collectionName: string,
-  filters: QueryConstraint[] = [],
-  sortOrders: QueryConstraint[] = [],
-  pageSize: number = 0,
-): Query => {
-  const constraints: QueryConstraint[] = [...filters, ...sortOrders];
+export const buildFirestoreQuery = ({
+  db,
+  collectionName,
+  constraints = [],
+  filters = [],
+  sortOrders = [],
+  pageSize = 0,
+}: {
+  db: Firestore;
+  collectionName: string;
+  constraints?: QueryConstraint[];
+  filters?: QueryConstraint[];
+  sortOrders?: QueryConstraint[];
+  pageSize?: number;
+}): Query => {
+  if (constraints.length) {
+    return query(collection(db, collectionName), ...constraints);
+  } else {
+    const constraintArray = [...filters, ...sortOrders];
 
-  if (pageSize > 0) constraints.push(limit(pageSize));
+    if (pageSize > 0) constraintArray.push(limit(pageSize));
 
-  return query(collection(db, collectionName), ...constraints);
+    return query(collection(db, collectionName), ...constraintArray);
+  }
 };

@@ -23,6 +23,12 @@ export const getIsoTime: (
 ) => string = (isoString, includeSecond = false) =>
   includeSecond ? isoString.slice(11, 19) : isoString.slice(11, 16);
 
+export const getIsoDay: (isoString: string) => string = (isoString) => {
+  const date = new Date(isoString);
+  const koreanDay = ['일', '월', '화', '수', '목', '금', '토'];
+  return koreanDay[date.getDay()];
+};
+
 export function compareArray<T>(array1: Array<T>, array2: Array<T>): boolean {
   if (array1.length === array2.length) {
     for (let i = 0; i < array1.length; i++) {
@@ -76,3 +82,6 @@ export const loadScript: LoadScript = (src, successMessages, errorMessages) => {
     }
   });
 };
+
+export const isEqual = (obj1: unknown, obj2: unknown) =>
+  obj1 === obj2 || Object.is(obj1, obj2);

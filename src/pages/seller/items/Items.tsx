@@ -3,7 +3,7 @@ import Main from '@/components/layouts/main/Main';
 import { H3, H4 } from '@/components/ui/header/Header.Style';
 import * as S from './Items.Style';
 import { RiListCheck } from 'react-icons/ri';
-import HorizontalCard from '@/components/ui/productcard/horizontalcard/HorizontalCard';
+import HorizontalCard from '@/components/ui/productcard/horizontal/HorizontalCard';
 import useItems from './useItems';
 import Spinner from '@/components/ui/spinner/Spinner';
 import Button from '@/components/ui/button/Button';

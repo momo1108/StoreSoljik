@@ -1,11 +1,12 @@
 import Header from '@/components/layouts/header/Header';
 import Main from '@/components/layouts/main/Main';
 import useCategory from './useCategory';
-import VerticalCard from '@/components/ui/productcard/verticalcard/VerticalCard';
+import VerticalCard from '@/components/ui/productcard/vertical/VerticalCard';
 import * as S from './Category.Style';
-import VerticalSelect from '@/components/ui/filter/VerticalSelect';
+import HorizontalSelect from '@/components/ui/filter/horizontal/HorizontalSelect';
 import Spinner from '@/components/ui/spinner/Spinner';
 import { H2 } from '@/components/ui/header/Header.Style';
+import { ProductDirection, ProductField } from '@/services/productService';
 
 const Category: React.FC = () => {
   const {
@@ -27,50 +28,69 @@ const Category: React.FC = () => {
       <Main>
         <S.CategoryContainer>
           <H2>카테고리별 상품 조회</H2>
-          <S.FilterBox>
-            {[
-              {
-                title: '카테고리',
-                type: 'category',
-                options: categories.length
-                  ? [
-                      { name: '전체', value: '전체' },
-                      ...categories.map((categoryName) => ({
-                        name: categoryName,
-                        value: categoryName,
-                      })),
-                    ]
-                  : [],
-              },
-              {
-                title: '정렬 기준',
-                type: 'field',
-                options: [
+          <S.FilterConatiner>
+            <S.FilterBox>
+              <S.Title>카테고리</S.Title>
+              <HorizontalSelect
+                options={
+                  categories.length
+                    ? [
+                        { name: '전체', value: '전체' },
+                        ...categories.map((categoryName) => ({
+                          name: categoryName,
+                          value: categoryName,
+                        })),
+                      ]
+                    : []
+                }
+                state={filterOptions.category}
+                handleChangeOption={(option) =>
+                  setFilterOptions({
+                    category: option.value as string,
+                    field: 'createdAt',
+                    direction: 'desc',
+                  })
+                }
+                disabled={isPending}
+              />
+            </S.FilterBox>
+            <S.FilterBox>
+              <S.Title>정렬 기준</S.Title>
+              <HorizontalSelect
+                options={[
                   { name: '등록날짜순', value: 'createdAt' },
                   { name: '가격순', value: 'productPrice' },
                   { name: '판매량순', value: 'productSalesrate' },
-                ],
-              },
-              {
-                title: '정렬 순서',
-                type: 'direction',
-                options: [
+                ]}
+                state={filterOptions.field}
+                handleChangeOption={(option) =>
+                  setFilterOptions((prevFilter) => ({
+                    ...prevFilter,
+                    field: option.value as ProductField,
+                    direction: 'desc',
+                  }))
+                }
+                disabled={isPending}
+              />
+            </S.FilterBox>
+            <S.FilterBox>
+              <S.Title>정렬 순서</S.Title>
+              <HorizontalSelect
+                options={[
                   { name: '내림차순', value: 'desc' },
                   { name: '오름차순', value: 'asc' },
-                ],
-              },
-            ].map((filterInfo) => (
-              <VerticalSelect
-                title={filterInfo.title}
-                type={filterInfo.type as 'field' | 'direction' | 'category'}
-                options={filterInfo.options}
-                getter={filterOptions}
-                setter={setFilterOptions}
+                ]}
+                state={filterOptions.direction}
+                handleChangeOption={(option) =>
+                  setFilterOptions((prevFilter) => ({
+                    ...prevFilter,
+                    direction: option.value as ProductDirection,
+                  }))
+                }
                 disabled={isPending}
-                key={`select_${filterInfo.type}`}
               />
-            ))}
-          </S.FilterBox>
+            </S.FilterBox>
+          </S.FilterConatiner>
           <S.ProductCardList>
             {status === 'pending' ? (
               <S.SpinnerBox>
