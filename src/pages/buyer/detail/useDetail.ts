@@ -1,5 +1,6 @@
 import { useCartItems } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
+import useWebSocket from '@/hooks/useWebSocket';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
@@ -9,6 +10,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const useDetail = () => {
+  const { isConnected, messages } = useWebSocket('ws://localhost:3000');
+  console.log(isConnected, messages);
+
   const navigate = useNavigate();
   const param = useParams();
   if (!param.id) {

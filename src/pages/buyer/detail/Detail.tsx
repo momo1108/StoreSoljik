@@ -50,6 +50,13 @@ const Detail: React.FC = () => {
               <S.CarouselWrapper>
                 <Carousel data={data.productImageUrlArray} size={500} />
               </S.CarouselWrapper>
+              <S.ChattingContainer>
+                <H4>실시간 채팅</H4>
+                <p className='descr'>
+                  이 상품을 보고있는 다른 회원님들이나 구매자와 소통해보세요!
+                </p>
+                <S.ChattingBox>hello</S.ChattingBox>
+              </S.ChattingContainer>
             </S.ImageContainer>
             <S.InfoContainer>
               <S.InfoHeaderP>
