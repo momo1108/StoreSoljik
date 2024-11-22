@@ -46,7 +46,7 @@ export const ChattingContainer = styled.div`
     rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
     rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
 
-  h4 {
+  & > h4 {
     border-bottom: 1px solid ${({ theme }) => theme.color.brighterGray};
     padding-bottom: 10px;
   }
@@ -54,9 +54,40 @@ export const ChattingContainer = styled.div`
   p.descr {
     color: ${({ theme }) => theme.color.gray};
   }
+
+  input {
+    height: 36px;
+  }
 `;
 
-export const ChattingBox = styled.div``;
+export const ChattingBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 250px;
+  padding: 10px;
+  overflow: auto;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+
+  h4 {
+    margin: auto 0;
+  }
+
+  .notification {
+    color: ${({ theme }) => theme.color.gray};
+  }
+
+  .myMessage {
+    background: yellow;
+    margin-right: auto;
+  }
+  .userMessage {
+    background: skyblue;
+    margin-left: auto;
+  }
+`;
 
 export const InfoContainer = styled.div`
   display: flex;

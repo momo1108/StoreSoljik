@@ -1,6 +1,7 @@
 import { useCartItems } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
-import useWebSocket from '@/hooks/useWebSocket';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import useWebSocket, { WebSocketMessageType } from '@/hooks/useWebSocket';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
@@ -10,9 +11,6 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
 const useDetail = () => {
-  const { isConnected, messages } = useWebSocket('ws://localhost:3000');
-  console.log(isConnected, messages);
-
   const navigate = useNavigate();
   const param = useParams();
   if (!param.id) {
@@ -21,6 +19,10 @@ const useDetail = () => {
       navigate('/');
     }, 1000);
   }
+  const { isOpen, toggleCart } = useCartUI();
+  const { checkItemIsInCart, addItem } = useCartItems();
+  const { sendMessage } = useWebSocket();
+  const { userInfo } = useFirebaseAuth();
 
   // 구매 수량 state (input 의 value 로 사용되므로 string 타입 사용)
   const [cartItemQuantity, setCartItemQuantity] = useState<string>('1');
@@ -114,8 +116,6 @@ const useDetail = () => {
 
   // console.log(recommendData, recommendStatus, recommendError);
 
-  const { isOpen, toggleCart } = useCartUI();
-  const { checkItemIsInCart, addItem } = useCartItems();
   const isProductInCart: boolean = checkItemIsInCart(data);
   const handleClickPurchase = () => {
     if (data) {
@@ -134,6 +134,25 @@ const useDetail = () => {
     if (isOpen) toggleCart();
   }, [param.id]);
 
+  const [message, setMessage] = useState<string>('');
+  const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      sendMessage({
+        type: 'message',
+        roomId: param.id,
+        userId: userInfo?.uid,
+        message,
+      });
+      setMessage('');
+    }
+  };
+
+  const getMessageType = (msg: WebSocketMessageType) => {
+    if (msg.type === 'notification') return 'notification';
+    else if (msg.userId === userInfo?.uid) return 'myMessage';
+    else return 'userMessage';
+  };
+
   return {
     cartItemQuantity,
     handleOnchangeQuantityInput,
@@ -147,6 +166,10 @@ const useDetail = () => {
     handleClickPurchase,
     isProductInCart,
     addItem,
+    message,
+    setMessage,
+    handleKeydown,
+    getMessageType,
   };
 };
 
