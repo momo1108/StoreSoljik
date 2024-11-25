@@ -24,6 +24,7 @@ export const ImageContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 500px;
   flex-shrink: 0;
 `;
 
@@ -33,6 +34,59 @@ export const CarouselWrapper = styled.div`
     rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
     rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
   overflow: hidden;
+`;
+
+export const ChattingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px 20px;
+  border-radius: 6px;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+
+  & > h4 {
+    border-bottom: 1px solid ${({ theme }) => theme.color.brighterGray};
+    padding-bottom: 10px;
+  }
+
+  p.descr {
+    color: ${({ theme }) => theme.color.gray};
+  }
+
+  input {
+    height: 36px;
+  }
+`;
+
+export const ChattingBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 250px;
+  padding: 10px;
+  overflow: auto;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+
+  h4 {
+    margin: auto 0;
+  }
+
+  .notification {
+    color: ${({ theme }) => theme.color.gray};
+  }
+
+  .myMessage {
+    background: yellow;
+    margin-right: auto;
+  }
+  .userMessage {
+    background: skyblue;
+    margin-left: auto;
+  }
 `;
 
 export const InfoContainer = styled.div`
