@@ -66,6 +66,7 @@ export const ChattingBox = styled.div`
   align-items: center;
   height: 250px;
   padding: 10px;
+  gap: 10px;
   overflow: auto;
   box-shadow:
     rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
@@ -77,14 +78,25 @@ export const ChattingBox = styled.div`
 
   .notification {
     color: ${({ theme }) => theme.color.gray};
+    // margin-bottom: 10px;
+  }
+
+  .myMessage,
+  .userMessage {
+    padding: 6px 12px;
+    box-shadow:
+      rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+      rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    border-radius: 6px;
   }
 
   .myMessage {
-    background: yellow;
+    background: #fff6ad;
     margin-right: auto;
   }
+
   .userMessage {
-    background: skyblue;
+    background: #d6ecff;
     margin-left: auto;
   }
 `;

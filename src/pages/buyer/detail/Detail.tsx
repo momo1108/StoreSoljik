@@ -32,6 +32,7 @@ const Detail: React.FC = () => {
     setMessage,
     handleKeydown,
     getMessageType,
+    chattingBoxRef,
   } = useDetail();
   const theme = useTheme();
   const { isConnected, messages } = useWebSocket();
@@ -62,7 +63,7 @@ const Detail: React.FC = () => {
                 <p className='descr'>
                   이 상품을 보고있는 다른 회원님들이나 구매자와 소통해보세요!
                 </p>
-                <S.ChattingBox>
+                <S.ChattingBox ref={chattingBoxRef}>
                   {isConnected ? (
                     <>
                       {messages
