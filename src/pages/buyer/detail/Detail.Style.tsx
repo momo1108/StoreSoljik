@@ -83,11 +83,24 @@ export const ChattingBox = styled.div`
 
   .myMessage,
   .userMessage {
+    position: relative;
+    margin-top: 20px;
     padding: 6px 12px;
     box-shadow:
       rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
       rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
     border-radius: 6px;
+
+    span.header {
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+      background: transparent;
+      position: absolute;
+      top: -20px;
+      left: 10px;
+      color: ${({ theme }) => theme.color.gray};
+    }
   }
 
   .myMessage {

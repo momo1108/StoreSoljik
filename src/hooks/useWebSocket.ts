@@ -11,7 +11,8 @@ export type WebSocketMessageType = {
 const useWebSocket = () => {
   const socketRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [messages, setMessages] = useState<string[]>([]);
+  const [messages, setMessages] = useState<WebSocketMessageType[]>([]);
+  const memberMap: Map<string, number> = new Map();
 
   const param = useParams();
   useEffect(() => {
@@ -38,8 +39,15 @@ const useWebSocket = () => {
     };
 
     socket.onmessage = (event) => {
-      console.log(`서버로부터 메시지 수신: ${event.data}`);
-      setMessages((prevMessages) => [...prevMessages, event.data]);
+      const data: WebSocketMessageType = JSON.parse(event.data);
+      console.log(`서버로부터 메시지 수신: ${data}`);
+      console.dir(data.userId);
+      console.log(data.userId && memberMap.get(data.userId));
+      if (data.userId && !memberMap.get(data.userId)) {
+        memberMap.set(data.userId, memberMap.size + 1);
+        console.log('set', memberMap);
+      }
+      setMessages((prevMessages) => [...prevMessages, data]);
     };
 
     socket.onclose = () => {
@@ -66,7 +74,7 @@ const useWebSocket = () => {
     }
   };
 
-  return { isConnected, messages, sendMessage };
+  return { isConnected, messages, sendMessage, memberMap };
 };
 
 export default useWebSocket;

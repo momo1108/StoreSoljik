@@ -35,7 +35,7 @@ const Detail: React.FC = () => {
     chattingBoxRef,
   } = useDetail();
   const theme = useTheme();
-  const { isConnected, messages } = useWebSocket();
+  const { isConnected, messages, memberMap } = useWebSocket();
 
   return (
     <>
@@ -66,16 +66,21 @@ const Detail: React.FC = () => {
                 <S.ChattingBox ref={chattingBoxRef}>
                   {isConnected ? (
                     <>
-                      {messages
-                        .map((msg) => JSON.parse(msg))
-                        .map((msg, index) => (
-                          <div
-                            key={`message_${msg.message.slice(0, 10)}_${index}`}
-                            className={getMessageType(msg)}
-                          >
-                            {msg.message}
-                          </div>
-                        ))}
+                      {messages.map((msg, index) => (
+                        <div
+                          key={`message_${msg.userId}_${index}`}
+                          className={getMessageType(msg)}
+                        >
+                          <span className={`header ${getMessageType(msg)}`}>
+                            {getMessageType(msg) === 'myMessage'
+                              ? '나'
+                              : getMessageType(msg) === 'userMessage'
+                                ? `구매자${memberMap.get(msg.userId as string)}`
+                                : ''}
+                          </span>
+                          <span>{msg.message}</span>
+                        </div>
+                      ))}
                     </>
                   ) : (
                     <H4>채팅에 연결되지 않았습니다.</H4>
