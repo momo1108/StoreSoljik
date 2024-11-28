@@ -12,7 +12,7 @@ const useWebSocket = () => {
   const socketRef = useRef<WebSocket | null>(null);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [messages, setMessages] = useState<WebSocketMessageType[]>([]);
-  const memberMap: Map<string, number> = new Map();
+  const [memberMap, setMemberMap] = useState<Record<string, number>>({});
 
   const param = useParams();
   useEffect(() => {
@@ -41,10 +41,11 @@ const useWebSocket = () => {
     socket.onmessage = (event) => {
       const data: WebSocketMessageType = JSON.parse(event.data);
       console.log(`서버로부터 메시지 수신: ${data}`);
-      console.dir(data.userId);
-      console.log(data.userId && memberMap.get(data.userId));
-      if (data.userId && !memberMap.get(data.userId)) {
-        memberMap.set(data.userId, memberMap.size + 1);
+      if (data.userId && !memberMap[data.userId]) {
+        setMemberMap((map) => ({
+          ...map,
+          [data.userId as string]: Object.keys(map).length,
+        }));
         console.log('set', memberMap);
       }
       setMessages((prevMessages) => [...prevMessages, data]);

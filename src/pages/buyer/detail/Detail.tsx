@@ -75,7 +75,7 @@ const Detail: React.FC = () => {
                             {getMessageType(msg) === 'myMessage'
                               ? '나'
                               : getMessageType(msg) === 'userMessage'
-                                ? `구매자${memberMap.get(msg.userId as string)}`
+                                ? `구매자${memberMap[msg.userId as string]}`
                                 : ''}
                           </span>
                           <span>{msg.message}</span>

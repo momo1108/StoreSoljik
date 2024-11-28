@@ -92,13 +92,13 @@ export const ChattingBox = styled.div`
     border-radius: 6px;
 
     span.header {
+      width: 100px;
       margin: 0;
       padding: 0;
       box-shadow: none;
       background: transparent;
       position: absolute;
       top: -20px;
-      left: 10px;
       color: ${({ theme }) => theme.color.gray};
     }
   }
@@ -106,11 +106,20 @@ export const ChattingBox = styled.div`
   .myMessage {
     background: #fff6ad;
     margin-right: auto;
+
+    span.header {
+      left: 5px;
+    }
   }
 
   .userMessage {
     background: #d6ecff;
     margin-left: auto;
+
+    span.header {
+      text-align: right;
+      right: 5px;
+    }
   }
 `;
 
