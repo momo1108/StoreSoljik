@@ -84,14 +84,24 @@ export const ChattingBox = styled.div`
   .myMessage,
   .userMessage {
     position: relative;
-    margin-top: 20px;
+    margin-top: 30px;
     padding: 6px 12px;
     box-shadow:
       rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
       rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
     border-radius: 6px;
 
+    &.hideHeader {
+      margin-top: 0px;
+      span.header {
+        display: none;
+      }
+    }
+
     span.header {
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
       width: 100px;
       margin: 0;
       padding: 0;
@@ -100,6 +110,17 @@ export const ChattingBox = styled.div`
       position: absolute;
       top: -20px;
       color: ${({ theme }) => theme.color.gray};
+
+      span.buyerTag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 4px 2px 2px;
+        background: ${({ theme }) => theme.color.primary};
+        font-size: ${({ theme }) => theme.fontSize.xs};
+        font-weight: bold;
+        color: white;
+        border-radius: 6px;
+      }
     }
   }
 
@@ -117,7 +138,7 @@ export const ChattingBox = styled.div`
     margin-left: auto;
 
     span.header {
-      text-align: right;
+      justify-content: end;
       right: 5px;
     }
   }

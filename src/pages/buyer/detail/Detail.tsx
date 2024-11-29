@@ -13,6 +13,7 @@ import { useTheme } from 'styled-components';
 import HR from '@/components/ui/hr/HR';
 import useWebSocket from '@/hooks/useWebSocket';
 import StateInput from '@/components/form/stateinput/StateInput';
+import { LiaCertificateSolid } from 'react-icons/lia';
 
 const Detail: React.FC = () => {
   const {
@@ -35,7 +36,7 @@ const Detail: React.FC = () => {
     chattingBoxRef,
   } = useDetail();
   const theme = useTheme();
-  const { isConnected, messages, memberMap } = useWebSocket();
+  const { isConnected, messages, memberArray } = useWebSocket();
 
   return (
     <>
@@ -66,16 +67,28 @@ const Detail: React.FC = () => {
                 <S.ChattingBox ref={chattingBoxRef}>
                   {isConnected ? (
                     <>
-                      {messages.map((msg, index) => (
+                      {messages.map((msg, index, msgArr) => (
                         <div
                           key={`message_${msg.userId}_${index}`}
-                          className={getMessageType(msg)}
+                          className={`${getMessageType(msg)} ${
+                            index > 1 && msg.userId === msgArr[index - 1].userId
+                              ? 'hideHeader'
+                              : ''
+                          }`}
                         >
                           <span className={`header ${getMessageType(msg)}`}>
+                            {msg.isBuyer ? (
+                              <span className='buyerTag'>
+                                <LiaCertificateSolid color='white' />
+                                구매자
+                              </span>
+                            ) : (
+                              <></>
+                            )}
                             {getMessageType(msg) === 'myMessage'
                               ? '나'
                               : getMessageType(msg) === 'userMessage'
-                                ? `구매자${memberMap[msg.userId as string]}`
+                                ? `회원${memberArray.current.indexOf(msg.userId as string)}`
                                 : ''}
                           </span>
                           <span>{msg.message}</span>
