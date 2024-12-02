@@ -1,3 +1,4 @@
+import { db } from '@/firebase';
 import { useCartItems } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
@@ -5,7 +6,13 @@ import useWebSocket, { WebSocketMessageType } from '@/hooks/useWebSocket';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
-import { orderBy, where } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  onSnapshot,
+  orderBy,
+  where,
+} from 'firebase/firestore';
 import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -115,6 +122,19 @@ const useDetail = () => {
   });
 
   // console.log(recommendData, recommendStatus, recommendError);
+  const unsub = onSnapshot(
+    collection(
+      db,
+      'product',
+      'Gc9PekwVw5PjyALKV8t6VBL4xp43-04d54196-c4e1-4cbc-a5fb-10d87d5b223c',
+      'chatting',
+    ),
+    (querySnapshot) => {
+      querySnapshot.docs.forEach((doc) => {
+        console.log(doc.data());
+      });
+    },
+  );
 
   const isProductInCart: boolean = checkItemIsInCart(data);
   const handleClickPurchase = () => {
