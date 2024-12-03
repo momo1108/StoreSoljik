@@ -7,6 +7,7 @@ import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
 import {
+  addDoc,
   collection,
   doc,
   onSnapshot,
@@ -133,6 +134,20 @@ const useDetail = () => {
       querySnapshot.docs.forEach((doc) => {
         console.log(doc.data());
       });
+    },
+  );
+
+  addDoc(
+    collection(
+      db,
+      'product',
+      'Gc9PekwVw5PjyALKV8t6VBL4xp43-42422994-acf2-4fc8-b447-d57390109f74',
+      'chatting',
+    ),
+    {
+      message: 'hello',
+      type: 'notification',
+      userId: 'notification',
     },
   );
 
