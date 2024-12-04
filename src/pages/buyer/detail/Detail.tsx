@@ -14,6 +14,7 @@ import HR from '@/components/ui/hr/HR';
 import useWebSocket from '@/hooks/useWebSocket';
 import StateInput from '@/components/form/stateinput/StateInput';
 import { LiaCertificateSolid } from 'react-icons/lia';
+import useFirebaseListener from '@/hooks/useFirebaseListener';
 
 const Detail: React.FC = () => {
   const {
@@ -36,7 +37,7 @@ const Detail: React.FC = () => {
     chattingBoxRef,
   } = useDetail();
   const theme = useTheme();
-  const { isConnected, messages, memberArray } = useWebSocket();
+  const { isConnected, messages, memberArray } = useFirebaseListener();
 
   return (
     <>
@@ -67,11 +68,12 @@ const Detail: React.FC = () => {
                 <S.ChattingBox ref={chattingBoxRef}>
                   {isConnected ? (
                     <>
+                      <div className='notification'>채팅에 연결됐습니다.</div>
                       {messages.map((msg, index, msgArr) => (
                         <div
                           key={`message_${msg.userId}_${index}`}
                           className={`${getMessageType(msg)} ${
-                            index > 1 && msg.userId === msgArr[index - 1].userId
+                            index > 0 && msg.userId === msgArr[index - 1].userId
                               ? 'hideHeader'
                               : ''
                           }`}

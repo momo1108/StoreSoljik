@@ -15,7 +15,7 @@ export type WebSocketMessageType = {
 
 const useWebSocket = () => {
   const socketRef = useRef<WebSocket | null>(null);
-  const isBuyer = useRef<boolean>(false);
+  const [isBuyer, setIsBuyer] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [messages, setMessages] = useState<WebSocketMessageType[]>([]);
   const memberArray = useRef<string[]>([]);
@@ -34,7 +34,7 @@ const useWebSocket = () => {
         ],
       })
         .then((res) => {
-          if (res.length) isBuyer.current = true;
+          if (res.length) setIsBuyer(true);
         })
         .catch((err) => {
           console.error(err);
@@ -63,6 +63,13 @@ const useWebSocket = () => {
       const data: WebSocketMessageType = JSON.parse(event.data);
       console.log(`서버로부터 메시지 수신`);
       console.dir(data);
+
+      if (
+        data.message === 'chatting connected' &&
+        data.userId === userInfo?.uid
+      )
+        return;
+
       if (data.userId && memberArray.current.indexOf(data.userId) === -1) {
         console.log(memberArray);
         memberArray.current.push(data.userId as string);
@@ -88,9 +95,7 @@ const useWebSocket = () => {
 
   const sendMessage = (message: WebSocketMessageType) => {
     if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      socketRef.current.send(
-        JSON.stringify({ ...message, isBuyer: isBuyer.current }),
-      );
+      socketRef.current.send(JSON.stringify({ ...message, isBuyer }));
     } else {
       console.error('WebSocket 연결이 열려있지 않습니다.');
     }

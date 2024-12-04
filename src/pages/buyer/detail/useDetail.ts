@@ -1,19 +1,12 @@
-import { db } from '@/firebase';
 import { useCartItems } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import useFirebaseListener from '@/hooks/useFirebaseListener';
 import useWebSocket, { WebSocketMessageType } from '@/hooks/useWebSocket';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
-import {
-  addDoc,
-  collection,
-  doc,
-  onSnapshot,
-  orderBy,
-  where,
-} from 'firebase/firestore';
+import { orderBy, where } from 'firebase/firestore';
 import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -29,7 +22,6 @@ const useDetail = () => {
   }
   const { isOpen, toggleCart } = useCartUI();
   const { checkItemIsInCart, addItem } = useCartItems();
-  const { messages, sendMessage } = useWebSocket();
   const { userInfo } = useFirebaseAuth();
 
   // 구매 수량 state (input 의 value 로 사용되므로 string 타입 사용)
@@ -123,33 +115,6 @@ const useDetail = () => {
   });
 
   // console.log(recommendData, recommendStatus, recommendError);
-  const unsub = onSnapshot(
-    collection(
-      db,
-      'product',
-      'Gc9PekwVw5PjyALKV8t6VBL4xp43-04d54196-c4e1-4cbc-a5fb-10d87d5b223c',
-      'chatting',
-    ),
-    (querySnapshot) => {
-      querySnapshot.docs.forEach((doc) => {
-        console.log(doc.data());
-      });
-    },
-  );
-
-  addDoc(
-    collection(
-      db,
-      'product',
-      'Gc9PekwVw5PjyALKV8t6VBL4xp43-42422994-acf2-4fc8-b447-d57390109f74',
-      'chatting',
-    ),
-    {
-      message: 'hello',
-      type: 'notification',
-      userId: 'notification',
-    },
-  );
 
   const isProductInCart: boolean = checkItemIsInCart(data);
   const handleClickPurchase = () => {
@@ -169,6 +134,7 @@ const useDetail = () => {
     if (isOpen) toggleCart();
   }, [param.id]);
 
+  const { messages, sendMessage } = useFirebaseListener();
   const chattingBoxRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (chattingBoxRef.current)
