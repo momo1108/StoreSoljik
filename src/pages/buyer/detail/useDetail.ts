@@ -144,19 +144,11 @@ const useDetail = () => {
   const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       sendMessage({
-        type: 'message',
-        roomId: param.id,
-        userId: userInfo?.uid,
+        userId: userInfo!.uid,
         message,
       });
       setMessage('');
     }
-  };
-
-  const getMessageType = (msg: WebSocketMessageType) => {
-    if (msg.type === 'notification') return 'notification';
-    else if (msg.userId === userInfo?.uid) return 'myMessage';
-    else return 'userMessage';
   };
 
   return {
@@ -175,7 +167,6 @@ const useDetail = () => {
     message,
     setMessage,
     handleKeydown,
-    getMessageType,
     chattingBoxRef,
   };
 };

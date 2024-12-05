@@ -83,6 +83,7 @@ export const ChattingBox = styled.div`
 
   .myMessage,
   .userMessage {
+    max-width: 60%;
     position: relative;
     margin-top: 30px;
     padding: 6px 12px;
@@ -99,6 +100,7 @@ export const ChattingBox = styled.div`
     }
 
     span.header {
+      max-width: unset;
       display: inline-flex;
       align-items: center;
       gap: 2px;
@@ -122,6 +124,13 @@ export const ChattingBox = styled.div`
         border-radius: 6px;
       }
     }
+
+    span.time {
+      position: absolute;
+      bottom: 2px;
+      font-size: ${({ theme }) => theme.fontSize.sm};
+      color: ${({ theme }) => theme.color.gray};
+    }
   }
 
   .myMessage {
@@ -130,6 +139,9 @@ export const ChattingBox = styled.div`
 
     span.header {
       left: 5px;
+    }
+    span.time {
+      right: -38px;
     }
   }
 
@@ -140,6 +152,9 @@ export const ChattingBox = styled.div`
     span.header {
       justify-content: end;
       right: 5px;
+    }
+    span.time {
+      left: -38px;
     }
   }
 `;

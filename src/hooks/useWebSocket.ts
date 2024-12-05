@@ -101,7 +101,12 @@ const useWebSocket = () => {
     }
   };
 
-  return { isConnected, messages, sendMessage, memberArray };
+  const getMessageType = (msg: WebSocketMessageType) => {
+    if (msg.userId === userInfo?.uid) return 'myMessage';
+    else return 'userMessage';
+  };
+
+  return { isConnected, messages, sendMessage, memberArray, getMessageType };
 };
 
 export default useWebSocket;

@@ -14,21 +14,23 @@ import { useFirebaseAuth } from './useFirebaseAuth';
 import { db } from '@/firebase';
 import { fetchOrders } from '@/services/orderService';
 import { OrderStatus } from '@/types/FirebaseType';
-import { getKoreanIsoDatetime } from '@/utils/utils';
+import { getIsoDate, getKoreanIsoDatetime } from '@/utils/utils';
 
-export type WebSocketMessageType = {
-  type: 'notification' | 'message' | 'join';
-  roomId?: string;
+export type FirebaseMessageType = {
   userId?: string;
   message?: string;
   isBuyer?: boolean;
+  createdAt?: string;
 };
 
 const useFirebaseListener = () => {
   const unsubChatting = useRef<Unsubscribe | null>(null);
   const [isBuyer, setIsBuyer] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [messages, setMessages] = useState<WebSocketMessageType[]>([]);
+  const [messages, setMessages] = useState<FirebaseMessageType[]>([]);
+  const [messagesPerDate, setMessagesPerDate] = useState<
+    Record<string, FirebaseMessageType[]>
+  >({});
   const memberArray = useRef<string[]>([]);
 
   const param = useParams();
@@ -61,10 +63,20 @@ const useFirebaseListener = () => {
           orderBy('createdAt', 'asc'),
         ),
         (querySnapshot) => {
-          console.log(querySnapshot);
+          const tempMessagesPerDate: Record<string, FirebaseMessageType[]> = {};
+          querySnapshot.docs.forEach((doc) => {
+            const messageData = doc.data() as FirebaseMessageType;
+            const messageDate = getIsoDate(messageData.createdAt as string);
+            if (tempMessagesPerDate[messageDate]) {
+              tempMessagesPerDate[messageDate].push(messageData);
+            } else {
+              tempMessagesPerDate[messageDate] = [messageData];
+            }
+          });
+          setMessagesPerDate(tempMessagesPerDate);
           setMessages(
             querySnapshot.docs.map((doc) => {
-              return doc.data() as WebSocketMessageType;
+              return doc.data() as FirebaseMessageType;
             }),
           );
         },
@@ -83,7 +95,7 @@ const useFirebaseListener = () => {
     }
   }, [param.id]);
 
-  const sendMessage = (message: WebSocketMessageType) => {
+  const sendMessage = (message: FirebaseMessageType) => {
     if (unsubChatting && unsubChatting.current) {
       addDoc(collection(db, 'product', param.id as string, 'chatting'), {
         ...message,
@@ -97,7 +109,19 @@ const useFirebaseListener = () => {
     }
   };
 
-  return { isConnected, messages, sendMessage, memberArray };
+  const getMessageType = (msg: FirebaseMessageType) => {
+    if (msg.userId === userInfo?.uid) return 'myMessage';
+    else return 'userMessage';
+  };
+
+  return {
+    isConnected,
+    messages,
+    messagesPerDate,
+    sendMessage,
+    memberArray,
+    getMessageType,
+  };
 };
 
 export default useFirebaseListener;
