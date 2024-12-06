@@ -23,7 +23,6 @@ const Management: React.FC = () => {
     productList,
     selectedProduct,
     setSelectedProduct,
-    timeOrderStatus,
     orderDataPerDate,
     handleChangeOptionOrderStatus,
     ref,

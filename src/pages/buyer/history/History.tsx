@@ -17,13 +17,11 @@ import HorizontalSelect from '@/components/ui/filter/horizontal/HorizontalSelect
 
 const History: React.FC = () => {
   const {
-    allOrderStatus,
     dateOrderDataEntries,
     orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,
     orderStatusMapKrToEn,
-    status,
     ref,
     isCancelingOrder,
     cancelOrder,

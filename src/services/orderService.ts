@@ -1,10 +1,5 @@
 import { db } from '@/firebase';
-import {
-  OrderSchema,
-  OrderStatus,
-  ProductSchema,
-  QueryDocumentType,
-} from '@/types/FirebaseType';
+import { OrderSchema, OrderStatus } from '@/types/FirebaseType';
 import {
   FetchInfiniteQueryParams,
   FetchInfiniteQueryResult,
@@ -15,7 +10,6 @@ import {
   collection,
   doc,
   DocumentData,
-  getCountFromServer,
   getDocs,
   limit,
   query,
