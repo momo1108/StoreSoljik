@@ -8,11 +8,26 @@ export const checkPathIsActive: (path: string) => boolean = (path) => {
   }
 };
 
+export const getKoreanIsoDatetime = () => {
+  const timeOffset = new Date().getTimezoneOffset() * 60000;
+  const koreanDatetime = new Date(Date.now() - timeOffset).toISOString();
+  return koreanDatetime;
+};
+
 export const getIsoDate: (isoString: string) => string = (isoString) =>
   isoString.slice(0, 10);
 
-export const getIsoTime: (isoString: string) => string = (isoString) =>
-  isoString.slice(11, 16);
+export const getIsoTime: (
+  isoString: string,
+  includeSecond?: boolean,
+) => string = (isoString, includeSecond = false) =>
+  includeSecond ? isoString.slice(11, 19) : isoString.slice(11, 16);
+
+export const getIsoDay: (isoString: string) => string = (isoString) => {
+  const date = new Date(isoString);
+  const koreanDay = ['일', '월', '화', '수', '목', '금', '토'];
+  return koreanDay[date.getDay()];
+};
 
 export function compareArray<T>(array1: Array<T>, array2: Array<T>): boolean {
   if (array1.length === array2.length) {
@@ -67,3 +82,6 @@ export const loadScript: LoadScript = (src, successMessages, errorMessages) => {
     }
   });
 };
+
+export const isEqual = (obj1: unknown, obj2: unknown) =>
+  obj1 === obj2 || Object.is(obj1, obj2);

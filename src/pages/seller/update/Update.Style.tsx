@@ -114,12 +114,6 @@ export const UpdateContentImagePreviewBox = styled.div`
   grid-template-columns: 1fr 1fr;
   overflow: auto;
 
-  // 스크롤바 없애기
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  scrollbar-width: none;
-
   background:
     linear-gradient(white 30%, rgba(255, 255, 255, 0)),
     linear-gradient(rgba(255, 255, 255, 0), white 70%) 0 100%,

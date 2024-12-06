@@ -1,6 +1,6 @@
 // import media from '@/style/media';
 import StateInput from '@/components/form/stateinput/StateInput';
-import VerticalCard from '@/components/ui/productcard/verticalcard/VerticalCard';
+import VerticalCard from '@/components/ui/productcard/vertical/VerticalCard';
 import Spinner from '@/components/ui/spinner/Spinner';
 import styled from 'styled-components';
 
@@ -24,6 +24,7 @@ export const ImageContainer = styled.div`
   display: flex;
   flex-direction: column;
   gap: 16px;
+  width: 500px;
   flex-shrink: 0;
 `;
 
@@ -33,6 +34,140 @@ export const CarouselWrapper = styled.div`
     rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
     rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
   overflow: hidden;
+`;
+
+export const ChattingContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px 20px;
+  border-radius: 6px;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+
+  & > h4 {
+    border-bottom: 1px solid ${({ theme }) => theme.color.brighterGray};
+    padding-bottom: 10px;
+  }
+
+  p.descr {
+    color: ${({ theme }) => theme.color.gray};
+  }
+
+  input {
+    height: 36px;
+  }
+`;
+
+export const ChattingBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 250px;
+  padding: 10px;
+  gap: 10px;
+  overflow: auto;
+  box-shadow:
+    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+
+  h4 {
+    margin: auto 0;
+  }
+
+  .notification {
+    color: ${({ theme }) => theme.color.gray};
+    // margin-bottom: 10px;
+  }
+
+  div.date {
+    display: flex;
+    align-item: center;
+    gap: 6px;
+    margin-top: 15px;
+    background: ${({ theme }) => theme.color.brighterGray};
+    font-size: ${({ theme }) => theme.fontSize.sm};
+    padding: 5px 10px;
+    border-radius: 13px;
+  }
+
+  .myMessage,
+  .userMessage {
+    max-width: 60%;
+    position: relative;
+    margin-top: 30px;
+    padding: 6px 12px;
+    box-shadow:
+      rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+      rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    border-radius: 6px;
+
+    &.hideHeader {
+      margin-top: 0px;
+      span.header {
+        display: none;
+      }
+    }
+
+    span.header {
+      max-width: unset;
+      display: inline-flex;
+      align-items: center;
+      gap: 2px;
+      width: 100px;
+      margin: 0;
+      padding: 0;
+      box-shadow: none;
+      background: transparent;
+      position: absolute;
+      top: -20px;
+      color: ${({ theme }) => theme.color.gray};
+
+      span.buyerTag {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 4px 2px 2px;
+        background: ${({ theme }) => theme.color.primary};
+        font-size: ${({ theme }) => theme.fontSize.xs};
+        font-weight: bold;
+        color: white;
+        border-radius: 6px;
+      }
+    }
+
+    span.time {
+      position: absolute;
+      bottom: 2px;
+      font-size: ${({ theme }) => theme.fontSize.sm};
+      color: ${({ theme }) => theme.color.gray};
+    }
+  }
+
+  .myMessage {
+    background: #fff6ad;
+    margin-right: auto;
+
+    span.header {
+      left: 5px;
+    }
+    span.time {
+      right: -38px;
+    }
+  }
+
+  .userMessage {
+    background: #d6ecff;
+    margin-left: auto;
+
+    span.header {
+      justify-content: end;
+      right: 5px;
+    }
+    span.time {
+      left: -38px;
+    }
+  }
 `;
 
 export const InfoContainer = styled.div`

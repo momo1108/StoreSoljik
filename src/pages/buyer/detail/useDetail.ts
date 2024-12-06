@@ -1,10 +1,11 @@
 import { useCartItems } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
+import useFirebaseListener from '@/hooks/useFirestoreListener';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
-import { where } from 'firebase/firestore';
-import { ChangeEventHandler, useEffect, useState } from 'react';
+import { orderBy, where } from 'firebase/firestore';
+import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -17,8 +18,10 @@ const useDetail = () => {
       navigate('/');
     }, 1000);
   }
+  const { isOpen, toggleCart } = useCartUI();
+  const { checkItemIsInCart, addItem } = useCartItems();
 
-  // 구매 수량 state
+  // 구매 수량 state (input 의 value 로 사용되므로 string 타입 사용)
   const [cartItemQuantity, setCartItemQuantity] = useState<string>('1');
   /**
    * 구매 수량 input 태그의 onchange 이벤트 핸들러 함수.
@@ -63,6 +66,7 @@ const useDetail = () => {
     }
     const productData = await fetchProducts({
       filters: [where('productCategory', '==', productCategory)],
+      sortOrders: [orderBy('createdAt', 'desc')],
       pageSize: 8,
     });
 
@@ -109,16 +113,37 @@ const useDetail = () => {
 
   // console.log(recommendData, recommendStatus, recommendError);
 
-  const { isOpen, toggleCart } = useCartUI();
-  const { checkItemIsInCart, addItem } = useCartItems();
   const isProductInCart: boolean = checkItemIsInCart(data);
-  const handleClickPurchase = () => {};
+  const handleClickPurchase = () => {
+    if (data) {
+      if (!isProductInCart) addItem(data, parseInt(cartItemQuantity));
+      navigate('/purchase', {
+        state: {
+          prevRoute: window.location.pathname,
+        },
+      });
+    }
+  };
 
   useEffect(() => {
     // 여기서 추천상품 스크롤 초기화?
     setCartItemQuantity('1');
     if (isOpen) toggleCart();
   }, [param.id]);
+
+  const { messagesDailyArray, sendMessage } = useFirebaseListener();
+  const chattingBoxRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (chattingBoxRef.current)
+      chattingBoxRef.current.scrollTop = chattingBoxRef.current.scrollHeight;
+  }, [messagesDailyArray]);
+  const [message, setMessage] = useState<string>('');
+  const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      sendMessage(message);
+      setMessage('');
+    }
+  };
 
   return {
     cartItemQuantity,
@@ -133,6 +158,10 @@ const useDetail = () => {
     handleClickPurchase,
     isProductInCart,
     addItem,
+    message,
+    setMessage,
+    handleKeydown,
+    chattingBoxRef,
   };
 };
 

@@ -4,18 +4,21 @@ import { PurchaseFormData } from '@/types/FormType';
 import { ChangeEventHandler, MouseEventHandler, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useCartItems } from '@/hooks/useCartItems';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { useFirebaseAuth, UserInfo } from '@/hooks/useFirebaseAuth';
 import { toast } from 'sonner';
 import { confirmPayment, processPayment } from '@/services/paymentService';
 import { createPurchaseRegisterObject } from '@/utils/createRegisterObject';
 import {
   fetchProducts,
   purchaseProducts,
-  rollbackPurchaseProducts,
+  rollbackBatchOrder,
 } from '@/services/productService';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
-import { where } from 'firebase/firestore';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { orderBy, where } from 'firebase/firestore';
+import { updateBatchOrderStatus } from '@/services/orderService';
+import { OrderStatus } from '@/types/FirebaseType';
+import { v4 as uuidv4 } from 'uuid';
 
 const usePurchase = () => {
   const {
@@ -30,6 +33,7 @@ const usePurchase = () => {
   const [isReadyToCheckout, setIsReadyToCheckout] = useState<boolean>(false);
   const navigate = useNavigate();
   const { state } = useLocation();
+  const queryClient = useQueryClient();
 
   const handlePurchaseCheckbox: ChangeEventHandler<HTMLInputElement> = (
     event,
@@ -47,12 +51,12 @@ const usePurchase = () => {
 
     refetchProductQuantityArray();
 
-    let orderId: string = '';
+    let batchOrderId = '';
 
     try {
-      orderId = await purchaseProducts(
+      batchOrderId = await purchaseProducts(
         items,
-        userInfo!.uid,
+        userInfo as UserInfo,
         `${items[0].productName}${items.length > 1 ? ` 외 ${items.length - 1}건` : ''}`,
       );
 
@@ -61,7 +65,7 @@ const usePurchase = () => {
        */
       const confirmData = await processPayment({
         totalPrice,
-        orderId,
+        orderId: uuidv4(),
         items,
         email: data.buyerEmail,
         name: data.buyerName,
@@ -69,10 +73,16 @@ const usePurchase = () => {
       });
 
       const paymentResultData = await confirmPayment({ confirmData });
+      await updateBatchOrderStatus({
+        batchOrderId,
+        orderStatus: OrderStatus.OrderCompleted,
+      });
 
       toast.success(
         `"${paymentResultData.orderName}" 주문 건의 결제액 "${paymentResultData.totalAmount.toLocaleString()}원" 결제가 성공적으로 완료됐습니다.`,
       );
+
+      queryClient.invalidateQueries({ queryKey: ['orders'] });
 
       clearCart();
 
@@ -81,7 +91,7 @@ const usePurchase = () => {
       else navigate('/');
     } catch (error: unknown) {
       console.log(error);
-      if (orderId) await rollbackPurchaseProducts(items, orderId);
+      if (batchOrderId) await rollbackBatchOrder({ batchOrderId });
       toast.error('구매 도중 에러가 발생했습니다.', {
         description: (error as Error).message,
       });
@@ -146,10 +156,12 @@ const usePurchase = () => {
             items.map((item) => item.id),
           ),
         ],
+        sortOrders: [orderBy('createdAt', 'desc')],
       });
 
       return productData;
     },
+    refetchOnMount: 'always',
   });
 
   return {

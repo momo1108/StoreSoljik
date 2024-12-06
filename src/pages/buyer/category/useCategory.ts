@@ -1,9 +1,10 @@
 import { getValidCategories } from '@/services/categoryService';
 import {
   fetchInfiniteProducts,
-  FetchInfiniteProductsResult,
   ProductFilter,
 } from '@/services/productService';
+import { ProductSchema } from '@/types/FirebaseType';
+import { FetchInfiniteQueryResult } from '@/types/ReactQueryType';
 import {
   QueryFunction,
   QueryKey,
@@ -68,7 +69,7 @@ const useCategory = () => {
                 ['createdAt', 'desc'],
               ]) as [string, 'asc' | 'desc'][]
         ).map((order) => orderBy(...order)),
-        pageSize: pageSize,
+        pageSize,
       });
     } catch (error) {
       toast.error(`데이터 로딩에 실패했습니다.\n${(error as Error).message}`);
@@ -89,21 +90,28 @@ const useCategory = () => {
   //   });
   // };
 
-  const { data, status, error, fetchNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery<FetchInfiniteProductsResult>({
-      queryKey,
-      queryFn: (({ pageParam }) =>
-        fetchProductsWrapper({ pageParam, filterOptions })) as QueryFunction<
-        FetchInfiniteProductsResult,
-        QueryKey,
-        unknown
-      >,
-      initialPageParam: null,
-      getNextPageParam: (lastPage) =>
-        lastPage.documentArray.length > pageSize
-          ? lastPage.documentArray[pageSize]
-          : null,
-    });
+  const {
+    data,
+    status,
+    error,
+    fetchNextPage,
+    isFetchingNextPage,
+    isLoading,
+    isPending,
+  } = useInfiniteQuery<FetchInfiniteQueryResult<ProductSchema>>({
+    queryKey,
+    queryFn: (({ pageParam }) =>
+      fetchProductsWrapper({ pageParam, filterOptions })) as QueryFunction<
+      FetchInfiniteQueryResult<ProductSchema>,
+      QueryKey,
+      unknown
+    >,
+    initialPageParam: null,
+    getNextPageParam: (lastPage) =>
+      lastPage.documentArray.length > pageSize
+        ? lastPage.documentArray[pageSize]
+        : null,
+  });
 
   const { ref, inView } = useInView({
     /* options */
@@ -125,8 +133,8 @@ const useCategory = () => {
     error,
     isFetchingNextPage,
     isLoading,
+    isPending,
     ref,
-    pageSize,
   };
 };
 

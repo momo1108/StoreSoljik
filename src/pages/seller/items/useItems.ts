@@ -4,10 +4,9 @@ import {
   deleteProductDocument,
   deleteProductImages,
   fetchInfiniteProducts,
-  FetchInfiniteProductsResult,
-  PageParamType,
 } from '@/services/productService';
-import { ProductSchema } from '@/types/FirebaseType';
+import { PageParamType, ProductSchema } from '@/types/FirebaseType';
+import { FetchInfiniteQueryResult } from '@/types/ReactQueryType';
 import {
   useInfiniteQuery,
   useMutation,
@@ -38,16 +37,16 @@ const useItems = () => {
     pageParam,
   }: {
     pageParam: unknown;
-  }) => Promise<FetchInfiniteProductsResult> = ({ pageParam }) =>
+  }) => Promise<FetchInfiniteQueryResult<ProductSchema>> = ({ pageParam }) =>
     fetchInfiniteProducts({
       pageParam,
       filters: [where('sellerEmail', '==', userInfo?.email)],
       sortOrders: [orderBy('createdAt', 'desc')],
-      pageSize: pageSize,
+      pageSize,
     });
 
   const { data, status, error, fetchNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteQuery<FetchInfiniteProductsResult>({
+    useInfiniteQuery<FetchInfiniteQueryResult<ProductSchema>>({
       queryKey: ['products', 'seller'],
       queryFn: queryFnWrapper,
       initialPageParam: null,
@@ -100,17 +99,17 @@ const useItems = () => {
       const result = queryClient.setQueryData(
         ['products', 'seller'],
         (oldData: {
-          pages: FetchInfiniteProductsResult[];
+          pages: FetchInfiniteQueryResult<ProductSchema>[];
           pageParams: PageParamType[];
         }) => {
           const flattenedDataArray = oldData.pages
-            .map((page: FetchInfiniteProductsResult) =>
+            .map((page: FetchInfiniteQueryResult<ProductSchema>) =>
               page.dataArray.slice(0, pageSize),
             )
             .flat()
             .filter((product) => product.id !== productId);
           const flattenedDocumentArray = oldData.pages
-            .map((page: FetchInfiniteProductsResult) =>
+            .map((page: FetchInfiniteQueryResult<ProductSchema>) =>
               page.documentArray.slice(0, pageSize),
             )
             .flat()
@@ -118,7 +117,7 @@ const useItems = () => {
           const totalLength = flattenedDataArray.length;
 
           const newData: {
-            pages: FetchInfiniteProductsResult[];
+            pages: FetchInfiniteQueryResult<ProductSchema>[];
             pageParams: PageParamType[];
           } = {
             pages: [
@@ -194,7 +193,6 @@ const useItems = () => {
     isLoading,
     navigateToUpdate,
     deleteItem,
-    pageSize,
   };
 };
 

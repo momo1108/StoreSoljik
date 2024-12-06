@@ -1,10 +1,9 @@
 import media from '@/style/media';
 import styled from 'styled-components';
-import { ButtonProps } from './Button';
 
-export const StyledButton = styled.button<
-  ButtonProps & { $styleType: 'normal' | 'primary' | 'disabled' }
->`
+export const StyledButton = styled.button<{
+  $styleType: 'normal' | 'primary' | 'disabled';
+}>`
   display: flex;
   gap: 8px;
   justify-content: center;

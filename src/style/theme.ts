@@ -39,6 +39,16 @@ const lineHeight: Record<FontSizes, string> = {
   xxxxl: '4rem',
 };
 
+const width: Record<string, string> = {
+  w1: '400px',
+  w2: '600px',
+  w3: '800px',
+  w4: '900px',
+  w5: '950px',
+  w6: '1140px',
+  w7: '1240px',
+};
+
 export type Themes = 'light' | 'dark';
 
 const light = {
@@ -69,10 +79,16 @@ const light = {
   input: 'hsl(214.3 31.8% 91.4%)',
   ring: 'hsl(221.2 83.2% 53.3%)',
   radius: '0.5rem',
+  darkerGray: '#444',
+  darkGray: '#555',
   gray: '#777',
   brightGray: '#AAA',
   brighterGray: '#DDD',
+  brightestGray: '#F5F5F5',
   beige: '#F2F0EA',
+  active: '#083ca3',
+  darkBlue: '#002369',
+  skyBlue: '#237fdb',
 };
 
 const dark = {
@@ -103,15 +119,22 @@ const dark = {
   input: 'hsl(217.2 32.6% 17.5%)',
   ring: 'hsl(224.3 76.3% 48%)',
   radius: '0.5rem',
+  darkerGray: '#BBB',
+  darkGray: '#AAA',
   gray: '#999',
   brightGray: '#666',
   brighterGray: '#333',
+  brightestGray: '#1A1A1A',
   beige: '#F2F0EA',
+  active: '#3670e3',
+  darkBlue: '#002369',
+  skyBlue: '#237fdb',
 };
 
 const theme = {
   fontSize,
   lineHeight,
+  width,
   light,
   dark,
 };

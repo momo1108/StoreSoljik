@@ -8,6 +8,7 @@ import { AuthProvider } from './hooks/useFirebaseAuth';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { Toaster } from 'sonner';
+import { ModalProvider } from './hooks/useModal.tsx';
 
 function App() {
   /**
@@ -40,11 +41,11 @@ function App() {
     refetchIntervalInBackground: false,
     gcTime: 1000 * 60 * 30,
   });
-  queryClient.setQueryDefaults(['quantities'], {
-    staleTime: 1000 * 5,
-    refetchInterval: 1000 * 5,
-    refetchIntervalInBackground: true,
-    gcTime: 1000 * 60,
+  queryClient.setQueryDefaults(['orders'], {
+    staleTime: 1000 * 60 * 5,
+    refetchInterval: 1000 * 60 * 5,
+    refetchIntervalInBackground: false,
+    gcTime: 1000 * 60 * 30,
   });
 
   // ThemeProvider 의 type 을 오버라이드해서 theme 에 들어갈 타입을 지정하면 사용하기 편하지 않을까?
@@ -61,7 +62,9 @@ function App() {
       <BrowserRouter>
         <AuthProvider>
           <QueryClientProvider client={queryClient}>
-            <MainRouter />
+            <ModalProvider>
+              <MainRouter />
+            </ModalProvider>
             <ReactQueryDevtools initialIsOpen={false} />
             <Toaster
               richColors

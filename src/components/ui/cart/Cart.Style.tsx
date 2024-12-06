@@ -13,7 +13,7 @@ export const CartContainer = styled.div<{ $isOpen: boolean }>`
   padding: 0 20px;
   box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
   transition: right 0.3s ease;
-  z-index: 1000;
+  z-index: 5;
   display: flex;
   flex-direction: column;
 `;

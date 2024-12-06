@@ -8,9 +8,14 @@ import { Link } from 'react-router-dom';
 import Loading from '@/pages/loading/Loading';
 import Button from '@/components/ui/button/Button';
 import { BiError } from 'react-icons/bi';
-import { FaCheck } from 'react-icons/fa';
+import { FaCheck, FaRegCalendarAlt } from 'react-icons/fa';
 import { useTheme } from 'styled-components';
 import HR from '@/components/ui/hr/HR';
+import StateInput from '@/components/form/stateinput/StateInput';
+import { LiaCertificateSolid } from 'react-icons/lia';
+import useFirebaseListener from '@/hooks/useFirestoreListener';
+import { getIsoTime } from '@/utils/utils';
+import { Fragment } from 'react/jsx-runtime';
 
 const Detail: React.FC = () => {
   const {
@@ -26,8 +31,14 @@ const Detail: React.FC = () => {
     handleClickPurchase,
     isProductInCart,
     addItem,
+    message,
+    setMessage,
+    handleKeydown,
+    chattingBoxRef,
   } = useDetail();
   const theme = useTheme();
+  const { isConnected, messagesDailyArray, memberArray } =
+    useFirebaseListener();
 
   return (
     <>
@@ -50,6 +61,70 @@ const Detail: React.FC = () => {
               <S.CarouselWrapper>
                 <Carousel data={data.productImageUrlArray} size={500} />
               </S.CarouselWrapper>
+              <S.ChattingContainer>
+                <H4>실시간 채팅</H4>
+                <p className='descr'>
+                  이 상품을 보고있는 다른 회원님들이나 구매자와 소통해보세요!
+                </p>
+                <S.ChattingBox ref={chattingBoxRef}>
+                  {isConnected ? (
+                    <>
+                      <div className='notification'>채팅에 연결됐습니다.</div>
+                      {messagesDailyArray.map(([date, messages]) => (
+                        <Fragment key={`messageBox_${date}`}>
+                          <div className='date'>
+                            <FaRegCalendarAlt />
+                            {date}
+                          </div>
+                          {messages.map((msg, index, msgArr) => (
+                            <div
+                              key={`message_${msg.userId}_${index}`}
+                              className={`${msg.messageType} ${
+                                index > 0 &&
+                                msg.userId === msgArr[index - 1].userId
+                                  ? 'hideHeader'
+                                  : ''
+                              }`}
+                            >
+                              <span className={`header ${msg.messageType}`}>
+                                {msg.isBuyer ? (
+                                  <span className='buyerTag'>
+                                    <LiaCertificateSolid color='white' />
+                                    구매자
+                                  </span>
+                                ) : (
+                                  <></>
+                                )}
+                                {msg.messageType === 'myMessage'
+                                  ? '나'
+                                  : msg.messageType === 'userMessage'
+                                    ? `회원${memberArray.current.indexOf(msg.userId as string)}`
+                                    : ''}
+                              </span>
+                              <span>{msg.message}</span>
+                              <span className='time'>
+                                {getIsoTime(msg.createdAt as string)}
+                              </span>
+                            </div>
+                          ))}
+                        </Fragment>
+                      ))}
+                    </>
+                  ) : (
+                    <H4>채팅에 연결되지 않았습니다.</H4>
+                  )}
+                </S.ChattingBox>
+                <StateInput
+                  titleVisibility='hidden'
+                  placeholder='메세지를 입력하시고 엔터키로 전송하세요.'
+                  disabled={isConnected}
+                  attrs={{
+                    value: message,
+                    onChange: (e) => setMessage(e.target.value),
+                    onKeyDown: handleKeydown,
+                  }}
+                />
+              </S.ChattingContainer>
             </S.ImageContainer>
             <S.InfoContainer>
               <S.InfoHeaderP>
@@ -98,10 +173,10 @@ const Detail: React.FC = () => {
                       </Button>
                       <Button
                         styleType={isProductInCart ? 'disabled' : 'primary'}
+                        disabled={isProductInCart}
                         onClick={() =>
                           addItem(data, parseInt(cartItemQuantity))
                         }
-                        disabled={isProductInCart}
                       >
                         {isProductInCart ? (
                           <>
