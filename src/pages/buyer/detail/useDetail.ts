@@ -1,12 +1,12 @@
 import { useCartItems } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
-import useWebSocket, { WebSocketMessageType } from '@/hooks/useWebSocket';
+import useFirebaseListener from '@/hooks/useFirestoreListener';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
-import { ChangeEventHandler, useEffect, useState } from 'react';
+import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -21,8 +21,6 @@ const useDetail = () => {
   }
   const { isOpen, toggleCart } = useCartUI();
   const { checkItemIsInCart, addItem } = useCartItems();
-  const { sendMessage } = useWebSocket();
-  const { userInfo } = useFirebaseAuth();
 
   // 구매 수량 state (input 의 value 로 사용되므로 string 타입 사용)
   const [cartItemQuantity, setCartItemQuantity] = useState<string>('1');
@@ -134,23 +132,18 @@ const useDetail = () => {
     if (isOpen) toggleCart();
   }, [param.id]);
 
+  const { messagesDailyArray, sendMessage } = useFirebaseListener();
+  const chattingBoxRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (chattingBoxRef.current)
+      chattingBoxRef.current.scrollTop = chattingBoxRef.current.scrollHeight;
+  }, [messagesDailyArray]);
   const [message, setMessage] = useState<string>('');
   const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      sendMessage({
-        type: 'message',
-        roomId: param.id,
-        userId: userInfo?.uid,
-        message,
-      });
+      sendMessage(message);
       setMessage('');
     }
-  };
-
-  const getMessageType = (msg: WebSocketMessageType) => {
-    if (msg.type === 'notification') return 'notification';
-    else if (msg.userId === userInfo?.uid) return 'myMessage';
-    else return 'userMessage';
   };
 
   return {
@@ -169,7 +162,7 @@ const useDetail = () => {
     message,
     setMessage,
     handleKeydown,
-    getMessageType,
+    chattingBoxRef,
   };
 };
 
