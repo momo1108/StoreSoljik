@@ -1,6 +1,5 @@
 import { useCartItems } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import useFirebaseListener from '@/hooks/useFirestoreListener';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';

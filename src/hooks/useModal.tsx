@@ -1,23 +1,4 @@
-import {
-  useState,
-  useEffect,
-  useContext,
-  createContext,
-  ReactNode,
-  useRef,
-} from 'react';
-import { auth, db } from '@/firebase';
-import {
-  User,
-  deleteUser,
-  onAuthStateChanged,
-  signOut,
-  updateProfile,
-} from 'firebase/auth';
-import { DocumentData, deleteDoc, doc, getDoc } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
-import { FirebaseError } from 'firebase/app';
-import { toast } from 'sonner';
+import { useState, useContext, createContext } from 'react';
 import { Children } from '@/types/GlobalType';
 
 type AccountType = '구매자' | '판매자';
