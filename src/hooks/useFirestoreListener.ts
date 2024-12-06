@@ -1,7 +1,6 @@
 import {
   addDoc,
   collection,
-  limit,
   onSnapshot,
   orderBy,
   query,
@@ -16,21 +15,21 @@ import { fetchOrders } from '@/services/orderService';
 import { OrderStatus } from '@/types/FirebaseType';
 import { getIsoDate, getKoreanIsoDatetime } from '@/utils/utils';
 
-export type FirebaseMessageType = {
+export type FirestoreMessageType = {
   userId?: string;
   message?: string;
   isBuyer?: boolean;
   createdAt?: string;
 };
 
-const useFirebaseListener = () => {
+const useFirestoreListener = () => {
   const unsubChatting = useRef<Unsubscribe | null>(null);
   const [isBuyer, setIsBuyer] = useState<boolean>(false);
   const [isConnected, setIsConnected] = useState<boolean>(false);
-  const [messages, setMessages] = useState<FirebaseMessageType[]>([]);
-  const [messagesPerDate, setMessagesPerDate] = useState<
-    Record<string, FirebaseMessageType[]>
-  >({});
+  const [messages, setMessages] = useState<FirestoreMessageType[]>([]);
+  const [messagesDailyArray, setMessagesDailyArray] = useState<
+    Array<[string, (FirestoreMessageType & { messageType: string })[]]>
+  >([]);
   const memberArray = useRef<string[]>([]);
 
   const param = useParams();
@@ -48,6 +47,7 @@ const useFirebaseListener = () => {
       })
         .then((res) => {
           if (res.length) setIsBuyer(true);
+          else setIsBuyer(false);
         })
         .catch((err) => {
           console.error(err);
@@ -63,20 +63,32 @@ const useFirebaseListener = () => {
           orderBy('createdAt', 'asc'),
         ),
         (querySnapshot) => {
-          const tempMessagesPerDate: Record<string, FirebaseMessageType[]> = {};
+          const tempMessagesDailyArray: Record<string, FirestoreMessageType[]> =
+            {};
           querySnapshot.docs.forEach((doc) => {
-            const messageData = doc.data() as FirebaseMessageType;
+            const messageData = doc.data() as FirestoreMessageType;
             const messageDate = getIsoDate(messageData.createdAt as string);
-            if (tempMessagesPerDate[messageDate]) {
-              tempMessagesPerDate[messageDate].push(messageData);
+            if (tempMessagesDailyArray[messageDate]) {
+              tempMessagesDailyArray[messageDate].push(messageData);
             } else {
-              tempMessagesPerDate[messageDate] = [messageData];
+              tempMessagesDailyArray[messageDate] = [messageData];
             }
           });
-          setMessagesPerDate(tempMessagesPerDate);
+
+          setMessagesDailyArray(
+            Object.entries(tempMessagesDailyArray)
+              .sort(([date1], [date2]) => (date1 > date2 ? 1 : -1))
+              .map(([date, messages]) => [
+                date,
+                messages.map((msg) => ({
+                  ...msg,
+                  messageType: getMessageType(msg),
+                })),
+              ]),
+          );
           setMessages(
             querySnapshot.docs.map((doc) => {
-              return doc.data() as FirebaseMessageType;
+              return doc.data() as FirestoreMessageType;
             }),
           );
         },
@@ -95,10 +107,11 @@ const useFirebaseListener = () => {
     }
   }, [param.id]);
 
-  const sendMessage = (message: FirebaseMessageType) => {
+  const sendMessage = (message: string) => {
     if (unsubChatting && unsubChatting.current) {
       addDoc(collection(db, 'product', param.id as string, 'chatting'), {
-        ...message,
+        message,
+        userId: userInfo?.uid,
         isBuyer,
         createdAt: getKoreanIsoDatetime(),
       });
@@ -109,7 +122,7 @@ const useFirebaseListener = () => {
     }
   };
 
-  const getMessageType = (msg: FirebaseMessageType) => {
+  const getMessageType = (msg: FirestoreMessageType) => {
     if (msg.userId === userInfo?.uid) return 'myMessage';
     else return 'userMessage';
   };
@@ -117,11 +130,11 @@ const useFirebaseListener = () => {
   return {
     isConnected,
     messages,
-    messagesPerDate,
+    messagesDailyArray,
     sendMessage,
     memberArray,
     getMessageType,
   };
 };
 
-export default useFirebaseListener;
+export default useFirestoreListener;

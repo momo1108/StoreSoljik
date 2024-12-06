@@ -81,6 +81,17 @@ export const ChattingBox = styled.div`
     // margin-bottom: 10px;
   }
 
+  div.date {
+    display: flex;
+    align-item: center;
+    gap: 6px;
+    margin-top: 15px;
+    background: ${({ theme }) => theme.color.brighterGray};
+    font-size: ${({ theme }) => theme.fontSize.sm};
+    padding: 5px 10px;
+    border-radius: 13px;
+  }
+
   .myMessage,
   .userMessage {
     max-width: 60%;

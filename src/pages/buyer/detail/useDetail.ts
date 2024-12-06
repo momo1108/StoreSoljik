@@ -1,8 +1,7 @@
 import { useCartItems } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
-import useFirebaseListener from '@/hooks/useFirebaseListener';
-import useWebSocket, { WebSocketMessageType } from '@/hooks/useWebSocket';
+import useFirebaseListener from '@/hooks/useFirestoreListener';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
@@ -22,7 +21,6 @@ const useDetail = () => {
   }
   const { isOpen, toggleCart } = useCartUI();
   const { checkItemIsInCart, addItem } = useCartItems();
-  const { userInfo } = useFirebaseAuth();
 
   // 구매 수량 state (input 의 value 로 사용되므로 string 타입 사용)
   const [cartItemQuantity, setCartItemQuantity] = useState<string>('1');
@@ -134,19 +132,16 @@ const useDetail = () => {
     if (isOpen) toggleCart();
   }, [param.id]);
 
-  const { messages, sendMessage } = useFirebaseListener();
+  const { messagesDailyArray, sendMessage } = useFirebaseListener();
   const chattingBoxRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     if (chattingBoxRef.current)
       chattingBoxRef.current.scrollTop = chattingBoxRef.current.scrollHeight;
-  }, [messages]);
+  }, [messagesDailyArray]);
   const [message, setMessage] = useState<string>('');
   const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      sendMessage({
-        userId: userInfo!.uid,
-        message,
-      });
+      sendMessage(message);
       setMessage('');
     }
   };

@@ -1,16 +1,18 @@
 import { fetchOrders } from '@/services/orderService';
 import { where } from 'firebase/firestore';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useFirebaseAuth } from './useFirebaseAuth';
 import { OrderStatus } from '@/types/FirebaseType';
+import { getIsoDate, getKoreanIsoDatetime } from '@/utils/utils';
 
 export type WebSocketMessageType = {
-  type: 'notification' | 'message' | 'join';
+  type: 'notification' | 'message' | 'join' | 'error';
   roomId?: string;
   userId?: string;
   message?: string;
   isBuyer?: boolean;
+  createdAt?: string;
 };
 
 const useWebSocket = () => {
@@ -35,13 +37,13 @@ const useWebSocket = () => {
       })
         .then((res) => {
           if (res.length) setIsBuyer(true);
+          else setIsBuyer(false);
         })
         .catch((err) => {
           console.error(err);
         });
     }
 
-    sendMessage({ type: 'join', roomId: param.id });
     setMessages([]);
 
     if (socketRef.current) {
@@ -55,23 +57,18 @@ const useWebSocket = () => {
 
     socket.onopen = () => {
       console.log('WebSocket 연결 성공');
-      sendMessage({ type: 'join', roomId: param.id, userId: userInfo?.uid });
+      joinChatting();
       setIsConnected(true);
     };
 
     socket.onmessage = (event) => {
       const data: WebSocketMessageType = JSON.parse(event.data);
-      console.log(`서버로부터 메시지 수신`);
-      console.dir(data);
+      // console.log(`서버로부터 메시지 수신`);
+      // console.dir(data);
 
-      if (
-        data.message === 'chatting connected' &&
-        data.userId === userInfo?.uid
-      )
-        return;
+      if (data.type === 'notification') return;
 
       if (data.userId && memberArray.current.indexOf(data.userId) === -1) {
-        console.log(memberArray);
         memberArray.current.push(data.userId as string);
       }
       setMessages((prevMessages) => [...prevMessages, data]);
@@ -93,20 +90,74 @@ const useWebSocket = () => {
     };
   }, [param.id]);
 
-  const sendMessage = (message: WebSocketMessageType) => {
-    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
-      socketRef.current.send(JSON.stringify({ ...message, isBuyer }));
-    } else {
-      console.error('WebSocket 연결이 열려있지 않습니다.');
-    }
-  };
-
   const getMessageType = (msg: WebSocketMessageType) => {
     if (msg.userId === userInfo?.uid) return 'myMessage';
     else return 'userMessage';
   };
 
-  return { isConnected, messages, sendMessage, memberArray, getMessageType };
+  const messagesDailyArray = useMemo<
+    Array<[string, (WebSocketMessageType & { messageType: string })[]]>
+  >(() => {
+    // console.dir(messages);
+    const tempMessagesDailyArray: Record<string, WebSocketMessageType[]> = {};
+    messages.forEach((messageData: WebSocketMessageType) => {
+      const messageDate = getIsoDate(messageData.createdAt as string);
+      if (tempMessagesDailyArray[messageDate]) {
+        tempMessagesDailyArray[messageDate].push(messageData);
+      } else {
+        tempMessagesDailyArray[messageDate] = [messageData];
+      }
+    });
+    return Object.entries(tempMessagesDailyArray)
+      .sort(([date1], [date2]) => (date1 > date2 ? 1 : -1))
+      .map(([date, messages]) => [
+        date,
+        messages.map((msg) => ({
+          ...msg,
+          messageType: getMessageType(msg),
+        })),
+      ]);
+  }, [messages]);
+
+  const joinChatting = () => {
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(
+        JSON.stringify({
+          type: 'join',
+          roomId: param.id,
+          userId: userInfo?.uid,
+        }),
+      );
+    } else {
+      console.error('WebSocket 연결이 열려있지 않습니다.');
+    }
+  };
+
+  const sendMessage = (message: string) => {
+    if (socketRef.current && socketRef.current.readyState === WebSocket.OPEN) {
+      socketRef.current.send(
+        JSON.stringify({
+          type: 'message',
+          roomId: param.id,
+          userId: userInfo?.uid,
+          message,
+          isBuyer,
+          createdAt: getKoreanIsoDatetime(),
+        }),
+      );
+    } else {
+      console.error('WebSocket 연결이 열려있지 않습니다.');
+    }
+  };
+
+  return {
+    isConnected,
+    messages,
+    messagesDailyArray,
+    sendMessage,
+    memberArray,
+    getMessageType,
+  };
 };
 
 export default useWebSocket;
