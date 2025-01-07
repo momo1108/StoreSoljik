@@ -21,6 +21,7 @@ import { ProductFormData } from '@/types/FormType';
 import { createProductRegisterObject } from '@/utils/createRegisterObject';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getKoreanIsoDatetime } from '@/utils/utils';
+import { resizeImage } from '@/utils/imageUtils';
 
 const useRegistration = () => {
   const navigate = useNavigate();
@@ -50,6 +51,10 @@ const useRegistration = () => {
 
       for (const file of watchImages) {
         newImages.push(URL.createObjectURL(file));
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+        console.dir(img);
+        resizeImage(file, 200);
       }
 
       setImagePreviewUrls(newImages);
