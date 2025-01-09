@@ -51,10 +51,7 @@ const useRegistration = () => {
 
       for (const file of watchImages) {
         newImages.push(URL.createObjectURL(file));
-        const img = new Image();
-        img.src = URL.createObjectURL(file);
-        console.dir(img);
-        resizeImage(file, 200);
+        resizeImage(file, 500);
       }
 
       setImagePreviewUrls(newImages);
@@ -76,6 +73,13 @@ const useRegistration = () => {
           imageFile,
         );
         productImageUrlArray.push(imageDownloadUrl);
+        // 여기서 resizeImage 를 실행하고, 이미지 파일을 사용한 콜백함수를 넘겨줘서 resizeImage 내부에서 upload 과 imageUrl 을 저장하도록 한다.
+        // 다만 나머지 처리를 동기적으로 하기 위해서는 진행 정도를 파악할 상태도 필요할 듯. 콜백함수 내부에서 진행 상태를 complete 로 변경하도록 설정?
+        // const img = new Image();
+        // img.src = URL.createObjectURL(file);
+        // console.dir(img);
+        // console.log(img.width, img.height);
+        // if (img.width > 500 || img.height > 500) resizeImage(file, 500);
       }
 
       /**

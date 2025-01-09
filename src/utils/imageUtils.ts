@@ -32,14 +32,14 @@ const getImageMIMEType = (fileName: string) => {
   const extension = splitFileName[splitFileName.length - 1].toLowerCase();
 
   const imageMIMETypesMapper: Record<string, string> = {
-    apng: 'apng',
-    avif: 'avif',
-    gif: 'gif',
-    jpeg: 'jpeg',
-    jpg: 'jpeg',
-    png: 'png',
-    svg: 'svg+xml',
-    webp: 'webp',
+    apng: 'image/apng',
+    avif: 'image/avif',
+    gif: 'image/gif',
+    jpeg: 'image/jpeg',
+    jpg: 'image/jpeg',
+    png: 'image/png',
+    svg: 'image/svg+xml',
+    webp: 'image/webp',
   };
 
   return imageMIMETypesMapper[extension] || 'none';
@@ -77,7 +77,18 @@ const b64toFile = (b64Data: string, fileName: string) => {
   return file;
 };
 
+const downloadFile = (file: File) => {
+  const link = document.createElement('a');
+  link.setAttribute('href', URL.createObjectURL(file));
+  link.setAttribute('download', file.name);
+  link.style.display = 'none';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+};
+
 export const resizeImage = (file: File, size: number) => {
+  console.log(size);
   const reader = new FileReader();
   if (file) {
     if (file.type && !file.type.includes('image')) {
@@ -91,6 +102,7 @@ export const resizeImage = (file: File, size: number) => {
           var resizedDataUrl = imgToResizedDataUrl(image, size);
           let fileName = file.name;
           const newFile = b64toFile(resizedDataUrl, fileName);
+          downloadFile(newFile);
         };
       };
       reader.onerror = (pe) => {
