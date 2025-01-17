@@ -32,7 +32,7 @@ export type ProductSchema = {
   /**
    * 배열 데이터를 JSON.stringify 메서드로 문자열 변환 후 저장
    */
-  productImageUrlArray: string[];
+  productImageUrlArray: Record<string, string>[];
   /**
    * new Date()에 new Date().getTimezoneOffset() * 60000 를 빼준다.(한국시간)
    * toISOString 메서드로 변환한다.

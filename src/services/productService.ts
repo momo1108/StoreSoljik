@@ -58,14 +58,14 @@ type CreateProductDataParam = {
   id: string;
   userInfo: UserInfo;
   formData: ProductFormData;
-  productImageUrlArray: string[];
+  productImageUrlArray: Record<string, string>[];
   isoTime: string;
 };
 type UpdateProductDataParam = {
   originalProductData: ProductSchema;
   userInfo: UserInfo;
   formData: ProductFormData;
-  productImageUrlArray: string[];
+  productImageUrlArray: Record<string, string>[];
   isoTime: string;
 };
 
@@ -87,7 +87,7 @@ export const createProductData = async ({
     productQuantity: parseInt(formData.productQuantity),
     productSalesrate: 0,
     productCategory: formData.productCategory,
-    productImageUrlArray: productImageUrlArray,
+    productImageUrlArray,
     createdAt: isoTime,
     updatedAt: isoTime,
   };

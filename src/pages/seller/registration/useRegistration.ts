@@ -51,7 +51,6 @@ const useRegistration = () => {
 
       for (const file of watchImages) {
         newImages.push(URL.createObjectURL(file));
-        resizeImage(file, 500);
       }
 
       setImagePreviewUrls(newImages);
@@ -63,23 +62,34 @@ const useRegistration = () => {
     const id = `${userInfo!.uid}-${uuidv4()}`;
 
     try {
-      /**
-       * 1. Storage 로직
-       */
-      const productImageUrlArray: string[] = [];
-      for (const imageFile of data.images) {
-        const imageDownloadUrl = await uploadProductImage(
-          `${id}/${imageFile.name}`,
-          imageFile,
-        );
-        productImageUrlArray.push(imageDownloadUrl);
-        // 여기서 resizeImage 를 실행하고, 이미지 파일을 사용한 콜백함수를 넘겨줘서 resizeImage 내부에서 upload 과 imageUrl 을 저장하도록 한다.
-        // 다만 나머지 처리를 동기적으로 하기 위해서는 진행 정도를 파악할 상태도 필요할 듯. 콜백함수 내부에서 진행 상태를 complete 로 변경하도록 설정?
-        // const img = new Image();
-        // img.src = URL.createObjectURL(file);
-        // console.dir(img);
-        // console.log(img.width, img.height);
-        // if (img.width > 500 || img.height > 500) resizeImage(file, 500);
+      const productImageUrlArray: Record<string, string>[] = [];
+
+      for (let i = 0; i < data.images.length; i++) {
+        // [원본, 250, 600] 순서. 사이즈가 충분치 크지않은 경우, 250이나 600 크기의 리사이즈가 없을 수 있음.
+        const imageFiles = await resizeImage(data.images[i], i);
+        const linkPerImage: Record<string, string> = {};
+
+        /**
+         * 1. Storage 로직
+         */
+        for (
+          let resizeIndex = 0;
+          resizeIndex < imageFiles.length;
+          resizeIndex++
+        ) {
+          const imageDownloadUrl = await uploadProductImage(
+            `${id}/${imageFiles[resizeIndex].name}`,
+            imageFiles[resizeIndex],
+          );
+          if (resizeIndex == 0) {
+            linkPerImage['original'] = imageDownloadUrl;
+            linkPerImage['250px'] = imageDownloadUrl;
+            linkPerImage['600px'] = imageDownloadUrl;
+          } else if (resizeIndex == 1) linkPerImage['250px'] = imageDownloadUrl;
+          else linkPerImage['600px'] = imageDownloadUrl;
+        }
+
+        productImageUrlArray.push(linkPerImage);
       }
 
       /**

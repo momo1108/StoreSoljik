@@ -87,30 +87,59 @@ const downloadFile = (file: File) => {
   document.body.removeChild(link);
 };
 
-export const resizeImage = (file: File, size: number) => {
-  console.log(size);
-  const reader = new FileReader();
-  if (file) {
-    if (file.type && !file.type.includes('image')) {
-      throw Error('File Is NOT Image!');
-    } else {
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        var image = new Image();
-        image.src = reader.result as string;
-        image.onload = function () {
-          var resizedDataUrl = imgToResizedDataUrl(image, size);
-          let fileName = file.name;
-          const newFile = b64toFile(resizedDataUrl, fileName);
-          downloadFile(newFile);
+export const resizeImage = async (
+  file: File,
+  fileIndex: number,
+): Promise<File[]> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    if (file) {
+      if (file.type && !file.type.includes('image')) {
+        reject(new Error('File Is NOT Image!'));
+      } else {
+        reader.readAsDataURL(file);
+        reader.onload = () => {
+          let image = new Image();
+          image.src = reader.result as string;
+          image.onload = function () {
+            const splitName = file.name.split('.');
+            const ext = splitName[splitName.length - 1];
+            const originalFileClone = new File(
+              [file],
+              `${fileIndex}_original.${ext}`,
+              { type: file.type },
+            );
+            const imageFileList: File[] = [originalFileClone];
+
+            // 사용되는 이미지들의 사이즈 : 500, 220, 240, 150, 52
+            // 상품 레코드별로 이미지:{원본:링크, 250:링크, 600:링크} 형태로 저장해야할듯
+            // 만약 리사이즈가 필요없는 사이즈의 경우, 원본의 링크를 그대로 넣기
+            if (image.width > 250 || image.height > 250) {
+              let imageDataUrl250 = imgToResizedDataUrl(image, 250);
+              const newFile250 = b64toFile(
+                imageDataUrl250,
+                `${fileIndex}_thumb_250.${ext}`,
+              );
+              imageFileList.push(newFile250);
+            }
+            if (image.width > 600 || image.height > 600) {
+              let imageDataUrl600 = imgToResizedDataUrl(image, 600);
+              const newFile600 = b64toFile(
+                imageDataUrl600,
+                `${fileIndex}_thumb_600.${ext}`,
+              );
+              imageFileList.push(newFile600);
+            }
+            resolve(imageFileList);
+          };
         };
-      };
-      reader.onerror = (pe) => {
-        console.log(pe);
-        throw Error('File Reading Failed!');
-      };
+        reader.onerror = (pe) => {
+          console.log(pe);
+          reject(new Error('File Reading Failed!'));
+        };
+      }
+    } else {
+      reject(new Error('File Not Found!'));
     }
-  } else {
-    throw Error('File Not Found!');
-  }
+  });
 };
