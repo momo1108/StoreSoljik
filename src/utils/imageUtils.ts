@@ -1,4 +1,39 @@
-const imgToResizedDataUrl = (image: HTMLImageElement, size: number) => {
+import { storage } from '@/firebase';
+import { getDownloadURL, ref } from 'firebase/storage';
+
+type ImageFormat =
+  | 'apng'
+  | 'avif'
+  | 'gif'
+  | 'jpeg'
+  | 'jpg'
+  | 'png'
+  | 'svg'
+  | 'webp';
+
+const imageMIMETypesMapper: Record<ImageFormat, string> = {
+  apng: 'image/apng',
+  avif: 'image/avif',
+  gif: 'image/gif',
+  jpeg: 'image/jpeg',
+  jpg: 'image/jpeg',
+  png: 'image/png',
+  svg: 'image/svg+xml',
+  webp: 'image/webp',
+};
+
+const getImageMIMEType = (fileName: string) => {
+  const splitFileName = fileName.split('.');
+  const extension = splitFileName[splitFileName.length - 1].toLowerCase();
+
+  return imageMIMETypesMapper[extension as ImageFormat] || 'none';
+};
+
+const imgToResizedDataUrl = (
+  image: HTMLImageElement,
+  imageFormat: ImageFormat,
+  size: number,
+) => {
   var canvas = document.createElement('canvas');
   let { width, height } = image;
   const canvasContext = canvas.getContext('2d') as CanvasRenderingContext2D;
@@ -24,25 +59,7 @@ const imgToResizedDataUrl = (image: HTMLImageElement, size: number) => {
 
     canvasContext.drawImage(image, 0, 0, width, height);
   }
-  return canvas.toDataURL();
-};
-
-const getImageMIMEType = (fileName: string) => {
-  const splitFileName = fileName.split('.');
-  const extension = splitFileName[splitFileName.length - 1].toLowerCase();
-
-  const imageMIMETypesMapper: Record<string, string> = {
-    apng: 'image/apng',
-    avif: 'image/avif',
-    gif: 'image/gif',
-    jpeg: 'image/jpeg',
-    jpg: 'image/jpeg',
-    png: 'image/png',
-    svg: 'image/svg+xml',
-    webp: 'image/webp',
-  };
-
-  return imageMIMETypesMapper[extension] || 'none';
+  return canvas.toDataURL(imageMIMETypesMapper[imageFormat]);
 };
 
 const b64toFile = (b64Data: string, fileName: string) => {
@@ -90,6 +107,8 @@ const downloadFile = (file: File) => {
 export const resizeImage = async (
   file: File,
   fileIndex: number,
+  imageFormat: ImageFormat | 'auto' = 'auto',
+  withWebp: boolean = false,
 ): Promise<File[]> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
@@ -103,7 +122,8 @@ export const resizeImage = async (
           image.src = reader.result as string;
           image.onload = function () {
             const splitName = file.name.split('.');
-            const ext = splitName[splitName.length - 1];
+            const ext = splitName[splitName.length - 1] as ImageFormat;
+            const newExt = imageFormat === 'auto' ? ext : imageFormat;
             const originalFileClone = new File(
               [file],
               `${fileIndex}_original.${ext}`,
@@ -115,18 +135,18 @@ export const resizeImage = async (
             // 상품 레코드별로 이미지:{원본:링크, 250:링크, 600:링크} 형태로 저장해야할듯
             // 만약 리사이즈가 필요없는 사이즈의 경우, 원본의 링크를 그대로 넣기
             if (image.width > 250 || image.height > 250) {
-              let imageDataUrl250 = imgToResizedDataUrl(image, 250);
+              let imageDataUrl250 = imgToResizedDataUrl(image, newExt, 250);
               const newFile250 = b64toFile(
                 imageDataUrl250,
-                `${fileIndex}_thumb_250.${ext}`,
+                `${fileIndex}_thumb_250.${newExt}`,
               );
               imageFileList.push(newFile250);
             }
             if (image.width > 600 || image.height > 600) {
-              let imageDataUrl600 = imgToResizedDataUrl(image, 600);
+              let imageDataUrl600 = imgToResizedDataUrl(image, newExt, 600);
               const newFile600 = b64toFile(
                 imageDataUrl600,
-                `${fileIndex}_thumb_600.${ext}`,
+                `${fileIndex}_thumb_600.${newExt}`,
               );
               imageFileList.push(newFile600);
             }
@@ -142,4 +162,12 @@ export const resizeImage = async (
       reject(new Error('File Not Found!'));
     }
   });
+};
+
+const resizeFirebaseImage = async () => {
+  // 모든 상품들의 id 를 가져오고, 각 id별로 반복문을 통해 원본 이미지를 리사이징해서 다시 저장한다.
+  const url = await getDownloadURL(ref(storage, ''));
+  let image = new Image();
+  image.src = url;
+  image.onload = function () {};
 };
