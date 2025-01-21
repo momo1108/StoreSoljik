@@ -102,12 +102,12 @@ export const getProductData = async (productId: string) => {
   } else return undefined;
 };
 
-export const getProductList = async (sellerId: string) => {
+export const getProductList = async (sellerId: string = 'all') => {
   const productListDocument = await getDocs(
     buildFirestoreQuery({
       db,
       collectionName: 'product',
-      filters: [where('sellerId', '==', sellerId)],
+      filters: sellerId === 'all' ? [] : [where('sellerId', '==', sellerId)],
       sortOrders: [orderBy('createdAt', 'desc')],
     }),
   );

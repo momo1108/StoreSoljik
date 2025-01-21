@@ -32,9 +32,9 @@ export type ProductSchema = {
   /**
    * 배열 데이터를 JSON.stringify 메서드로 문자열 변환 후 저장
    * 하나의 상품에는 최대 6가지의 이미지 key-value 쌍이 존재
-   * 원본사이즈 - 원본타입, webp
-   * 600px - 원본타입, webp
-   * 250px - 원본타입, webp
+   * 원본사이즈 - 원본타입, webp - ex) { original: 링크, original_webp: 링크 }
+   * 600px - 원본타입, webp - ex) { 600px: 링크, 600px_webp: 링크 }
+   * 250px - 원본타입, webp - ex) { 250px: 링크, 250px_webp: 링크 }
    */
   productImageUrlArray: Record<string, string>[];
   /**
