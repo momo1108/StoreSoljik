@@ -62,61 +62,68 @@ const useRegistration = () => {
     const id = `${userInfo!.uid}-${uuidv4()}`;
 
     try {
-      const productImageUrlArray: Record<string, string>[] = [];
+      const productImageUrlMapArray: Record<string, string>[] = [];
 
       for (let i = 0; i < data.images.length; i++) {
         // [원본, 250, 600] 순서. 사이즈가 충분치 크지않은 경우, 250이나 600 크기의 리사이즈가 없을 수 있음.
-        const imageFiles = await resizeImage(data.images[i], i);
+        const imageFilesMap = await resizeImage(data.images[i], i);
+        const imageKeys = [
+          'original',
+          'original_webp',
+          '250px',
+          '250px_webp',
+          '600px',
+          '600px_webp',
+        ];
         const linkPerImage: Record<string, string> = {};
-        console.dir(imageFiles);
 
-        // /**
-        //  * 1. Storage 로직
-        //  */
-        // for (
-        //   let resizeIndex = 0;
-        //   resizeIndex < imageFiles.length;
-        //   resizeIndex++
-        // ) {
-        //   const imageDownloadUrl = await uploadProductImage(
-        //     `${id}/${imageFiles[resizeIndex].name}`,
-        //     imageFiles[resizeIndex],
-        //   );
-        //   if (resizeIndex == 0) {
-        //     linkPerImage['original'] = imageDownloadUrl;
-        //     linkPerImage['250px'] = imageDownloadUrl;
-        //     linkPerImage['600px'] = imageDownloadUrl;
-        //   } else if (resizeIndex == 1) linkPerImage['250px'] = imageDownloadUrl;
-        //   else linkPerImage['600px'] = imageDownloadUrl;
-        // }
+        /**
+         * 1. Storage 로직
+         */
+        for (let resizeIndex = 0; resizeIndex < 6; resizeIndex++) {
+          const file = imageFilesMap[imageKeys[resizeIndex]];
+          const imageKey = imageKeys[resizeIndex];
 
-        // productImageUrlArray.push(linkPerImage);
+          if (!file) {
+            linkPerImage[imageKey] = '';
+            continue;
+          }
+
+          const imageDownloadUrl = await uploadProductImage(
+            `${id}/${file.name}`,
+            file,
+          );
+
+          linkPerImage[imageKey] = imageDownloadUrl;
+        }
+
+        productImageUrlMapArray.push(linkPerImage);
       }
 
-      // /**
-      //  * 2. FireStore 로직
-      //  */
-      // await createProductData({
-      //   id,
-      //   userInfo: userInfo!,
-      //   formData: data,
-      //   productImageUrlArray,
-      //   isoTime,
-      // });
+      /**
+       * 2. FireStore 로직
+       */
+      await createProductData({
+        id,
+        userInfo: userInfo!,
+        formData: data,
+        productImageUrlMapArray,
+        isoTime,
+      });
 
-      // /**
-      //  * 3. 카테고리 컬렉션 정보 업데이트
-      //  */
-      // const allCategories = await getAllCategories();
-      // if (!!allCategories.includes(data.productCategory)) {
-      //   await updateCategory(data.productCategory, true);
-      // } else {
-      //   await createCategory(data.productCategory);
-      // }
+      /**
+       * 3. 카테고리 컬렉션 정보 업데이트
+       */
+      const allCategories = await getAllCategories();
+      if (!!allCategories.includes(data.productCategory)) {
+        await updateCategory(data.productCategory, true);
+      } else {
+        await createCategory(data.productCategory);
+      }
 
-      // // 완료 후 판매 상품 페이지로 이동
-      // toast.success('판매 상품 등록이 완료됐습니다!');
-      // navigate('/items');
+      // 완료 후 판매 상품 페이지로 이동
+      toast.success('판매 상품 등록이 완료됐습니다!');
+      navigate('/items');
     } catch (error: unknown) {
       if (error instanceof StorageError) {
         await deleteProductImages(id);

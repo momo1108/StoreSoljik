@@ -111,8 +111,8 @@ export const resizeImage = async (
   file: File,
   fileIndex: number, // 스키마 자체에서는 상관이 없지만, Storage 서비스에서 하나의 디렉터리에 모든 이미지를 저장하기 때문에 파일을 구분하기 위해 fileIndex 를 사용한다.
   imageFormat: ImageFormat | 'auto' = 'auto',
-  withWebp: boolean = false,
-): Promise<Record<string, File>> => {
+  withWebp: boolean = true,
+): Promise<Record<string, File | null>> => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     if (file) {
@@ -132,8 +132,13 @@ export const resizeImage = async (
               `${fileIndex}_original.${ext}`,
               { type: file.type },
             );
-            const imageFileMap: Record<string, File> = {
+            const imageFileMap: Record<string, File | null> = {
               original: originalFileClone,
+              original_webp: null,
+              '250px': null,
+              '250px_webp': null,
+              '600px': null,
+              '600px_webp': null,
             };
             if (withWebp) {
               let imageDataUrl = imgToResizedDataUrl(image, 'webp');
@@ -167,7 +172,9 @@ export const resizeImage = async (
                 );
                 imageFileMap['600px_webp'] = newFile600Webp;
               }
-            } else if (image.width > 250 || image.height > 250) {
+            }
+
+            if (image.width > 300 || image.height > 300) {
               let imageDataUrl250 = imgToResizedDataUrl(image, newExt, 250);
               const newFile250 = b64toFile(
                 imageDataUrl250,
@@ -202,83 +209,103 @@ export const resizeImage = async (
   });
 };
 
-const loadImage = (src: string): Promise<HTMLImageElement> => {
-  return new Promise((resolve, reject) => {
-    const image = new Image();
-    image.crossOrigin = 'anonymous';
-    image.src = src;
-    image.onload = () => resolve(image);
-    image.onerror = (err) => reject(new Error('Image failed to load'));
-  });
-};
+const getProperSizeImageLink = (
+  imageLinkMap: Record<string, string>,
+  size: number,
+) => {
+  const links = {
+    original: imageLinkMap.original,
+    webp: imageLinkMap.original_webp,
+  };
 
-const resizeFirebaseImage = async () => {
-  // 모든 상품들의 id 를 가져오고, 각 id별로 반복문을 통해 원본 이미지를 리사이징해서 리사이징된 이미지들을 다시 저장한다. 원본은 나중에 성능 비교 후 삭제
-  // Storage 서비스에서 파일명을 수정하는 메서드는 따로 제공하지 않기 때문에 삭제 후 재업로드 방식을 사용한다.
-  try {
-    const productList = (await getProductList()) as ProductSchema[];
-    console.log(productList);
-    for (let i = 0; i < productList.length; i++) {
-      const product = productList[i];
-      const productImageUrlMapArray: Record<string, string>[] = [];
-      console.log(product);
-
-      for (let j = 0; j < product.productImageUrlArray.length; j++) {
-        console.log(j);
-        const productImageUrlMap: Record<string, string> = {
-          original: '',
-          original_webp: '',
-          '250px': '',
-          '250px_webp': '',
-          '600px': '',
-          '600px_webp': '',
-        };
-        const url = product.productImageUrlArray[j].replace(
-          'https://firebasestorage.googleapis.com',
-          'http://localhost:5173/firebase',
-        );
-        let image = await loadImage(url);
-        const sizeList = [0, 250, 600];
-        const sizeNameList = ['original', '250px', '600px'];
-
-        for (let sizeIndex = 0; sizeIndex < 3; sizeIndex++) {
-          const size = sizeList[sizeIndex];
-
-          if (image.width > size || image.height > size) {
-            let imageDataUrl = imgToResizedDataUrl(image, 'jpg', size);
-            const newFile = b64toFile(
-              imageDataUrl,
-              `${j}_${sizeNameList[sizeIndex]}.jpg`,
-            );
-            productImageUrlMap[`${sizeNameList[sizeIndex]}`] =
-              await uploadProductImage(
-                `${product.id}/${newFile.name}`,
-                newFile,
-              );
-
-            let imageDataUrlWebp = imgToResizedDataUrl(image, 'webp', size);
-            const newFileWebp = b64toFile(
-              imageDataUrlWebp,
-              `${j}_${sizeNameList[sizeIndex]}.webp`,
-            );
-            productImageUrlMap[`${sizeNameList[sizeIndex]}_webp`] =
-              await uploadProductImage(
-                `${product.id}/${newFileWebp.name}`,
-                newFileWebp,
-              );
-          }
-        }
-
-        productImageUrlMapArray.push(productImageUrlMap);
-      }
-
-      await updateDoc(doc(db, 'product', product.id), {
-        productImageUrlMapArray,
-      });
-    }
-  } catch (error) {
-    console.log(error);
+  if (size <= 250) {
+    if (imageLinkMap['250px'])
+      links.original = imageLinkMap['250px'] || imageLinkMap['600px'];
+    if (imageLinkMap['250px_webp'])
+      links.original = imageLinkMap['250px_webp'] || imageLinkMap['600px_webp'];
+  } else if (size <= 600) {
+    if (imageLinkMap['600px']) links.original = imageLinkMap['600px'];
+    if (imageLinkMap['600px_webp']) links.original = imageLinkMap['600px_webp'];
   }
+
+  return links;
 };
 
-resizeFirebaseImage();
+// const loadImage = (src: string): Promise<HTMLImageElement> => {
+//   return new Promise((resolve, reject) => {
+//     const image = new Image();
+//     image.crossOrigin = 'anonymous';
+//     image.src = src;
+//     image.onload = () => resolve(image);
+//     image.onerror = (err) => reject(new Error('Image failed to load'));
+//   });
+// };
+
+// const resizeFirebaseImage = async () => {
+//   // 모든 상품들의 id 를 가져오고, 각 id별로 반복문을 통해 원본 이미지를 리사이징해서 리사이징된 이미지들을 다시 저장한다. 원본은 나중에 성능 비교 후 삭제
+//   // Storage 서비스에서 파일명을 수정하는 메서드는 따로 제공하지 않기 때문에 삭제 후 재업로드 방식을 사용한다.
+//   try {
+//     const productList = (await getProductList()) as ProductSchema[];
+//     console.log(productList);
+//     for (let i = 0; i < productList.length; i++) {
+//       const product = productList[i];
+//       const productImageUrlMapArray: Record<string, string>[] = [];
+//       console.log(product);
+
+//       for (let j = 0; j < product.productImageUrlArray.length; j++) {
+//         console.log(j);
+//         const productImageUrlMap: Record<string, string> = {
+//           original: '',
+//           original_webp: '',
+//           '250px': '',
+//           '250px_webp': '',
+//           '600px': '',
+//           '600px_webp': '',
+//         };
+//         const url = product.productImageUrlArray[j].replace(
+//           'https://firebasestorage.googleapis.com',
+//           'http://localhost:5173/firebasestorage',
+//         );
+//         let image = await loadImage(url);
+//         const sizeList = [0, 300, 600];
+//         const sizeNameList = ['original', '250px', '600px'];
+
+//         for (let sizeIndex = 0; sizeIndex < 3; sizeIndex++) {
+//           const size = sizeList[sizeIndex];
+
+//           if (image.width > size || image.height > size) {
+//             let imageDataUrl = imgToResizedDataUrl(image, 'jpg', size);
+//             const newFile = b64toFile(
+//               imageDataUrl,
+//               `${j}_${sizeNameList[sizeIndex]}.jpg`,
+//             );
+//             productImageUrlMap[`${sizeNameList[sizeIndex]}`] =
+//               await uploadProductImage(
+//                 `${product.id}/${newFile.name}`,
+//                 newFile,
+//               );
+
+//             let imageDataUrlWebp = imgToResizedDataUrl(image, 'webp', size);
+//             const newFileWebp = b64toFile(
+//               imageDataUrlWebp,
+//               `${j}_${sizeNameList[sizeIndex]}.webp`,
+//             );
+//             productImageUrlMap[`${sizeNameList[sizeIndex]}_webp`] =
+//               await uploadProductImage(
+//                 `${product.id}/${newFileWebp.name}`,
+//                 newFileWebp,
+//               );
+//           }
+//         }
+
+//         productImageUrlMapArray.push(productImageUrlMap);
+//       }
+
+//       await updateDoc(doc(db, 'product', product.id), {
+//         productImageUrlMapArray,
+//       });
+//     }
+//   } catch (error) {
+//     console.log(error);
+//   }
+// };

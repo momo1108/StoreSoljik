@@ -15,6 +15,7 @@ import { ProductSchema } from '@/types/FirebaseType';
 import { createProductRegisterObject } from '@/utils/createRegisterObject';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getKoreanIsoDatetime } from '@/utils/utils';
+import { resizeImage } from '@/utils/imageUtils';
 
 const useUpdate = () => {
   const navigate = useNavigate();
@@ -88,7 +89,11 @@ const useUpdate = () => {
        * 수정을 안하거나 취소하면 image 의 FileList 는 초기화
        */
       setImagePreviewUrls(
-        originalProductData ? originalProductData.productImageUrlArray : [],
+        originalProductData
+          ? originalProductData.productImageUrlMapArray.map(
+              (imageUrlMap) => imageUrlMap['250px'],
+            )
+          : [],
       );
       resetField('images');
     }
@@ -101,22 +106,47 @@ const useUpdate = () => {
       /**
        * 1. Storage 로직
        */
-      const productImageUrlArray: string[] =
-        originalProductData!.productImageUrlArray;
+      const productImageUrlMapArray: Record<string, string>[] =
+        originalProductData!.productImageUrlMapArray;
 
       if (isUpdatingImage) {
         /**
          * 기존 이미지들을 삭제해준다.
          */
         await deleteProductImages(originalProductData!.id);
-        productImageUrlArray.length = 0;
+        productImageUrlMapArray.length = 0;
 
-        for (const imageFile of data.images) {
-          const imageDownloadUrl = await uploadProductImage(
-            `${originalProductData!.id}/${imageFile.name}`,
-            imageFile,
-          );
-          productImageUrlArray.push(imageDownloadUrl);
+        for (let i = 0; i < data.images.length; i++) {
+          // [원본, 250, 600] 순서. 사이즈가 충분치 크지않은 경우, 250이나 600 크기의 리사이즈가 없을 수 있음.
+          const imageFilesMap = await resizeImage(data.images[i], i);
+          const imageKeys = [
+            'original',
+            'original_webp',
+            '250px',
+            '250px_webp',
+            '600px',
+            '600px_webp',
+          ];
+          const linkPerImage: Record<string, string> = {};
+
+          for (let resizeIndex = 0; resizeIndex < 6; resizeIndex++) {
+            const file = imageFilesMap[imageKeys[resizeIndex]];
+            const imageKey = imageKeys[resizeIndex];
+
+            if (!file) {
+              linkPerImage[imageKey] = '';
+              continue;
+            }
+
+            const imageDownloadUrl = await uploadProductImage(
+              `${originalProductData!.id}/${file.name}`,
+              file,
+            );
+
+            linkPerImage[imageKey] = imageDownloadUrl;
+          }
+
+          productImageUrlMapArray.push(linkPerImage);
         }
       }
 
@@ -127,7 +157,7 @@ const useUpdate = () => {
         originalProductData: originalProductData!,
         userInfo: userInfo!,
         formData: data,
-        productImageUrlArray,
+        productImageUrlMapArray,
         isoTime,
       });
 

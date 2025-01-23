@@ -36,7 +36,6 @@ export type ProductSchema = {
    * 600px - 원본타입, webp - ex) { 600px: 링크, 600px_webp: 링크 }
    * 250px - 원본타입, webp - ex) { 250px: 링크, 250px_webp: 링크 }
    */
-  productImageUrlArray: string[];
   productImageUrlMapArray: Record<string, string>[];
   /**
    * new Date()에 new Date().getTimezoneOffset() * 60000 를 빼준다.(한국시간)

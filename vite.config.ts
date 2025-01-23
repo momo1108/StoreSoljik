@@ -15,7 +15,7 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      '/firebase': {
+      '/firebasestorage': {
         target: 'https://firebasestorage.googleapis.com',
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/firebase/, ''),
