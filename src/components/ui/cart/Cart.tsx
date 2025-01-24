@@ -9,6 +9,7 @@ import Button from '../button/Button';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ProductSchema } from '@/types/FirebaseType';
+import Picture from '../picture/Picture';
 
 const Cart = () => {
   const { isOpen, toggleCart } = useCartUI();
@@ -29,8 +30,9 @@ const Cart = () => {
         {items.map((item, index) => (
           <React.Fragment key={item.id}>
             <S.CartItemBox key={index}>
-              <S.ItemImg
-                src={item.productImageUrlArray[0]}
+              <Picture
+                imageUrlMap={item.productImageUrlMapArray[0]}
+                size={120}
                 alt={item.productName}
               />
               <S.ItemDetailsBox>

@@ -209,26 +209,31 @@ export const resizeImage = async (
   });
 };
 
-const getProperSizeImageLink = (
-  imageLinkMap: Record<string, string>,
+export const getProperSizeImageUrl = (
+  imageUrlMap: Record<string, string>,
   size: number,
 ) => {
-  const links = {
-    original: imageLinkMap.original,
-    webp: imageLinkMap.original_webp,
+  const urls = {
+    original: '',
+    webp: '',
   };
 
   if (size <= 250) {
-    if (imageLinkMap['250px'])
-      links.original = imageLinkMap['250px'] || imageLinkMap['600px'];
-    if (imageLinkMap['250px_webp'])
-      links.original = imageLinkMap['250px_webp'] || imageLinkMap['600px_webp'];
+    urls.original =
+      imageUrlMap['250px'] || imageUrlMap['600px'] || imageUrlMap.original;
+    urls.webp =
+      imageUrlMap['250px_webp'] ||
+      imageUrlMap['600px_webp'] ||
+      imageUrlMap.original_webp;
   } else if (size <= 600) {
-    if (imageLinkMap['600px']) links.original = imageLinkMap['600px'];
-    if (imageLinkMap['600px_webp']) links.original = imageLinkMap['600px_webp'];
+    urls.original = imageUrlMap['600px'] || imageUrlMap.original;
+    urls.webp = imageUrlMap['600px_webp'] || imageUrlMap.original_webp;
+  } else {
+    urls.original = imageUrlMap.original;
+    urls.webp = imageUrlMap.original_webp;
   }
 
-  return links;
+  return urls;
 };
 
 // const loadImage = (src: string): Promise<HTMLImageElement> => {

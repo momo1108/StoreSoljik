@@ -4,6 +4,7 @@ import * as S from './HorizontalCard.Style';
 import { ClassName } from '@/types/GlobalType';
 import { getIsoDate, getIsoTime } from '@/utils/utils';
 import { ProductSchema } from '@/types/FirebaseType';
+import Picture from '../../picture/Picture';
 
 type HorizontalCardProps = ClassName & {
   data: ProductSchema;
@@ -20,14 +21,19 @@ const HorizontalCard: React.FC<HorizontalCardProps> = ({
   const {
     productName,
     productDescription,
-    productImageUrlArray,
+    productImageUrlMapArray,
     productPrice,
     productQuantity,
     createdAt,
   } = data;
+
   return (
     <S.CardContainer className={className}>
-      <S.CardImageBox $src={productImageUrlArray[0]} />
+      <Picture
+        imageUrlMap={productImageUrlMapArray[0]}
+        size={150}
+        alt={productName}
+      />
       <S.CardContentBox>
         <S.CardContentTitleBox>
           <H4 className='hideTextOverflow'>{productName}</H4>

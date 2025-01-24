@@ -16,7 +16,7 @@ export interface CartItem {
   productName: string;
   productPrice: number;
   productQuantity: number;
-  productImageUrlArray: string[];
+  productImageUrlMapArray: Record<string, string>[];
   // 추가적인 상품 정보...
 }
 
@@ -108,7 +108,7 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
         productName: product.productName,
         productPrice: product.productPrice,
         productQuantity,
-        productImageUrlArray: product.productImageUrlArray,
+        productImageUrlMapArray: product.productImageUrlMapArray,
       },
     ]);
   };

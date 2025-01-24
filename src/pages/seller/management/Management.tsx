@@ -15,6 +15,7 @@ import { H3, H4 } from '@/components/ui/header/Header.Style';
 import { getIsoDate, getIsoDay, getIsoTime } from '@/utils/utils';
 import { FaBox, FaClock } from 'react-icons/fa6';
 import { IoReceipt } from 'react-icons/io5';
+import Picture from '@/components/ui/picture/Picture';
 
 const Management: React.FC = () => {
   const {
@@ -93,8 +94,11 @@ const Management: React.FC = () => {
                           <strong>{getIsoDay(order.createdAt)}</strong>
                           <H3>{getIsoDate(order.createdAt).split('-')[2]}</H3>
                         </S.DayBox>
-                        <S.PreviewImg
-                          src={order.orderData.productImageUrlArray[0]}
+                        <Picture
+                          imageUrlMap={
+                            order.orderData.productImageUrlMapArray[0]
+                          }
+                          size={52}
                           alt={`${order.orderData.productName}_이미지`}
                         />
                         <S.ProductBox>
