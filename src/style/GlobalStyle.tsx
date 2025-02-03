@@ -85,6 +85,7 @@ button {
   url(${PretendardRegularWoff2}) format('woff2'), 
   url(${PretendardRegularWoff}) format('woff'), 
   url(${PretendardRegularOtf}) format('otf'),
+  font-display: swap;
 }
 @font-face {
 	font-family: 'Pretendard';
@@ -93,6 +94,7 @@ button {
   url(${PretendardMediumWoff2}) format('woff2'), 
   url(${PretendardMediumWoff}) format('woff'), 
   url(${PretendardMediumOtf}) format('otf'),
+  font-display: swap;
 }
 @font-face {
 	font-family: 'Pretendard';
@@ -101,6 +103,7 @@ button {
   url(${PretendardSemiBoldWoff2}) format('woff2'), 
   url(${PretendardSemiBoldWoff}) format('woff'), 
   url(${PretendardSemiBoldOtf}) format('otf'),
+  font-display: swap;
 }
 @font-face {
 	font-family: 'Pretendard';
@@ -109,6 +112,7 @@ button {
   url(${PretendardBoldWoff2}) format('woff2'), 
   url(${PretendardBoldWoff}) format('woff'), 
   url(${PretendardBoldOtf}) format('otf'),
+  font-display: swap;
 }
 @font-face {
 	font-family: 'Pretendard';
@@ -117,6 +121,7 @@ button {
   url(${PretendardExtraBoldWoff2}) format('woff2'), 
   url(${PretendardExtraBoldWoff}) format('woff'), 
   url(${PretendardExtraBoldOtf}) format('otf'),
+  font-display: swap;
 }
 
 * {

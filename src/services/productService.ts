@@ -58,14 +58,14 @@ type CreateProductDataParam = {
   id: string;
   userInfo: UserInfo;
   formData: ProductFormData;
-  productImageUrlArray: string[];
+  productImageUrlMapArray: Record<string, string>[];
   isoTime: string;
 };
 type UpdateProductDataParam = {
   originalProductData: ProductSchema;
   userInfo: UserInfo;
   formData: ProductFormData;
-  productImageUrlArray: string[];
+  productImageUrlMapArray: Record<string, string>[];
   isoTime: string;
 };
 
@@ -73,7 +73,7 @@ export const createProductData = async ({
   id,
   userInfo,
   formData,
-  productImageUrlArray,
+  productImageUrlMapArray,
   isoTime,
 }: CreateProductDataParam) => {
   const documentData: ProductSchema = {
@@ -87,7 +87,7 @@ export const createProductData = async ({
     productQuantity: parseInt(formData.productQuantity),
     productSalesrate: 0,
     productCategory: formData.productCategory,
-    productImageUrlArray: productImageUrlArray,
+    productImageUrlMapArray,
     createdAt: isoTime,
     updatedAt: isoTime,
   };
@@ -102,12 +102,12 @@ export const getProductData = async (productId: string) => {
   } else return undefined;
 };
 
-export const getProductList = async (sellerId: string) => {
+export const getProductList = async (sellerId: string = 'all') => {
   const productListDocument = await getDocs(
     buildFirestoreQuery({
       db,
       collectionName: 'product',
-      filters: [where('sellerId', '==', sellerId)],
+      filters: sellerId === 'all' ? [] : [where('sellerId', '==', sellerId)],
       sortOrders: [orderBy('createdAt', 'desc')],
     }),
   );
@@ -129,7 +129,7 @@ export const uploadProductImage = async (path: string, imageFile: File) => {
 export const updateProductData = async ({
   originalProductData,
   formData,
-  productImageUrlArray,
+  productImageUrlMapArray,
   isoTime,
 }: UpdateProductDataParam) => {
   const documentData: ProductSchema = {
@@ -139,7 +139,7 @@ export const updateProductData = async ({
     productPrice: parseInt(formData.productPrice),
     productQuantity: parseInt(formData.productQuantity),
     productCategory: formData.productCategory,
-    productImageUrlArray,
+    productImageUrlMapArray,
     updatedAt: isoTime,
   };
 

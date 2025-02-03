@@ -13,4 +13,13 @@ export default defineConfig({
       '@': path.resolve(__dirname, 'src/'),
     },
   },
+  server: {
+    proxy: {
+      '/firebasestorage': {
+        target: 'https://firebasestorage.googleapis.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/firebase/, ''),
+      },
+    },
+  },
 });

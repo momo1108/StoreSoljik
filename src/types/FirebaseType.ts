@@ -30,9 +30,13 @@ export type ProductSchema = {
   productDescription: string;
   productCategory: string;
   /**
-   * 배열 데이터를 JSON.stringify 메서드로 문자열 변환 후 저장
+   * 링크크 데이터를 JSON.stringify 메서드로 문자열 변환 후 저장
+   * 하나의 상품에는 최대 6가지의 이미지 key-value 쌍이 존재
+   * 원본사이즈 - 원본타입, webp - ex) { original: 링크, original_webp: 링크 }
+   * 600px - 원본타입, webp - ex) { 600px: 링크, 600px_webp: 링크 }
+   * 250px - 원본타입, webp - ex) { 250px: 링크, 250px_webp: 링크 }
    */
-  productImageUrlArray: string[];
+  productImageUrlMapArray: Record<string, string>[];
   /**
    * new Date()에 new Date().getTimezoneOffset() * 60000 를 빼준다.(한국시간)
    * toISOString 메서드로 변환한다.
