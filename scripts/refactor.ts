@@ -1,8 +1,16 @@
-import { db } from '@/firebase';
+import { db } from '@/firebase.ts';
+import { CartItem } from '@/hooks/useCartItems';
 import { getProductList, uploadProductImage } from '@/services/productService';
-import { ProductSchema } from '@/types/FirebaseType';
+import { OrderSchema, ProductSchema } from '@/types/FirebaseType';
+import { buildFirestoreQuery } from '@/utils/firebaseUtils';
 import { b64toFile, imgToResizedDataUrl } from '@/utils/imageUtils';
-import { doc, updateDoc } from 'firebase/firestore';
+import {
+  doc,
+  DocumentReference,
+  getDocs,
+  runTransaction,
+  updateDoc,
+} from 'firebase/firestore';
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
@@ -92,3 +100,59 @@ const resizeFirebaseImage = async () => {
 /**
  * OrderSchema 의 OrderData 내부에 이미지 관련 링크들도 리팩토링이 필요하다.
  */
+const refactorOrderData = async () => {
+  try {
+    const orderDocumentSnapshots = await getDocs(
+      buildFirestoreQuery({
+        db,
+        collectionName: 'order',
+      }),
+    );
+
+    await runTransaction(db, async (transaction) => {
+      const orderRefDataMapArray: {
+        ref: DocumentReference;
+        newOrderData: CartItem & {
+          productImageUrlArray?: string[];
+        };
+      }[] = [];
+
+      for (let i = 0; i < orderDocumentSnapshots.docs.length; i++) {
+        const orderSnapshot = orderDocumentSnapshots.docs[i];
+        const orderDocument = orderSnapshot.data() as OrderSchema;
+        const newOrderData = orderDocument.orderData as CartItem & {
+          productImageUrlArray?: string[];
+        };
+        delete newOrderData.productImageUrlArray;
+
+        const productSnapshot = await transaction.get(
+          doc(db, 'product', newOrderData.id),
+        );
+        const productData = productSnapshot.data() as ProductSchema;
+        newOrderData.productImageUrlMapArray =
+          productData.productImageUrlMapArray;
+
+        // console.dir(newOrderData);
+        orderRefDataMapArray.push({ ref: orderSnapshot.ref, newOrderData });
+      }
+
+      // console.dir(
+      //   orderRefDataMapArray.map(
+      //     (obj) => obj.newOrderData.productImageUrlMapArray,
+      //   ),
+      // );
+
+      // orderRefDataMapArray.forEach((orderRefDataMap) => {
+      //   transaction.update(orderRefDataMap.ref, {
+      //     orderData: orderRefDataMap.newOrderData,
+      //   });
+      // });
+    });
+  } catch (err) {
+    throw new Error(err as string);
+  } finally {
+    console.log('done');
+  }
+};
+
+refactorOrderData();
