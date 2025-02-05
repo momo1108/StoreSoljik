@@ -2,10 +2,10 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
+import dotenv from 'dotenv';
 
 // Node.js 환경일 경우 dotenv 로드
 if (typeof process !== 'undefined' && process.env) {
-  const dotenv = await import('dotenv'); // ES Module에서 동적 import
   dotenv.config();
 }
 

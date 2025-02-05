@@ -14,6 +14,7 @@ import Button from '@/components/ui/button/Button';
 import StatusBar from '@/components/ui/statusbar/StatusBar';
 import { Link } from 'react-router-dom';
 import HorizontalSelect from '@/components/ui/filter/horizontal/HorizontalSelect';
+import Picture from '@/components/ui/picture/Picture';
 
 const History: React.FC = () => {
   const {
@@ -115,10 +116,16 @@ const History: React.FC = () => {
                             key={`${order.batchOrderId}_${order.orderData.id}`}
                           >
                             <S.OrderInfoContentBox>
-                              <S.OrderImage
+                              <Picture
+                                imageUrlMap={
+                                  order.orderData.productImageUrlMapArray[0]
+                                }
+                                size={120}
+                              />
+                              {/* <S.OrderImage
                                 src={order.orderData.productImageUrlArray[0]}
                                 alt={order.orderData.productName}
-                              />
+                              /> */}
                               <S.OrderContentBox>
                                 <S.OrderContentMenuBox>
                                   <StatusBar>

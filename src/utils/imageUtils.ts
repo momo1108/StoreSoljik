@@ -91,15 +91,15 @@ export const b64toFile = (b64Data: string, fileName: string) => {
   return file;
 };
 
-const downloadFile = (file: File) => {
-  const link = document.createElement('a');
-  link.setAttribute('href', URL.createObjectURL(file));
-  link.setAttribute('download', file.name);
-  link.style.display = 'none';
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-};
+// const downloadFile = (file: File) => {
+//   const link = document.createElement('a');
+//   link.setAttribute('href', URL.createObjectURL(file));
+//   link.setAttribute('download', file.name);
+//   link.style.display = 'none';
+//   document.body.appendChild(link);
+//   link.click();
+//   document.body.removeChild(link);
+// };
 
 export const resizeImage = async (
   file: File,

@@ -1,5 +1,6 @@
 import Slider, { Settings } from 'react-slick';
 import * as S from './Carousel.Style';
+import Picture from '../picture/Picture';
 
 export const defaultSetiing = {
   dots: true,
@@ -14,7 +15,7 @@ export const defaultSetiing = {
 
 type CarouselProps = {
   settings?: Settings;
-  data: string[];
+  data: Record<string, string>[];
   size?: number;
 };
 
@@ -26,9 +27,9 @@ const Carousel: React.FC<CarouselProps> = ({
   return (
     <S.CarouselImageContainer $size={size}>
       <Slider {...settings}>
-        {data.map(($src, index) => (
+        {data.map((record, index) => (
           <div className='slider-item-div' key={`carousel_${index}`}>
-            <S.CarouselImageItemBox $src={$src as string} />
+            <Picture imageUrlMap={record} size={size} />
           </div>
         ))}
       </Slider>

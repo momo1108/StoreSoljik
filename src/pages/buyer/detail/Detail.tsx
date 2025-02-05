@@ -59,7 +59,7 @@ const Detail: React.FC = () => {
           <S.DetailContainer>
             <S.ImageContainer>
               <S.CarouselWrapper>
-                <Carousel data={data.productImageUrlArray} size={500} />
+                <Carousel data={data.productImageUrlMapArray} size={500} />
               </S.CarouselWrapper>
               <S.ChattingContainer>
                 <H4>실시간 채팅</H4>

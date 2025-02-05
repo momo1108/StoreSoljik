@@ -11,6 +11,7 @@ import { RiDeleteBin5Line } from 'react-icons/ri';
 import HR from '@/components/ui/hr/HR';
 import Checkbox from '@/components/form/checkbox/Checkbox';
 import { useCartItems } from '@/hooks/useCartItems';
+import Picture from '@/components/ui/picture/Picture';
 
 const Purchase: React.FC = () => {
   const {
@@ -89,10 +90,14 @@ const Purchase: React.FC = () => {
               {items.map((item, index) => (
                 <React.Fragment key={item.id}>
                   <S.CartItemBox key={index}>
-                    <S.ItemImg
+                    <Picture
+                      imageUrlMap={item.productImageUrlMapArray[0]}
+                      size={120}
+                    />
+                    {/* <S.ItemImg
                       src={item.productImageUrlArray[0]}
                       alt={item.productName}
-                    />
+                    /> */}
                     <S.ItemDetailsBox>
                       <S.ItemDatailHeader>
                         <H4 className='hideTextOverflow'>{item.productName}</H4>

@@ -18,7 +18,10 @@ const loadImage = (src: string): Promise<HTMLImageElement> => {
     image.crossOrigin = 'anonymous';
     image.src = src;
     image.onload = () => resolve(image);
-    image.onerror = (err) => reject(new Error('Image failed to load'));
+    image.onerror = (err) => {
+      console.error(err);
+      reject(new Error('Image failed to load'));
+    };
   });
 };
 
@@ -123,24 +126,27 @@ const refactorOrderData = async () => {
         const newOrderData = orderDocument.orderData as CartItem & {
           productImageUrlArray?: string[];
         };
-        delete newOrderData.productImageUrlArray;
+        // delete newOrderData.productImageUrlArray;
 
         const productSnapshot = await transaction.get(
           doc(db, 'product', newOrderData.id),
         );
-        const productData = productSnapshot.data() as ProductSchema;
-        newOrderData.productImageUrlMapArray =
-          productData.productImageUrlMapArray;
+        const productData = productSnapshot.data() as ProductSchema & {
+          productImageUrlArray?: string[];
+        };
+        // newOrderData.productImageUrlMapArray =
+        //   productData.productImageUrlMapArray;
+        newOrderData.productImageUrlArray = productData.productImageUrlArray;
 
         // console.dir(newOrderData);
         orderRefDataMapArray.push({ ref: orderSnapshot.ref, newOrderData });
       }
 
-      // console.dir(
-      //   orderRefDataMapArray.map(
-      //     (obj) => obj.newOrderData.productImageUrlMapArray,
-      //   ),
-      // );
+      console.dir(
+        orderRefDataMapArray.map(
+          (map) => map.newOrderData.productImageUrlArray,
+        ),
+      );
 
       // orderRefDataMapArray.forEach((orderRefDataMap) => {
       //   transaction.update(orderRefDataMap.ref, {
