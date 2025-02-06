@@ -3,7 +3,11 @@ import { CartItem } from '@/hooks/useCartItems';
 import { getProductList, uploadProductImage } from '@/services/productService';
 import { OrderSchema, ProductSchema } from '@/types/FirebaseType';
 import { buildFirestoreQuery } from '@/utils/firebaseUtils';
-import { b64toFile, imgToResizedDataUrl } from '@/utils/imageUtils';
+import {
+  b64toFile,
+  downloadFile,
+  imgToResizedDataUrl,
+} from '@/utils/imageUtils';
 import {
   doc,
   DocumentReference,
@@ -11,6 +15,7 @@ import {
   runTransaction,
   updateDoc,
 } from 'firebase/firestore';
+import { readFileSync } from 'fs';
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
@@ -160,5 +165,3 @@ const refactorOrderData = async () => {
     console.log('done');
   }
 };
-
-refactorOrderData();
