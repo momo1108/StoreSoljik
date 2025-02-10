@@ -165,3 +165,5 @@ const refactorOrderData = async () => {
     console.log('done');
   }
 };
+
+refactorOrderData();
