@@ -4,7 +4,8 @@ import * as S from './Signin.Style';
 import useSignin from './useSignin';
 import Spinner from '@/components/ui/spinner/Spinner';
 import Input from '@/components/form/input/Input';
-import signinImgUrl from '@/assets/images/signup.png';
+import signinImgUrlPng from '@/assets/images/signup.png';
+import signinImgUrlWebp from '@/assets/images/signup.webp';
 import HR from '@/components/ui/hr/HR';
 import { useTheme } from 'styled-components';
 
@@ -87,9 +88,14 @@ const Signin: React.FC = () => {
             <h3>소셜 로그인</h3>
             <S.SigninIconBox>gd</S.SigninIconBox>
           </S.SigninFormContainer>
-          <S.SigninImageBox>
-            <img src={signinImgUrl} alt='' />
-          </S.SigninImageBox>
+          <S.SigninPicture
+            imageUrlMap={{
+              original: signinImgUrlPng,
+              webp: signinImgUrlWebp,
+            }}
+            size={700}
+            alt='메인페이지이미지'
+          />
         </S.SigninContainer>
       </Main>
     </>

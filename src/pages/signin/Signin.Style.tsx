@@ -1,5 +1,6 @@
 import Checkbox from '@/components/form/checkbox/Checkbox';
 import Button from '@/components/ui/button/Button';
+import Picture from '@/components/ui/picture/Picture';
 import media from '@/style/media';
 import styled from 'styled-components';
 
@@ -59,15 +60,11 @@ export const SigninIconBox = styled.div`
   gap: 8px;
 `;
 
-export const SigninImageBox = styled.div`
+export const SigninPicture = styled(Picture)`
   background: #eee;
-  width: 700px;
-  height: 700px;
-  border: 1px solid ${(props) => props.theme.color.foreground};
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 
-  & > img {
-    width: 700px;
-    height: 700px;
+  img {
+    border: 1px solid ${(props) => props.theme.color.foreground};
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   }
 `;
