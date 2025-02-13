@@ -24,7 +24,7 @@ export const SigninFormContainer = styled.form`
   gap: 22px;
   box-sizing: border-box;
   width: 500px;
-  padding: 40px 50px;
+  padding: 40px;
 
   & > h2,
   & > h3,
