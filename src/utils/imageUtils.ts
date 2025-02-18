@@ -229,3 +229,20 @@ export const getProperSizeImageUrl = (
 
   return urls;
 };
+
+export const preloadImages = (...src: string[]) => {
+  if (!src.every((s) => typeof s === 'string')) {
+    throw new Error('Image source must be string.');
+  }
+  const img = new Image();
+  img.src = src[0];
+
+  let index = 1;
+
+  img.onload = () => {
+    if (index < src.length) {
+      img.src = src[index];
+      index += 1;
+    }
+  };
+};

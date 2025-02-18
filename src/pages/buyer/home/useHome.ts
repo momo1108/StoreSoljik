@@ -1,6 +1,7 @@
 import { getValidCategories } from '@/services/categoryService';
 import { fetchProducts } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
+import { preloadImages } from '@/utils/imageUtils';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
@@ -26,6 +27,10 @@ const useHome = () => {
     };
 
     getCategories();
+    preloadImages(
+      'https://firebasestorage.googleapis.com/v0/b/buythis-37f33.appspot.com/o/Gc9PekwVw5PjyALKV8t6VBL4xp43-a26079d8-6eb0-4444-bf3d-69756fb833f8%2F0_600px.webp?alt=media&token=83fe2f69-1215-44db-ab47-674af8ba7433',
+      'https://firebasestorage.googleapis.com/v0/b/buythis-37f33.appspot.com/o/Gc9PekwVw5PjyALKV8t6VBL4xp43-a26079d8-6eb0-4444-bf3d-69756fb833f8%2F1_600px.webp?alt=media&token=ac2a7c04-0f73-4ddc-82c7-3dcee6ac90c4',
+    );
   }, []);
 
   const {
