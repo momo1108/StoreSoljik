@@ -230,19 +230,32 @@ export const getProperSizeImageUrl = (
   return urls;
 };
 
-export const preloadImages = (...src: string[]) => {
-  if (!src.every((s) => typeof s === 'string')) {
-    throw new Error('Image source must be string.');
-  }
-  const img = new Image();
-  img.src = src[0];
+// export const preloadImages = (...src: string[]) => {
+//   if (!src.every((s) => typeof s === 'string')) {
+//     throw new Error('Image source must be string.');
+//   }
+//   const img = new Image();
+//   img.src = src[0];
 
-  let index = 1;
+//   let index = 1;
 
-  img.onload = () => {
-    if (index < src.length) {
-      img.src = src[index];
-      index += 1;
-    }
-  };
+//   img.onload = () => {
+//     if (index < src.length) {
+//       img.src = src[index];
+//       index += 1;
+//     }
+//   };
+// };
+
+export const preloadImages = (imageUrls: string[]) => {
+  return Promise.all(
+    imageUrls.map((url) => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.src = url;
+        img.onload = resolve;
+        img.onerror = reject;
+      });
+    }),
+  );
 };

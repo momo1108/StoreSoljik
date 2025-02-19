@@ -1,10 +1,11 @@
+import useIdleCallback from '@/hooks/useIdleCallback';
 import { getValidCategories } from '@/services/categoryService';
 import { fetchProducts } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
-import { preloadImages } from '@/utils/imageUtils';
+import { getProperSizeImageUrl, preloadImages } from '@/utils/imageUtils';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
 
 const useHome = () => {
@@ -27,10 +28,6 @@ const useHome = () => {
     };
 
     getCategories();
-    preloadImages(
-      'https://firebasestorage.googleapis.com/v0/b/buythis-37f33.appspot.com/o/Gc9PekwVw5PjyALKV8t6VBL4xp43-a26079d8-6eb0-4444-bf3d-69756fb833f8%2F0_600px.webp?alt=media&token=83fe2f69-1215-44db-ab47-674af8ba7433',
-      'https://firebasestorage.googleapis.com/v0/b/buythis-37f33.appspot.com/o/Gc9PekwVw5PjyALKV8t6VBL4xp43-a26079d8-6eb0-4444-bf3d-69756fb833f8%2F1_600px.webp?alt=media&token=ac2a7c04-0f73-4ddc-82c7-3dcee6ac90c4',
-    );
   }, []);
 
   const {
@@ -39,27 +36,32 @@ const useHome = () => {
     error: hotProductsError,
   } = useQuery<ProductSchema[]>({
     queryKey: ['products', 'hot'],
-    queryFn: async () =>
-      await fetchProducts({
+    queryFn: async () => {
+      const result = await fetchProducts({
         sortOrders: [
           orderBy('productSalesrate', 'desc'),
           orderBy('createdAt', 'desc'),
         ],
-        pageSize: 8,
-      }),
+        pageSize: 5,
+      });
+      return result;
+    },
   });
 
   const recentProductsQueryPerCategory = useQueries({
     queries: categories.map((category) => ({
       queryKey: ['products', category, 'recent'],
-      queryFn: async () => ({
-        category,
-        result: await fetchProducts({
+      queryFn: async () => {
+        const result = await fetchProducts({
           filters: [where('productCategory', '==', category)],
           sortOrders: [orderBy('createdAt', 'desc')],
-          pageSize: 8,
-        }),
-      }),
+          pageSize: 4,
+        });
+        return {
+          category,
+          result,
+        };
+      },
     })),
     combine: (results) => {
       return results.map((categoryQuery) => ({
@@ -69,6 +71,41 @@ const useHome = () => {
       }));
     },
   });
+
+  const validPreloadImageUrls = useMemo<string[]>(() => {
+    if (
+      hotProductsArray &&
+      recentProductsQueryPerCategory.every(
+        (query) => query.status === 'success',
+      )
+    ) {
+      const urls: string[] = [];
+      hotProductsArray.forEach((product) => {
+        const imageMap = getProperSizeImageUrl(
+          product.productImageUrlMapArray[0],
+          600,
+        );
+        urls.push(imageMap.original, imageMap.webp);
+      });
+      recentProductsQueryPerCategory.forEach((query) => {
+        query.data?.result.forEach((product) => {
+          const imageMap = getProperSizeImageUrl(
+            product.productImageUrlMapArray[0],
+            600,
+          );
+          urls.push(imageMap.original, imageMap.webp);
+        });
+      });
+      return urls;
+    }
+    return [];
+  }, [hotProductsArray, recentProductsQueryPerCategory]);
+
+  useIdleCallback(() => {
+    if (validPreloadImageUrls.length > 0) {
+      preloadImages(validPreloadImageUrls);
+    }
+  }, [validPreloadImageUrls]);
 
   return {
     hotProductsArray,
