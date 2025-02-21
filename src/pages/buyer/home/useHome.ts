@@ -72,40 +72,53 @@ const useHome = () => {
     },
   });
 
-  const validPreloadImageUrls = useMemo<string[]>(() => {
+  useEffect(() => {
     if (
       hotProductsArray &&
       recentProductsQueryPerCategory.every(
         (query) => query.status === 'success',
       )
     ) {
-      const urls: string[] = [];
+      const homeImageUrls: string[] = [];
+      const preloadImageUrls: string[] = [];
       hotProductsArray.forEach((product) => {
-        const imageMap = getProperSizeImageUrl(
+        const homeImageMap = getProperSizeImageUrl(
+          product.productImageUrlMapArray[0],
+          250,
+        );
+        homeImageUrls.push(homeImageMap.original, homeImageMap.webp);
+
+        const preloadImageMap = getProperSizeImageUrl(
           product.productImageUrlMapArray[0],
           600,
         );
-        urls.push(imageMap.original, imageMap.webp);
+        preloadImageUrls.push(preloadImageMap.original, preloadImageMap.webp);
       });
       recentProductsQueryPerCategory.forEach((query) => {
         query.data?.result.forEach((product) => {
-          const imageMap = getProperSizeImageUrl(
+          const homeImageMap = getProperSizeImageUrl(
+            product.productImageUrlMapArray[0],
+            250,
+          );
+          homeImageUrls.push(homeImageMap.original, homeImageMap.webp);
+
+          const preloadImageMap = getProperSizeImageUrl(
             product.productImageUrlMapArray[0],
             600,
           );
-          urls.push(imageMap.original, imageMap.webp);
+          preloadImageUrls.push(preloadImageMap.original, preloadImageMap.webp);
         });
       });
-      return urls;
-    }
-    return [];
-  }, [hotProductsArray, recentProductsQueryPerCategory]);
 
-  useIdleCallback(() => {
-    if (validPreloadImageUrls.length > 0) {
-      preloadImages(validPreloadImageUrls);
+      preloadImages(homeImageUrls)
+        .then(() => {
+          preloadImages(preloadImageUrls);
+        })
+        .catch((error: Error) => {
+          console.error(error);
+        });
     }
-  }, [validPreloadImageUrls]);
+  }, [hotProductsArray, recentProductsQueryPerCategory]);
 
   return {
     hotProductsArray,
