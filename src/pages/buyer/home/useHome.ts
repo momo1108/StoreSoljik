@@ -1,11 +1,10 @@
-import useIdleCallback from '@/hooks/useIdleCallback';
 import { getValidCategories } from '@/services/categoryService';
 import { fetchProducts } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { getProperSizeImageUrl, preloadImages } from '@/utils/imageUtils';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 const useHome = () => {

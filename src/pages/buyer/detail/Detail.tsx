@@ -207,7 +207,6 @@ const Detail: React.FC = () => {
                       </S.RecommendationErrorBox>
                     ) : recommendData ? (
                       recommendData.result
-                        .filter((product) => product.id !== data.id)
                         .slice(0, 10)
                         .map((product) => (
                           <S.RecommendationVerticalCard

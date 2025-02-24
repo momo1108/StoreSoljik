@@ -3,7 +3,8 @@ import { useCartUI } from '@/hooks/useCartUI';
 import useFirebaseListener from '@/hooks/useFirestoreListener';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
-import { QueryKey, useQueries, useQuery } from '@tanstack/react-query';
+import { getProperSizeImageUrl, preloadImages } from '@/utils/imageUtils';
+import { QueryKey, useQuery } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
 import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -58,24 +59,37 @@ const useDetail = () => {
   }: {
     queryKey: QueryKey;
   }) => {
-    const [, productCategory] = queryKey;
-    if (!productCategory) {
-      const errorInstance = new Error('카테고리 정보가 로딩되기 전입니다.');
-      errorInstance.name = 'reactquery.query.product';
-      throw errorInstance;
-    }
-    const productData = await fetchProducts({
-      filters: [where('productCategory', '==', productCategory)],
-      sortOrders: [orderBy('createdAt', 'desc')],
-      pageSize: 8,
-    });
+    try {
+      const [, productCategory] = queryKey;
+      if (!productCategory) {
+        return {
+          category: '',
+          result: [],
+        };
+      }
 
-    if (productData)
-      return { category: productCategory as string, result: productData };
-    else {
-      const errorInstance = new Error('존재하지 않는 상품입니다.');
-      errorInstance.name = 'firebase.store.product.read';
-      throw errorInstance;
+      const productData = await fetchProducts({
+        filters: [
+          where('productCategory', '==', productCategory),
+          where('id', '!=', param.id),
+        ],
+        sortOrders: [orderBy('createdAt', 'desc')],
+        pageSize: 5,
+      });
+
+      if (productData)
+        return { category: productCategory as string, result: productData };
+      else {
+        const errorInstance = new Error('존재하지 않는 상품입니다.');
+        errorInstance.name = 'firebase.store.product.read';
+        throw errorInstance;
+      }
+    } catch (error) {
+      console.error(error);
+      return {
+        category: '',
+        result: [],
+      };
     }
   };
 
@@ -95,21 +109,37 @@ const useDetail = () => {
     category: string;
     result: ProductSchema[];
   }>({
-    queryKey: ['products', data?.productCategory, 'recent'],
+    queryKey: ['products', data?.productCategory, 'recommend'],
     queryFn: fetchProductRecommendList,
   });
 
-  useQueries({
-    queries:
-      recommendData === undefined
-        ? []
-        : recommendData.result
-            .filter((product) => product.id !== data?.id)
-            .map((product) => ({
-              queryKey: ['product', product.id],
-              queryFn: fetchProductdata,
-            })),
-  });
+  useEffect(() => {
+    if (data && recommendData && recommendData.result.length) {
+      const detailImageUrls: string[] = [];
+      const preloadImageUrls: string[] = [];
+
+      data.productImageUrlMapArray.forEach((imageMap) => {
+        detailImageUrls.push(imageMap['600px'], imageMap['600px_webp']);
+      });
+      recommendData.result.forEach((product) => {
+        preloadImageUrls.push(
+          ...Object.values(
+            getProperSizeImageUrl(product.productImageUrlMapArray[0], 600),
+          ),
+        );
+      });
+
+      // console.log(detailImageUrls, preloadImageUrls);
+
+      preloadImages(detailImageUrls)
+        .then(() => {
+          preloadImages(preloadImageUrls);
+        })
+        .catch((error) => {
+          console.error(error);
+        });
+    }
+  }, [data, recommendData]);
 
   // console.log(recommendData, recommendStatus, recommendError);
 

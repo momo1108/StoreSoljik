@@ -36,7 +36,7 @@ const useFirestoreListener = () => {
   const { userInfo } = useFirebaseAuth();
 
   useEffect(() => {
-    console.log(param.id);
+    // console.log(param.id);
     if (param.id) {
       fetchOrders({
         filters: [
