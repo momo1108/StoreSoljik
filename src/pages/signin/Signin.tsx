@@ -8,6 +8,17 @@ import signinImgUrlPng from '@/assets/images/signup.png';
 import signinImgUrlWebp from '@/assets/images/signup.webp';
 import HR from '@/components/ui/hr/HR';
 import { useTheme } from 'styled-components';
+import { FaFacebook, FaGithub, FaGoogle } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
+import {
+  FacebookAuthProvider,
+  getAuth,
+  GithubAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
+  TwitterAuthProvider,
+} from 'firebase/auth';
+import { auth } from '@/firebase';
 
 const Signin: React.FC = () => {
   const {
@@ -86,7 +97,124 @@ const Signin: React.FC = () => {
             </S.SignButton>
             <HR color={theme.color.border} />
             <h3>소셜 로그인</h3>
-            <S.SigninIconBox>gd</S.SigninIconBox>
+            <S.SigninIconBox>
+              <FaGoogle
+                onClick={() => {
+                  const provider = new GoogleAuthProvider();
+                  signInWithPopup(auth, provider)
+                    .then((result) => {
+                      // This gives you a Google Access Token. You can use it to access the Google API.
+                      const credential =
+                        GoogleAuthProvider.credentialFromResult(result);
+                      console.dir(credential);
+                      const token = credential!.accessToken;
+                      // The signed-in user info.
+                      const user = result.user;
+                      // IdP data available using getAdditionalUserInfo(result)
+                      // ...
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      // Handle Errors here.
+                      const errorCode = error.code;
+                      const errorMessage = error.message;
+                      // The email of the user's account used.
+                      const email = error.customData.email;
+                      // The AuthCredential type that was used.
+                      const credential =
+                        GoogleAuthProvider.credentialFromError(error);
+                      // ...
+                    });
+                }}
+              />
+              <FaXTwitter
+                onClick={() => {
+                  const provider = new TwitterAuthProvider();
+                  signInWithPopup(auth, provider)
+                    .then((result) => {
+                      // This gives you a Google Access Token. You can use it to access the Google API.
+                      const credential =
+                        TwitterAuthProvider.credentialFromResult(result);
+                      console.dir(credential);
+                      const token = credential!.accessToken;
+                      // The signed-in user info.
+                      const user = result.user;
+                      // IdP data available using getAdditionalUserInfo(result)
+                      // ...
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      // Handle Errors here.
+                      const errorCode = error.code;
+                      const errorMessage = error.message;
+                      // The email of the user's account used.
+                      const email = error.customData.email;
+                      // The AuthCredential type that was used.
+                      const credential =
+                        GoogleAuthProvider.credentialFromError(error);
+                      // ...
+                    });
+                }}
+              />
+              <FaFacebook
+                onClick={() => {
+                  const provider = new FacebookAuthProvider();
+                  signInWithPopup(auth, provider)
+                    .then((result) => {
+                      // This gives you a Google Access Token. You can use it to access the Google API.
+                      const credential =
+                        FacebookAuthProvider.credentialFromResult(result);
+                      console.dir(credential);
+                      const token = credential!.accessToken;
+                      // The signed-in user info.
+                      const user = result.user;
+                      // IdP data available using getAdditionalUserInfo(result)
+                      // ...
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      // Handle Errors here.
+                      const errorCode = error.code;
+                      const errorMessage = error.message;
+                      // The email of the user's account used.
+                      const email = error.customData.email;
+                      // The AuthCredential type that was used.
+                      const credential =
+                        GoogleAuthProvider.credentialFromError(error);
+                      // ...
+                    });
+                }}
+              />
+              <FaGithub
+                onClick={() => {
+                  const provider = new GithubAuthProvider();
+                  signInWithPopup(auth, provider)
+                    .then((result) => {
+                      // This gives you a Google Access Token. You can use it to access the Google API.
+                      const credential =
+                        GithubAuthProvider.credentialFromResult(result);
+                      console.dir(credential);
+                      const token = credential!.accessToken;
+                      // The signed-in user info.
+                      const user = result.user;
+                      // IdP data available using getAdditionalUserInfo(result)
+                      // ...
+                    })
+                    .catch((error) => {
+                      console.error(error);
+                      // Handle Errors here.
+                      const errorCode = error.code;
+                      const errorMessage = error.message;
+                      // The email of the user's account used.
+                      const email = error.customData.email;
+                      // The AuthCredential type that was used.
+                      const credential =
+                        GoogleAuthProvider.credentialFromError(error);
+                      // ...
+                    });
+                }}
+              />
+            </S.SigninIconBox>
           </S.SigninFormContainer>
           <S.SigninPicture
             imageUrlMap={{

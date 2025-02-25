@@ -57,7 +57,23 @@ export const SignButton = styled(Button)`
 export const SigninIconBox = styled.div`
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 16px;
+
+  svg {
+    width: 36px;
+    height: 36px;
+    padding: 4px;
+    fill: ${(props) => props.theme.color.primary};
+    border-radius: ${(props) => props.theme.color.radius};
+    cursor: pointer;
+
+    &:hover {
+      fill: ${(props) => props.theme.color.primaryHover};
+      box-shadow:
+        rgba(0, 0, 0, 0.03) 0px 6px 24px 0px,
+        rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+    }
+  }
 `;
 
 export const SigninPicture = styled(Picture)`

@@ -24,6 +24,8 @@ const useItems = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
 
+  console.log(userInfo);
+
   const onClickRegistration: MouseEventHandler<HTMLButtonElement> = () =>
     navigate('/registration');
 
