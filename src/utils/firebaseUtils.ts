@@ -1,3 +1,11 @@
+import { auth } from '@/firebase';
+import {
+  FacebookAuthProvider,
+  GithubAuthProvider,
+  GoogleAuthProvider,
+  signInWithPopup,
+  TwitterAuthProvider,
+} from 'firebase/auth';
 import {
   collection,
   Firestore,
@@ -38,4 +46,47 @@ export const buildFirestoreQuery = ({
 
     return query(collection(db, collectionName), ...constraintArray);
   }
+};
+
+type ThirdPartyProvider =
+  | 'google'
+  | 'twitter'
+  | 'x'
+  | 'facebook'
+  | 'meta'
+  | 'github';
+
+export const signinWithThirdParty = (provider: ThirdPartyProvider) => {
+  let ProviderInstance;
+
+  if (provider === 'google') ProviderInstance = new GoogleAuthProvider();
+  else if (provider === 'twitter' || provider === 'x')
+    ProviderInstance = new TwitterAuthProvider();
+  else if (provider === 'facebook' || provider === 'meta')
+    ProviderInstance = new FacebookAuthProvider();
+  else ProviderInstance = new GithubAuthProvider();
+
+  signInWithPopup(auth, ProviderInstance)
+    .then((result) => {
+      console.dir(result);
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      console.dir(credential);
+      const token = credential!.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+      // IdP data available using getAdditionalUserInfo(result)
+      // ...
+    })
+    .catch((error) => {
+      console.error(error);
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData.email;
+      // The AuthCredential type that was used.
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      // ...
+    });
 };
