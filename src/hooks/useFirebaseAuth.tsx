@@ -6,18 +6,15 @@ import {
   ReactNode,
   useRef,
 } from 'react';
-import { auth, db } from '@/firebase';
+import { auth } from '@/firebase';
 import {
   User,
-  deleteUser,
   onAuthStateChanged,
   signOut,
   updateProfile,
 } from 'firebase/auth';
-import { DocumentData, deleteDoc, doc, getDoc } from 'firebase/firestore';
+import { DocumentData } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
-import { FirebaseError } from 'firebase/app';
-import { toast } from 'sonner';
 
 type AccountType = '구매자' | '판매자';
 
@@ -79,59 +76,31 @@ const useProvideAuth = () => {
   };
 
   const handleUser = async (user: User | null) => {
+    /**
+     * 이 핸들러에서 모든 회원가입 / 로그인 처리를 하기위해 닉네임은 따로 입력받지 않고 이메일과 동일한 값이나 써드파티의 닉네임으로만 설정
+     * 깃헙과 구글에 같은 이메일 계정을 사용하는 경우, 깃헙으로 가입을 해도 구글 로그인을 시도하면 구글 계정으로 변환되는 이슈를 확인
+     */
     if (user) {
-      /**
-       * 유저 정보는 있는데 displayName 이 없는 경우
-       * 1. 회원가입 클릭 직후, 아직 displayName 세팅이 안된 시점
-       * 2. 회원가입까지만 성공하고, updateProfile 은 실패한 경우
-       */
-      if (user.displayName === null) {
-        try {
-          const userDocument = await getDoc(doc(db, 'user', user.uid));
-          let userInfo = null;
-          if (userDocument.exists()) {
-            const userData = userDocument.data();
-            await updateProfile(user, {
-              displayName: `${userData.nickname}#${userData.accountType}`,
-            });
-            userInfo = formatUser(userData, 'DocumentData');
-          } else {
-            throw new Error('사용자 데이터가 없습니다.');
-          }
-          setLoading(false);
-          setUserInfo(userInfo);
-          isSignedIn.current = true;
-          /**
-           * 1. 회원가입 직후 유저 객체 세팅 후
-           * 2. 회원가입 직후 유저 객체 세팅 실패. catch 에서 아이디 삭제까지 실패한 후 나중에 다시 로그인.
-           */
-          if (
-            location.pathname === '/signup' ||
-            location.pathname === '/signin'
-          ) {
-            navigate(userInfo.accountType === '구매자' ? '/' : '/items');
-          }
-        } catch (error: unknown) {
-          console.log(error);
-          /**
-           * updateProfile 실패하든말든 일단 사용자 삭제 시도
-           */
-          if (error instanceof FirebaseError && auth.currentUser) {
-            await deleteDoc(doc(db, 'user', auth.currentUser.uid));
-            await deleteUser(auth.currentUser);
-          }
-          toast.error('가입에 실패했습니다. 다시 시도해주세요.');
-        }
-      } else {
-        const userInfo = formatUser(user, 'User');
-        setLoading(false);
-        setUserInfo(userInfo);
-        isSignedIn.current = true;
+      if (!user.displayName) {
+        let providerData = user.providerData[0];
+        await updateProfile(user, {
+          displayName:
+            providerData.displayName ||
+            providerData.email ||
+            `${providerData.uid}@${providerData.providerId}`,
+        });
+      }
+      const userInfo = formatUser(user, 'User');
+      setLoading(false);
+      setUserInfo(userInfo);
+      isSignedIn.current = true;
+      if (location.pathname === '/signup' || location.pathname === '/signin') {
+        navigate('/');
       }
     } else if (!isSignedIn.current) {
       setLoading(false);
       setUserInfo(null);
-      if (!['/signin', '/signup'].includes(location.pathname)) {
+      if (!['/signin', '/signup', '/setting'].includes(location.pathname)) {
         navigate('/signin');
       }
     }
@@ -157,7 +126,7 @@ const formatUser = (
   if (type === 'DocumentData') {
     return {
       uid: (userData as DocumentData).uid,
-      email: (userData as DocumentData).email,
+      email: (userData as DocumentData).email || '',
       nickname: (userData as DocumentData).nickname,
       accountType: (userData as DocumentData).accountType,
     };
@@ -166,7 +135,7 @@ const formatUser = (
     const [nickname, accountType] = displayName.split('#');
     return {
       uid: (userData as User).uid,
-      email: (userData as User).email!,
+      email: (userData as User).email || '',
       nickname,
       accountType: accountType as AccountType,
     };

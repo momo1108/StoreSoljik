@@ -1,9 +1,8 @@
 import { Route, Routes } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import ProtectedRouteForSigning from './ProtectedRouteForSigning';
-import ProtectedRouteForBuyer from './ProtectedRouteForBuyer';
-import ProtectedRouteForSeller from './ProtectedRouteForSeller';
 import Loading from '@/pages/loading/Loading';
+import ProtectedRouteForMember from './ProtectedRouteForMember';
 
 const Signin = lazy(() => import('@/pages/signin/Signin'));
 const Signup = lazy(() => import('@/pages/signup/Signup'));
@@ -28,14 +27,12 @@ const MainRouter = () => {
           <Route path='/signin' element={<Signin />} />
           <Route path='/signup' element={<Signup />} />
         </Route>
-        <Route element={<ProtectedRouteForBuyer />}>
+        <Route element={<ProtectedRouteForMember />}>
           <Route path='/' element={<Home />} />
           <Route path='/category' element={<Category />} />
           <Route path='/detail/:id' element={<Detail />} />
           <Route path='/history' element={<History />} />
           <Route path='/purchase' element={<Purchase />} />
-        </Route>
-        <Route element={<ProtectedRouteForSeller />}>
           <Route path='/items' element={<Items />} />
           <Route path='/management' element={<Management />} />
           <Route path='/registration' element={<Registration />} />

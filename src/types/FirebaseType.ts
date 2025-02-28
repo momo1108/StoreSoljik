@@ -21,8 +21,6 @@ export type UserSchema = {
 export type ProductSchema = {
   id: string; // 사용자 uid + uuid
   sellerId: string;
-  sellerEmail: string;
-  sellerNickname: string;
   productName: string;
   productPrice: number;
   productQuantity: number;

@@ -2,7 +2,7 @@ import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import Loading from '@/pages/loading/Loading';
 import { Navigate, Outlet } from 'react-router-dom';
 
-const ProtectedRouteForUser = () => {
+const ProtectedRouteForSeller = () => {
   const { userInfo, loading } = useFirebaseAuth();
 
   return loading ? (
@@ -16,4 +16,4 @@ const ProtectedRouteForUser = () => {
   );
 };
 
-export default ProtectedRouteForUser;
+export default ProtectedRouteForSeller;

@@ -9,8 +9,10 @@ import {
   imgToResizedDataUrl,
 } from '@/utils/imageUtils';
 import {
+  deleteField,
   doc,
   DocumentReference,
+  FieldValue,
   getDocs,
   runTransaction,
   updateDoc,
@@ -166,4 +168,94 @@ const refactorOrderData = async () => {
   }
 };
 
-refactorOrderData();
+const refactorProductEmailField = async () => {
+  /**
+   * 삭제가 필요한 필드 (product - sellerEmail, sellerNickname)
+   */
+  try {
+    const productDocumentSnapshots = await getDocs(
+      buildFirestoreQuery({
+        db,
+        collectionName: 'product',
+      }),
+    );
+
+    await runTransaction(db, async (transaction) => {
+      for (let i = 0; i < productDocumentSnapshots.docs.length; i++) {
+        const productSnapshot = productDocumentSnapshots.docs[i];
+        transaction.update(productSnapshot.ref, {
+          sellerEmail: deleteField(),
+          sellerNickname: deleteField(),
+        });
+      }
+    });
+  } catch (err) {
+    throw new Error(err as string);
+  } finally {
+    console.log('done');
+  }
+};
+
+const refactorOrderDataEmailField = async () => {
+  /**
+   * 삭제가 필요한 필드 (order - orderData-sellerEmail)
+   */
+  try {
+    const orderDocumentSnapshots = await getDocs(
+      buildFirestoreQuery({
+        db,
+        collectionName: 'order',
+      }),
+    );
+
+    await runTransaction(db, async (transaction) => {
+      for (let i = 0; i < orderDocumentSnapshots.docs.length; i++) {
+        const orderSnapshot = orderDocumentSnapshots.docs[i];
+        const orderDocument = orderSnapshot.data();
+        delete orderDocument.orderData.sellerEmail;
+        transaction.update(orderSnapshot.ref, {
+          orderData: { ...orderDocument.orderData },
+        });
+      }
+    });
+  } catch (err) {
+    throw new Error(err as string);
+  } finally {
+    console.log('done');
+  }
+};
+
+const refactorOrderBatchIdField = async () => {
+  /**
+   * 변경이 필요한 필드 (order - batchOrderId)
+   */
+  try {
+    const orderDocumentSnapshots = await getDocs(
+      buildFirestoreQuery({
+        db,
+        collectionName: 'order',
+      }),
+    );
+
+    await runTransaction(db, async (transaction) => {
+      for (let i = 0; i < orderDocumentSnapshots.docs.length; i++) {
+        const orderSnapshot = orderDocumentSnapshots.docs[i];
+        const orderDocument = orderSnapshot.data() as OrderSchema;
+        const batchOrderId = [
+          orderDocument.buyerId,
+          orderDocument.batchOrderId.split('_')[1],
+        ].join('_');
+        // console.log(batchOrderId);
+        transaction.update(orderSnapshot.ref, {
+          batchOrderId,
+        });
+      }
+    });
+  } catch (err) {
+    throw new Error(err as string);
+  } finally {
+    console.log('done');
+  }
+};
+
+refactorOrderBatchIdField();

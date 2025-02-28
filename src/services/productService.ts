@@ -79,8 +79,6 @@ export const createProductData = async ({
   const documentData: ProductSchema = {
     id,
     sellerId: userInfo.uid,
-    sellerEmail: userInfo.email,
-    sellerNickname: userInfo.nickname,
     productName: formData.productName,
     productDescription: formData.productDescription,
     productPrice: parseInt(formData.productPrice),
@@ -102,6 +100,7 @@ export const getProductData = async (productId: string) => {
   } else return undefined;
 };
 
+// fetchProducts 와 겹치는 메서드.
 export const getProductList = async (sellerId: string = 'all') => {
   const productListDocument = await getDocs(
     buildFirestoreQuery({
@@ -167,7 +166,7 @@ export const purchaseProducts = async (
   buyerInfo: UserInfo,
   orderName: string,
 ) => {
-  let batchOrderId = `${buyerInfo.email}_${getKoreanIsoDatetime()}`;
+  let batchOrderId = `${buyerInfo.uid}_${getKoreanIsoDatetime()}`;
 
   await runTransaction(db, async (transaction) => {
     const productRefs = cartItemsArray.map((product) =>

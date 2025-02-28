@@ -4,8 +4,8 @@
 export type SignupFormDataType = {
   email: string;
   password: string; // DB 에는 저장하지 않는 필드(인증은 Authentication 으로만 진행)
-  accountType: '구매자' | '판매자';
-  nickname: string;
+  // accountType: '구매자' | '판매자';
+  // nickname: string;
 };
 export type SigninFormDataType = {
   email: string;

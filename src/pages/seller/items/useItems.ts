@@ -42,7 +42,7 @@ const useItems = () => {
   }) => Promise<FetchInfiniteQueryResult<ProductSchema>> = ({ pageParam }) =>
     fetchInfiniteProducts({
       pageParam,
-      filters: [where('sellerEmail', '==', userInfo?.email)],
+      filters: [where('sellerId', '==', userInfo?.uid)],
       sortOrders: [orderBy('createdAt', 'desc')],
       pageSize,
     });

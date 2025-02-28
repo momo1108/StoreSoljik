@@ -11,6 +11,8 @@ import { useTheme } from 'styled-components';
 import { FaFacebook, FaGithub, FaGoogle } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 import { signinWithThirdParty } from '@/utils/firebaseUtils';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Signin: React.FC = () => {
   const {
@@ -22,6 +24,7 @@ const Signin: React.FC = () => {
     registerEmail,
     registerPassword,
     registerMaintainCheckbox,
+    handleClickThirdParty,
   } = useSignin();
   const theme = useTheme();
 
@@ -92,22 +95,22 @@ const Signin: React.FC = () => {
             <S.SigninIconBox>
               <FaGoogle
                 onClick={() => {
-                  signinWithThirdParty('google');
+                  handleClickThirdParty('google');
                 }}
               />
               <FaXTwitter
                 onClick={() => {
-                  signinWithThirdParty('x');
+                  handleClickThirdParty('x');
                 }}
               />
               <FaFacebook
                 onClick={() => {
-                  signinWithThirdParty('facebook');
+                  handleClickThirdParty('facebook');
                 }}
               />
               <FaGithub
                 onClick={() => {
-                  signinWithThirdParty('github');
+                  handleClickThirdParty('github');
                 }}
               />
             </S.SigninIconBox>

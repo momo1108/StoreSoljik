@@ -10,6 +10,10 @@ import { FirebaseError } from 'firebase/app';
 import { MouseEventHandler } from 'react';
 import { toast } from 'sonner';
 import { SigninFormDataType } from '@/types/FormType';
+import {
+  signinWithThirdParty,
+  ThirdPartyProvider,
+} from '@/utils/firebaseUtils';
 
 const useSignin = () => {
   const navigate = useNavigate();
@@ -60,6 +64,20 @@ const useSignin = () => {
 
   const registerMaintainCheckbox = register('isMaintainChecked');
 
+  const handleClickThirdParty = (thirdParty: ThirdPartyProvider) => {
+    toast.promise(signinWithThirdParty(thirdParty), {
+      loading: '로그인 요청을 처리중입니다...',
+      success: '로그인이 완료됐습니다.',
+      error: (error) => {
+        console.dir(error);
+        if (error.code === 'auth/account-exists-with-different-credential') {
+          return `이미 다른 로그인 방식으로 가입된 이메일(${error.customData.email})입니다. 같은 이메일을 사용중인 다른 방식으로 시도해주세요.`;
+        }
+        return `로그인이 실패하였습니다. 다시 시도해주세요. [${error.message}]`;
+      },
+    });
+  };
+
   return {
     redirectToSignup,
     handleSubmit,
@@ -69,6 +87,7 @@ const useSignin = () => {
     registerEmail,
     registerPassword,
     registerMaintainCheckbox,
+    handleClickThirdParty,
   };
 };
 
