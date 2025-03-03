@@ -2,7 +2,6 @@ import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import {
   browserLocalPersistence,
-  browserSessionPersistence,
   signInWithEmailAndPassword,
 } from 'firebase/auth';
 import { auth } from '@/firebase';
@@ -30,13 +29,19 @@ const useSignin = () => {
 
   const submitLogic: SubmitHandler<SigninFormDataType> = async (data) => {
     try {
-      if (data.isMaintainChecked) {
-        await auth.setPersistence(browserLocalPersistence);
-      } else {
-        await auth.setPersistence(browserSessionPersistence);
-      }
-
-      await signInWithEmailAndPassword(auth, data.email, data.password);
+      await auth.setPersistence(browserLocalPersistence);
+      // 직접 로그인한 경우 로컬스토리지에 세션 유지 여부 정보를 저장한다.
+      // 이후에 만약 로그인된 상태에서 새로운 창으로 페이지에 접근하면 로컬스토리지에 저장된 정보를 보고 참조가 가능하다.
+      // 관련 메서드들을 세션 유틸로 분리?
+      const credential = await signInWithEmailAndPassword(
+        auth,
+        data.email,
+        data.password,
+      );
+      localStorage.setItem(
+        credential.user.uid,
+        data.isMaintainChecked ? 'maintain' : '',
+      );
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {
         if (error.code === 'auth/invalid-credential') {

@@ -5,7 +5,6 @@ import {
   GoogleAuthProvider,
   signInWithPopup,
   TwitterAuthProvider,
-  updateProfile,
 } from 'firebase/auth';
 import {
   collection,
@@ -15,7 +14,6 @@ import {
   Query,
   QueryConstraint,
 } from 'firebase/firestore';
-import { toast } from 'sonner';
 
 /**
  * Firestore 에 여러 조건을 적용한 쿼리를 생성하는 함수

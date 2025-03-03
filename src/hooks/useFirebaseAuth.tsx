@@ -5,16 +5,20 @@ import {
   createContext,
   ReactNode,
   useRef,
+  useCallback,
 } from 'react';
 import { auth } from '@/firebase';
 import {
+  Unsubscribe,
   User,
   onAuthStateChanged,
+  onIdTokenChanged,
   signOut,
   updateProfile,
 } from 'firebase/auth';
 import { DocumentData } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 
 type AccountType = '구매자' | '판매자';
 
@@ -65,13 +69,24 @@ export const useFirebaseAuth = () => {
 const useProvideAuth = () => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [loading, setLoading] = useState(true);
-  const isSignedIn = useRef<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
+  const unsubscribeAuthState = useRef<Unsubscribe | null>(null);
+  const unsubscribeIdToken = useRef<Unsubscribe | null>(null);
 
   const logout = () => {
     if (confirm('로그아웃 하시겠습니까?')) {
+      if (auth.currentUser) localStorage.removeItem(auth.currentUser.uid);
       signOut(auth);
-      isSignedIn.current = false;
+      setUserInfo(null);
+
+      if (unsubscribeAuthState.current) {
+        unsubscribeAuthState.current();
+        unsubscribeAuthState.current = null;
+      }
+      if (unsubscribeIdToken.current) {
+        unsubscribeIdToken.current();
+        unsubscribeIdToken.current = null;
+      }
     }
   };
 
@@ -81,6 +96,8 @@ const useProvideAuth = () => {
      * 깃헙과 구글에 같은 이메일 계정을 사용하는 경우, 깃헙으로 가입을 해도 구글 로그인을 시도하면 구글 계정으로 변환되는 이슈를 확인
      */
     if (user) {
+      const tokenResult = await user.getIdTokenResult();
+      console.dir(tokenResult);
       if (!user.displayName) {
         let providerData = user.providerData[0];
         await updateProfile(user, {
@@ -93,11 +110,10 @@ const useProvideAuth = () => {
       const userInfo = formatUser(user, 'User');
       setLoading(false);
       setUserInfo(userInfo);
-      isSignedIn.current = true;
       if (location.pathname === '/signup' || location.pathname === '/signin') {
         navigate('/');
       }
-    } else if (!isSignedIn.current) {
+    } else {
       setLoading(false);
       setUserInfo(null);
       if (!['/signin', '/signup', '/setting'].includes(location.pathname)) {
@@ -107,9 +123,18 @@ const useProvideAuth = () => {
   };
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, handleUser);
+    unsubscribeAuthState.current = onAuthStateChanged(auth, handleUser);
 
-    return () => unsubscribe();
+    return () => {
+      if (unsubscribeAuthState.current) {
+        unsubscribeAuthState.current();
+        unsubscribeAuthState.current = null;
+      }
+      if (unsubscribeIdToken.current) {
+        unsubscribeIdToken.current();
+        unsubscribeIdToken.current = null;
+      }
+    };
   }, []);
 
   return {
