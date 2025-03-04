@@ -12,7 +12,6 @@ import {
   Unsubscribe,
   User,
   onAuthStateChanged,
-  onIdTokenChanged,
   signOut,
   updateProfile,
 } from 'firebase/auth';
@@ -21,6 +20,9 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 
 type AccountType = '구매자' | '판매자';
+
+const SESSION_INTERVAL = 1 * 60 * 1000; // 3시간 뒤 체크
+const SESSION_OFFSET = 30 * 1000; // 5분 뒤까지 유지
 
 export interface UserInfo {
   uid: string;
@@ -71,23 +73,88 @@ const useProvideAuth = () => {
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const unsubscribeAuthState = useRef<Unsubscribe | null>(null);
-  const unsubscribeIdToken = useRef<Unsubscribe | null>(null);
+  const sessionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  const setSessionTimer = useCallback(
+    (
+      uid: string,
+      timestamp: number = SESSION_INTERVAL,
+      isSettingLocalStorage: boolean = false,
+    ) => {
+      // 기존 타이머 클리어
+      if (sessionTimeoutRef.current) clearTimeout(sessionTimeoutRef.current);
+      // 3시간 후 자동 로그아웃
+      sessionTimeoutRef.current = setTimeout(() => {
+        confirmSessionKeepAlive(uid);
+      }, timestamp);
+      if (isSettingLocalStorage)
+        localStorage.setItem(
+          `sessionTimestamp:${uid}`,
+          (Date.now() + SESSION_INTERVAL + SESSION_OFFSET).toString(),
+        );
+    },
+    [],
+  );
+
+  /** ✅ 세션 유지 여부를 묻고, 동기화하는 함수 */
+  const confirmSessionKeepAlive = (uid: string) => {
+    console.log('⚠️ 세션 유지 여부 확인');
+    if (document.hasFocus())
+      toast('로그인 상태를 유지하시겠습니까?', {
+        description:
+          '이 알림은 로그인 시 "로그인 유지" 를 체크하지 않은 경우 3시간 간격으로 출력되며, 응답이 없을 시 자동으로 로그아웃됩니다.',
+        action: {
+          label: '유지',
+          onClick: () => setSessionTimer(uid),
+        },
+        onAutoClose: () => logout(),
+        duration: 15000,
+        closeButton: false,
+      });
+  };
+
+  /** 웹브라우저 윈도우 별 초기 타이머 설정 메서드
+   * 접속 시 유저 정보가 있으며, localstorage 에 세션 유지 기간 정보가
+   * - 존재한다 : 세션 유지 기간이
+   *    - 남아있다 : 최근(3시간 이내)에 다른 창이 켜져있었다는 뜻이므로, 해당 시간에 맞춰 세션 연장 알림 타이머를 설정한다
+   *    - 남아있지 않다 : 지금으로부터 3시간 뒤를 새로운 세션 유지 기간으로 설정하고, 타이머를 설정한다.
+   * - 존재하지 않는다 : 지금으로부터 3시간 뒤를 새로운 세션 유지 기간으로 설정하고, 타이머를 설정한다.
+   */
+  const startSessionTimer = (uid: string) => {
+    const storedTimestamp = localStorage.getItem(`sessionTimestamp:${uid}`);
+    const remainTimestamp = storedTimestamp
+      ? parseInt(storedTimestamp) - Date.now()
+      : 0;
+
+    setSessionTimer(
+      uid,
+      remainTimestamp > 0 ? remainTimestamp : SESSION_INTERVAL,
+      true,
+    );
+  };
+
+  const handleStorageChange = (event: StorageEvent) => {
+    console.log(event);
+    const uid = auth.currentUser!.uid;
+    if (event.key === `sessionTimestamp:${uid}`) {
+      console.log('🔄 다른 창에서 세션 유지 선택됨 → 3시간 타이머 재시작');
+      setSessionTimer(uid);
+    }
+  };
 
   const logout = () => {
-    if (confirm('로그아웃 하시겠습니까?')) {
-      if (auth.currentUser) localStorage.removeItem(auth.currentUser.uid);
-      signOut(auth);
-      setUserInfo(null);
-
-      if (unsubscribeAuthState.current) {
-        unsubscribeAuthState.current();
-        unsubscribeAuthState.current = null;
-      }
-      if (unsubscribeIdToken.current) {
-        unsubscribeIdToken.current();
-        unsubscribeIdToken.current = null;
-      }
+    localStorage.removeItem(`sessionTimestamp:${auth.currentUser!.uid}`);
+    signOut(auth);
+    setUserInfo(null);
+    if (unsubscribeAuthState.current) {
+      unsubscribeAuthState.current();
+      unsubscribeAuthState.current = null;
     }
+    if (sessionTimeoutRef.current) {
+      clearTimeout(sessionTimeoutRef.current);
+      sessionTimeoutRef.current = null;
+    }
+    window.removeEventListener('storage', handleStorageChange);
   };
 
   const handleUser = async (user: User | null) => {
@@ -96,8 +163,6 @@ const useProvideAuth = () => {
      * 깃헙과 구글에 같은 이메일 계정을 사용하는 경우, 깃헙으로 가입을 해도 구글 로그인을 시도하면 구글 계정으로 변환되는 이슈를 확인
      */
     if (user) {
-      const tokenResult = await user.getIdTokenResult();
-      console.dir(tokenResult);
       if (!user.displayName) {
         let providerData = user.providerData[0];
         await updateProfile(user, {
@@ -110,6 +175,10 @@ const useProvideAuth = () => {
       const userInfo = formatUser(user, 'User');
       setLoading(false);
       setUserInfo(userInfo);
+
+      startSessionTimer(userInfo.uid);
+      window.addEventListener('storage', handleStorageChange);
+
       if (location.pathname === '/signup' || location.pathname === '/signin') {
         navigate('/');
       }
@@ -130,10 +199,11 @@ const useProvideAuth = () => {
         unsubscribeAuthState.current();
         unsubscribeAuthState.current = null;
       }
-      if (unsubscribeIdToken.current) {
-        unsubscribeIdToken.current();
-        unsubscribeIdToken.current = null;
+      if (sessionTimeoutRef.current) {
+        clearTimeout(sessionTimeoutRef.current);
+        sessionTimeoutRef.current = null;
       }
+      window.removeEventListener('storage', handleStorageChange);
     };
   }, []);
 

@@ -39,7 +39,13 @@ const HeaderContentForBuyer: React.FC = () => {
               <S.LengthSpan>{items.length}</S.LengthSpan>
             </S.CartButton>
           )}
-          <S.SignoutButton onClick={logout}>로그아웃</S.SignoutButton>
+          <S.SignoutButton
+            onClick={() => {
+              if (confirm('로그아웃 하시겠습니까?')) logout();
+            }}
+          >
+            로그아웃
+          </S.SignoutButton>
         </S.HeaderMenuBox>
       </S.HeaderTopBox>
     </>

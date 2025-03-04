@@ -26,7 +26,13 @@ const HeaderContentForSeller: React.FC = () => {
           />
         </S.HeaderNavBox>
         <S.HeaderMenuBox>
-          <S.SignoutButton onClick={logout}>로그아웃</S.SignoutButton>
+          <S.SignoutButton
+            onClick={() => {
+              if (confirm('로그아웃 하시겠습니까?')) logout();
+            }}
+          >
+            로그아웃
+          </S.SignoutButton>
         </S.HeaderMenuBox>
       </S.HeaderTopBox>
     </>
