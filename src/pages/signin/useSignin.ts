@@ -13,6 +13,7 @@ import {
   signinWithThirdParty,
   ThirdPartyProvider,
 } from '@/utils/firebaseUtils';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 
 const useSignin = () => {
   const navigate = useNavigate();
@@ -26,6 +27,8 @@ const useSignin = () => {
     handleSubmit,
     formState: { isSubmitting, errors },
   } = useForm<SigninFormDataType>();
+
+  const { authChannel } = useFirebaseAuth();
 
   const submitLogic: SubmitHandler<SigninFormDataType> = async (data) => {
     try {
@@ -42,6 +45,11 @@ const useSignin = () => {
         credential.user.uid,
         data.isMaintainChecked ? 'maintain' : '',
       );
+      console.dir(credential.user);
+      authChannel!.postMessage({
+        type: 'LOGIN',
+        user: JSON.stringify(credential.user),
+      });
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {
         if (error.code === 'auth/invalid-credential') {
