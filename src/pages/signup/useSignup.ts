@@ -29,12 +29,11 @@ const useSignup = () => {
       createUserWithEmailAndPassword(auth, data.email, data.password),
       {
         loading: '회원가입입 요청을 처리중입니다...',
-        success: async (credential) => {
+        success: () => {
           authChannel!.postMessage({
             type: 'LOGIN',
-            user: JSON.stringify(credential.user),
           });
-          return '회원가입입이 완료됐습니다.';
+          return '회원가입이 완료됐습니다.';
         },
         error: async (error) => {
           console.error(error);

@@ -41,14 +41,13 @@ const useSignin = () => {
         data.email,
         data.password,
       );
-      localStorage.setItem(
-        credential.user.uid,
-        data.isMaintainChecked ? 'maintain' : '',
-      );
-      console.dir(credential.user);
+      console.log(credential);
+      // localStorage.setItem(
+      //   credential.user.uid,
+      //   data.isMaintainChecked ? 'maintain' : '',
+      // );
       authChannel!.postMessage({
         type: 'LOGIN',
-        user: JSON.stringify(credential.user),
       });
     } catch (error: unknown) {
       if (error instanceof FirebaseError) {

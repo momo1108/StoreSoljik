@@ -1,5 +1,5 @@
 import { auth } from '@/firebase';
-import { onIdTokenChanged, signOut } from 'firebase/auth';
+import { onIdTokenChanged } from 'firebase/auth';
 
 export const setSessionMaintenance = (
   key: string,

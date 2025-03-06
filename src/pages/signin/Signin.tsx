@@ -10,9 +10,6 @@ import HR from '@/components/ui/hr/HR';
 import { useTheme } from 'styled-components';
 import { FaFacebook, FaGithub, FaGoogle } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
-import { signinWithThirdParty } from '@/utils/firebaseUtils';
-import { useNavigate } from 'react-router-dom';
-import { toast } from 'sonner';
 
 const Signin: React.FC = () => {
   const {

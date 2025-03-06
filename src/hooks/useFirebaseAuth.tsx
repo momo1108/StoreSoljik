@@ -11,6 +11,7 @@ import { auth } from '@/firebase';
 import {
   User,
   onAuthStateChanged,
+  reload,
   signOut,
   updateProfile,
 } from 'firebase/auth';
@@ -22,6 +23,7 @@ type AccountType = '구매자' | '판매자';
 
 const SESSION_INTERVAL = 1 * 60 * 1000; // 3시간 뒤 체크
 const SESSION_WARNING_OFFSET = 30 * 1000; // 5분 뒤까지 유지
+const SESSION_WARNING_DURATION = 15 * 1000; // 5분 뒤까지 유지
 
 export interface UserInfo {
   uid: string;
@@ -75,6 +77,17 @@ const useProvideAuth = () => {
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  /**
+   * 로그인 페이지를 여러탭에서 동시에 켜놓는 경우, 로그인한 탭이 로그인 후 다시 로그인페이지로 이동되는 이슈를 발견(하나의 탭만 사용하면 문제없음)
+   * 로그인한 탭에서 onAuthStateChanged 의 옵저버 메서드가 로그인된 user 객체로 실행된 후 null 객체로 다시 실행되는 것이 원인이라고 판단
+   * 다른 탭에서는 user 객체로만 옵저버 메서드가 실행됨
+   * 로그인 시에만 옵저버 메서드에 null 객체가 잘못전달되는것을 감지하기 위해 로그인, 로그아웃 시에만 변경할 isSignedIn 플래그를 사용한다
+   * state 는 비동기 업데이트이므로 useRef 를 사용해 동기 업데이트가 되도록 한다
+   * 옵저버 메서드에서 isSignedIn 플래그가 true 이면 null 객체가 와도 로그인된 상태로 판단하고 페이지를 이동하지 않도록 조치
+   * 이 플래그로 인해 로그아웃 시 다른 탭들이 자동으로 로그인페이지로 리다이렉트가 안됨. (직접 네비게이트 혹은 리로드?)
+   */
+  const isSignedIn = useRef<boolean>(false);
+  const userString = useRef<string>('');
   const sessionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const sessionAlarmRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -123,18 +136,16 @@ const useProvideAuth = () => {
    */
   const confirmSessionKeepAlive = (uid: string) => {
     console.log('⚠️ 세션 유지 여부 확인');
-    if (document.hasFocus())
-      toast('로그인 상태를 유지하시겠습니까?', {
-        description:
-          '이 알림은 로그인 시 "로그인 유지" 를 체크하지 않은 경우 3시간 간격으로 출력되며, 응답이 없을 시 자동으로 로그아웃됩니다.',
-        action: {
-          label: '유지',
-          onClick: () => setSessionTimer({ uid, isSettingLocalStorage: true }),
-        },
-        onAutoClose: () => logout(),
-        duration: 10 * 1000,
-        closeButton: false,
-      });
+    toast('로그인 상태를 유지하시겠습니까?', {
+      description:
+        '이 알림은 로그인 시 "로그인 유지" 를 체크하지 않은 경우 3시간 간격으로 출력되며, 응답이 없을 시 자동으로 로그아웃됩니다.',
+      action: {
+        label: '유지',
+        onClick: () => setSessionTimer({ uid, isSettingLocalStorage: true }),
+      },
+      duration: SESSION_WARNING_DURATION,
+      closeButton: false,
+    });
   };
 
   /** 웹브라우저 윈도우 별 초기 타이머 설정 메서드
@@ -159,7 +170,7 @@ const useProvideAuth = () => {
   };
 
   const handleStorageChange = (event: StorageEvent) => {
-    console.log(event);
+    // console.log(event);
     const uid = auth.currentUser!.uid;
     if (event.key === `sessionTimestamp:${uid}`) {
       console.log('🔄 다른 창에서 세션 유지 선택됨 → 3시간 타이머 재시작');
@@ -168,9 +179,8 @@ const useProvideAuth = () => {
   };
 
   const logout = () => {
+    window.removeEventListener('storage', handleStorageChange);
     localStorage.removeItem(`sessionTimestamp:${auth.currentUser!.uid}`);
-    signOut(auth);
-    setUserInfo(null);
     if (sessionTimeoutRef.current) {
       clearTimeout(sessionTimeoutRef.current);
       sessionTimeoutRef.current = null;
@@ -179,7 +189,11 @@ const useProvideAuth = () => {
       clearTimeout(sessionAlarmRef.current);
       sessionAlarmRef.current = null;
     }
-    window.removeEventListener('storage', handleStorageChange);
+    userString.current = '';
+    isSignedIn.current = false;
+    setUserInfo(null);
+    authChannel.postMessage({ type: 'LOGOUT' });
+    signOut(auth);
   };
 
   const handleUser = async (user: User | null) => {
@@ -198,6 +212,8 @@ const useProvideAuth = () => {
             `${providerData.uid}@${providerData.providerId}`,
         });
       }
+      isSignedIn.current = true;
+      userString.current = JSON.stringify(user);
       const userInfo = formatUser(user, 'User');
       setLoading(false);
       setUserInfo(userInfo);
@@ -210,23 +226,29 @@ const useProvideAuth = () => {
       }
     } else {
       setLoading(false);
-      setUserInfo(null);
-      if (!['/signin', '/signup', '/setting'].includes(location.pathname)) {
-        navigate('/signin');
+      if (!isSignedIn.current) {
+        if (!['/signin', '/signup'].includes(location.pathname)) {
+          navigate('/signin');
+        }
+      } else {
+        reload(JSON.parse(userString.current));
       }
     }
   };
 
   useEffect(() => {
     console.log('firebaseauth useeffect start');
-    authChannel = new BroadcastChannel('auth');
+    authChannel = new BroadcastChannel('auth'); // 개발 환경에서는 다시 초기화해야 정상 동작함
     const unsubscribeAuthChange = onAuthStateChanged(auth, handleUser);
 
     authChannel.onmessage = (event) => {
       console.log(event);
       if (event.data.type === 'LOGIN') {
-        console.log('🔄 다른 탭에서 로그인 감지:', event.data.user);
+        console.log('🔄 다른 탭에서 로그인 감지');
         if (!auth?.currentUser) location.reload();
+      } else if (event.data.type === 'LOGOUT') {
+        console.log('🔄 다른 탭에서 로그아웃 감지');
+        logout();
       }
     };
 
