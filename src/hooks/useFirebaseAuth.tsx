@@ -6,12 +6,13 @@ import {
   ReactNode,
   useRef,
   useCallback,
+  MutableRefObject,
 } from 'react';
 import { auth } from '@/firebase';
 import {
   User,
   onAuthStateChanged,
-  reload,
+  signInWithEmailAndPassword,
   signOut,
   updateProfile,
 } from 'firebase/auth';
@@ -32,15 +33,22 @@ export interface UserInfo {
   nickname: string;
 }
 
+type LoginInfo = {
+  email: string;
+  password: string;
+  isMaintainingSession: boolean;
+};
+
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
 interface AuthContextProps {
   userInfo: UserInfo | null;
   loading: boolean;
   logout: () => void;
   authChannel: BroadcastChannel | null;
-}
-
-interface AuthProviderProps {
-  children: ReactNode;
+  loginInfoRef: MutableRefObject<LoginInfo>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
@@ -48,6 +56,13 @@ const AuthContext = createContext<AuthContextProps>({
   loading: true,
   logout: () => {},
   authChannel: null,
+  loginInfoRef: {
+    current: {
+      email: '',
+      password: '',
+      isMaintainingSession: false,
+    },
+  },
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -86,8 +101,12 @@ const useProvideAuth = () => {
    * 옵저버 메서드에서 isSignedIn 플래그가 true 이면 null 객체가 와도 로그인된 상태로 판단하고 페이지를 이동하지 않도록 조치
    * 이 플래그로 인해 로그아웃 시 다른 탭들이 자동으로 로그인페이지로 리다이렉트가 안됨. (직접 네비게이트 혹은 리로드?)
    */
-  const isSignedIn = useRef<boolean>(false);
-  const userString = useRef<string>('');
+  const isSignedInRef = useRef<boolean>(false);
+  const loginInfoRef = useRef<LoginInfo>({
+    email: '',
+    password: '',
+    isMaintainingSession: false,
+  });
   const sessionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const sessionAlarmRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -156,6 +175,7 @@ const useProvideAuth = () => {
    * - 존재하지 않는다 : 지금으로부터 3시간 뒤를 새로운 세션 유지 기간으로 설정하고, 타이머를 설정한다.
    */
   const startSessionTimer = (uid: string) => {
+    console.log('start timer');
     const storedTimestamp = parseInt(
       localStorage.getItem(`sessionTimestamp:${uid}`) || '0',
     );
@@ -189,8 +209,7 @@ const useProvideAuth = () => {
       clearTimeout(sessionAlarmRef.current);
       sessionAlarmRef.current = null;
     }
-    userString.current = '';
-    isSignedIn.current = false;
+    isSignedInRef.current = false;
     setUserInfo(null);
     authChannel.postMessage({ type: 'LOGOUT' });
     signOut(auth);
@@ -212,13 +231,18 @@ const useProvideAuth = () => {
             `${providerData.uid}@${providerData.providerId}`,
         });
       }
-      isSignedIn.current = true;
-      userString.current = JSON.stringify(user);
+
       const userInfo = formatUser(user, 'User');
+      if (
+        !loginInfoRef.current.isMaintainingSession &&
+        !isSignedInRef.current
+      ) {
+        startSessionTimer(userInfo.uid);
+      }
+      isSignedInRef.current = true;
       setLoading(false);
       setUserInfo(userInfo);
 
-      startSessionTimer(userInfo.uid);
       window.addEventListener('storage', handleStorageChange);
 
       if (location.pathname === '/signup' || location.pathname === '/signin') {
@@ -226,26 +250,36 @@ const useProvideAuth = () => {
       }
     } else {
       setLoading(false);
-      if (!isSignedIn.current) {
+      if (!isSignedInRef.current) {
         if (!['/signin', '/signup'].includes(location.pathname)) {
           navigate('/signin');
         }
       } else {
-        reload(JSON.parse(userString.current));
+        signInWithEmailAndPassword(
+          auth,
+          loginInfoRef.current.email,
+          loginInfoRef.current.password,
+        );
       }
     }
   };
 
   useEffect(() => {
     console.log('firebaseauth useeffect start');
+    const isMaintaingSession = localStorage.getItem('soljik_maintain_session');
+    loginInfoRef.current.isMaintainingSession = !!isMaintaingSession;
+    console.log(loginInfoRef.current);
     authChannel = new BroadcastChannel('auth'); // 개발 환경에서는 다시 초기화해야 정상 동작함
     const unsubscribeAuthChange = onAuthStateChanged(auth, handleUser);
 
     authChannel.onmessage = (event) => {
-      console.log(event);
       if (event.data.type === 'LOGIN') {
         console.log('🔄 다른 탭에서 로그인 감지');
-        if (!auth?.currentUser) location.reload();
+        if (
+          !auth?.currentUser &&
+          ['/signin', '/signup'].includes(location.pathname)
+        )
+          location.reload();
       } else if (event.data.type === 'LOGOUT') {
         console.log('🔄 다른 탭에서 로그아웃 감지');
         logout();
@@ -273,6 +307,7 @@ const useProvideAuth = () => {
     loading,
     logout,
     authChannel,
+    loginInfoRef,
   };
 };
 

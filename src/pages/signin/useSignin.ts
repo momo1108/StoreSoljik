@@ -28,38 +28,42 @@ const useSignin = () => {
     formState: { isSubmitting, errors },
   } = useForm<SigninFormDataType>();
 
-  const { authChannel } = useFirebaseAuth();
+  const { authChannel, loginInfoRef } = useFirebaseAuth();
 
   const submitLogic: SubmitHandler<SigninFormDataType> = async (data) => {
-    try {
-      await auth.setPersistence(browserLocalPersistence);
-      // 직접 로그인한 경우 로컬스토리지에 세션 유지 여부 정보를 저장한다.
-      // 이후에 만약 로그인된 상태에서 새로운 창으로 페이지에 접근하면 로컬스토리지에 저장된 정보를 보고 참조가 가능하다.
-      // 관련 메서드들을 세션 유틸로 분리?
-      const credential = await signInWithEmailAndPassword(
-        auth,
-        data.email,
-        data.password,
-      );
-      console.log(credential);
-      // localStorage.setItem(
-      //   credential.user.uid,
-      //   data.isMaintainChecked ? 'maintain' : '',
-      // );
-      authChannel!.postMessage({
-        type: 'LOGIN',
-      });
-    } catch (error: unknown) {
-      if (error instanceof FirebaseError) {
-        if (error.code === 'auth/invalid-credential') {
-          toast.error('잘못된 ID 혹은 비밀번호입니다.');
+    auth
+      .setPersistence(browserLocalPersistence)
+      .then(() => {
+        // 직접 로그인한 경우 로컬스토리지에 세션 유지 여부 정보를 저장한다.
+        // 이후에 만약 로그인된 상태에서 새로운 창으로 페이지에 접근하면 로컬스토리지에 저장된 정보를 보고 참조가 가능하다.
+        // 관련 메서드들을 세션 유틸로 분리?
+        return signInWithEmailAndPassword(auth, data.email, data.password);
+      })
+      .then((credential) => {
+        localStorage.setItem(
+          'soljik_maintain_session',
+          data.isMaintainChecked ? 'maintain' : '',
+        );
+        loginInfoRef.current = {
+          email: data.email,
+          password: data.password,
+          isMaintainingSession: data.isMaintainChecked,
+        };
+        authChannel!.postMessage({
+          type: 'LOGIN',
+        });
+      })
+      .catch((error: unknown) => {
+        if (error instanceof FirebaseError) {
+          if (error.code === 'auth/invalid-credential') {
+            toast.error('잘못된 ID 혹은 비밀번호입니다.');
+          } else {
+            toast.error(error.message);
+          }
         } else {
-          toast.error(error.message);
+          toast.error((error as Error).message);
         }
-      } else {
-        toast.error((error as Error).message);
-      }
-    }
+      });
   };
 
   const registerEmail = register('email', {
@@ -79,7 +83,12 @@ const useSignin = () => {
   const handleClickThirdParty = (thirdParty: ThirdPartyProvider) => {
     toast.promise(signinWithThirdParty(thirdParty), {
       loading: '로그인 요청을 처리중입니다...',
-      success: '로그인이 완료됐습니다.',
+      success: () => {
+        authChannel!.postMessage({
+          type: 'LOGIN',
+        });
+        return '로그인이 완료됐습니다.';
+      },
       error: (error) => {
         console.dir(error);
         if (error.code === 'auth/account-exists-with-different-credential') {
