@@ -89,6 +89,8 @@ const light = {
   active: '#083ca3',
   darkBlue: '#002369',
   skyBlue: '#237fdb',
+  borderShadow: `rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+  rgba(0, 0, 0, 0.08) 0px 0px 0px 1px`,
 };
 
 const dark = {
@@ -129,6 +131,8 @@ const dark = {
   active: '#3670e3',
   darkBlue: '#002369',
   skyBlue: '#237fdb',
+  borderShadow: `rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
+  rgba(0, 0, 0, 0.08) 0px 0px 0px 1px`,
 };
 
 const theme = {

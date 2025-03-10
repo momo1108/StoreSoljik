@@ -14,7 +14,7 @@ import {
 } from '@tanstack/react-query';
 import { FirestoreError, orderBy, where } from 'firebase/firestore';
 import { StorageError } from 'firebase/storage';
-import { MouseEventHandler, useEffect, useState } from 'react';
+import { MouseEventHandler, useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -57,6 +57,18 @@ const useItems = () => {
           ? lastPage.documentArray[pageSize]
           : null,
     });
+
+  const registeredData: ProductSchema[] = useMemo(() => {
+    const result: ProductSchema[] = [];
+
+    if (data) {
+      data.pages.forEach((page) => {
+        result.push(...page.dataArray);
+      });
+    }
+
+    return result;
+  }, [data]);
 
   const deleteItemFromDB = async ({
     id,
@@ -188,7 +200,7 @@ const useItems = () => {
   return {
     onClickRegistration,
     ref,
-    data,
+    registeredData,
     status,
     error,
     isFetchingNextPage,

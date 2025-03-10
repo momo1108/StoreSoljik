@@ -7,11 +7,12 @@ import HorizontalCard from '@/components/ui/productcard/horizontal/HorizontalCar
 import useItems from './useItems';
 import Spinner from '@/components/ui/spinner/Spinner';
 import Button from '@/components/ui/button/Button';
+import { BiError } from 'react-icons/bi';
 
 const Items: React.FC = () => {
   const {
     onClickRegistration,
-    data,
+    registeredData,
     error,
     status,
     isFetchingNextPage,
@@ -48,29 +49,32 @@ const Items: React.FC = () => {
                 <S.ErrorBox>
                   {error?.message || '판매 상품을 불러오지 못했습니다.'}
                 </S.ErrorBox>
-              ) : (
-                data?.pages.map((page) => {
-                  return page.dataArray.map((item) => {
-                    return (
-                      <HorizontalCard
-                        data={item}
-                        key={item.id}
-                        handleClickUpdate={() => navigateToUpdate(item)}
-                        handleClickDelete={() => {
-                          if (
-                            confirm(
-                              `"${item.productName}" 상품을 삭제하시겠습니까?`,
-                            )
+              ) : registeredData.length ? (
+                registeredData.map((item) => {
+                  return (
+                    <HorizontalCard
+                      data={item}
+                      key={item.id}
+                      handleClickUpdate={() => navigateToUpdate(item)}
+                      handleClickDelete={() => {
+                        if (
+                          confirm(
+                            `"${item.productName}" 상품을 삭제하시겠습니까?`,
                           )
-                            deleteItem.mutate({
-                              id: item.id,
-                              category: item.productCategory,
-                            });
-                        }}
-                      />
-                    );
-                  });
+                        )
+                          deleteItem.mutate({
+                            id: item.id,
+                            category: item.productCategory,
+                          });
+                      }}
+                    />
+                  );
                 })
+              ) : (
+                <S.EmptyBox>
+                  <BiError size={200} />
+                  등록된 상품이 없습니다.
+                </S.EmptyBox>
               )}
               {!isLoading && isFetchingNextPage && (
                 <S.SpinnerBox>

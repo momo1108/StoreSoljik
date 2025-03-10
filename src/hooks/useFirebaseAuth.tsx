@@ -22,8 +22,8 @@ import { toast } from 'sonner';
 
 type AccountType = '구매자' | '판매자';
 
-const SESSION_INTERVAL = 1 * 60 * 1000; // 3시간 뒤 체크
-const SESSION_WARNING_OFFSET = 30 * 1000; // 5분 뒤까지 유지
+const SESSION_INTERVAL = 3 * 60 * 60 * 1000; // 3시간 뒤 체크
+const SESSION_WARNING_OFFSET = 5 * 60 * 1000; // 5분 뒤까지 유지
 const SESSION_WARNING_DURATION = 15 * 1000; // 5분 뒤까지 유지
 
 export interface UserInfo {
@@ -201,6 +201,7 @@ const useProvideAuth = () => {
   const logout = () => {
     window.removeEventListener('storage', handleStorageChange);
     localStorage.removeItem(`sessionTimestamp:${auth.currentUser!.uid}`);
+    localStorage.removeItem('soljik_maintain_session');
     if (sessionTimeoutRef.current) {
       clearTimeout(sessionTimeoutRef.current);
       sessionTimeoutRef.current = null;
@@ -255,6 +256,12 @@ const useProvideAuth = () => {
           navigate('/signin');
         }
       } else {
+        /**
+         * 여러 탭을 동시에 켜고 현재 탭에서 로그인할 시 현재 탭에서만 handleUser 가 두번 실행됨.
+         * 첫번째는 유저 객체, 두번째는 null 이 전달됨.
+         * 현재 유저 객체를 null 로 방치하면 로그아웃 등의 프로세스에 문제가 생기므로 로그인 정보를 재활용해서
+         * 로그인 메서드를 재실행해 현재 유저를 업데이트한다.
+         */
         signInWithEmailAndPassword(
           auth,
           loginInfoRef.current.email,
