@@ -9,18 +9,58 @@ import Spinner from '@/components/ui/spinner/Spinner';
 import Button from '@/components/ui/button/Button';
 import { BiError } from 'react-icons/bi';
 
-const Items: React.FC = () => {
+const ItemsListContentBox: React.FC = () => {
   const {
-    onClickRegistration,
     registeredData,
     error,
     status,
     isFetchingNextPage,
     isLoading,
     ref,
-    navigateToUpdate,
-    deleteItem,
+    handleClickUpdate,
+    handleClickDelete,
   } = useItems();
+  return (
+    <S.ItemsListContentBox>
+      {status === 'pending' ? (
+        <S.SpinnerBox>
+          <Spinner spinnerSize={32}>판매 상품을 불러오는 중입니다.</Spinner>
+        </S.SpinnerBox>
+      ) : status === 'error' ? (
+        <S.ErrorBox>
+          {error?.message || '판매 상품을 불러오지 못했습니다.'}
+        </S.ErrorBox>
+      ) : registeredData.length ? (
+        registeredData.map((item) => {
+          return (
+            <HorizontalCard
+              data={item}
+              key={item.id}
+              handleClickUpdate={() => handleClickUpdate(item)}
+              handleClickDelete={() => handleClickDelete(item)}
+            />
+          );
+        })
+      ) : (
+        <S.EmptyBox>
+          <BiError size={200} />
+          등록된 상품이 없습니다.
+        </S.EmptyBox>
+      )}
+      {!isLoading && isFetchingNextPage && (
+        <S.SpinnerBox>
+          <Spinner spinnerSize={32}>
+            다음 판매 상품들을 불러오는 중입니다.
+          </Spinner>
+        </S.SpinnerBox>
+      )}
+      <S.InViewDiv ref={ref}></S.InViewDiv>
+    </S.ItemsListContentBox>
+  );
+};
+
+const Items: React.FC = () => {
+  const { handleClickRegistration } = useItems();
   return (
     <>
       <Header userType={'seller'}></Header>
@@ -34,57 +74,11 @@ const Items: React.FC = () => {
           <S.ItemsListContainer>
             <S.ItemsListHeader>
               <H4>등록된 상품들</H4>
-              <Button styleType='primary' onClick={onClickRegistration}>
+              <Button styleType='primary' onClick={handleClickRegistration}>
                 판매 상품 등록
               </Button>
             </S.ItemsListHeader>
-            <S.ItemsListContentBox>
-              {status === 'pending' ? (
-                <S.SpinnerBox>
-                  <Spinner spinnerSize={32}>
-                    판매 상품을 불러오는 중입니다.
-                  </Spinner>
-                </S.SpinnerBox>
-              ) : status === 'error' ? (
-                <S.ErrorBox>
-                  {error?.message || '판매 상품을 불러오지 못했습니다.'}
-                </S.ErrorBox>
-              ) : registeredData.length ? (
-                registeredData.map((item) => {
-                  return (
-                    <HorizontalCard
-                      data={item}
-                      key={item.id}
-                      handleClickUpdate={() => navigateToUpdate(item)}
-                      handleClickDelete={() => {
-                        if (
-                          confirm(
-                            `"${item.productName}" 상품을 삭제하시겠습니까?`,
-                          )
-                        )
-                          deleteItem.mutate({
-                            id: item.id,
-                            category: item.productCategory,
-                          });
-                      }}
-                    />
-                  );
-                })
-              ) : (
-                <S.EmptyBox>
-                  <BiError size={200} />
-                  등록된 상품이 없습니다.
-                </S.EmptyBox>
-              )}
-              {!isLoading && isFetchingNextPage && (
-                <S.SpinnerBox>
-                  <Spinner spinnerSize={32}>
-                    다음 판매 상품들을 불러오는 중입니다.
-                  </Spinner>
-                </S.SpinnerBox>
-              )}
-              <S.InViewDiv ref={ref}></S.InViewDiv>
-            </S.ItemsListContentBox>
+            <ItemsListContentBox />
           </S.ItemsListContainer>
         </S.ItemsContainer>
       </Main>

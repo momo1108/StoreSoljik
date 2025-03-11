@@ -24,14 +24,13 @@ import { toast } from 'sonner';
 type DateOrderDataEntries = Array<[string, Array<[string, OrderSchema[]]>]>;
 type OrderStatusCountMap = Record<KoreanOrderStatus, number>;
 
-const useHistory = () => {
+const useStatusCountMap = () => {
   const { userInfo } = useFirebaseAuth();
-  const queryClient = useQueryClient();
 
   /**
    * 화면 상단의 주문 현황을 위한 코드
    */
-  const { data: allOrderData, status: allOrderStatus } = useQuery({
+  const { data: allOrderData } = useQuery({
     queryKey: ['orders', 'buyer', 'All'],
     queryFn: async () => {
       return await fetchOrders({
@@ -62,6 +61,13 @@ const useHistory = () => {
 
     return orderStatusCountMap;
   }, [allOrderData]);
+
+  return orderStatusCountMap;
+};
+
+const useHistory = () => {
+  const { userInfo } = useFirebaseAuth();
+  const queryClient = useQueryClient();
 
   /**
    * 구매 내역 목록 관련 코드
@@ -192,9 +198,7 @@ const useHistory = () => {
   };
 
   return {
-    allOrderStatus,
     dateOrderDataEntries,
-    orderStatusCountMap,
     orderStatusForList,
     setOrderStatusForList,
     orderStatusMapKrToEn,
@@ -205,4 +209,4 @@ const useHistory = () => {
   };
 };
 
-export default useHistory;
+export { useHistory, useStatusCountMap };

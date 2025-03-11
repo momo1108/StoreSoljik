@@ -15,9 +15,7 @@ export const FormContainer = styled.div`
   flex-grow: 1;
   display: flex;
   flex-direction: column;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
 `;
 
 export const ContainerHeaderBox = styled.div`
@@ -61,9 +59,7 @@ export const CartContainer = styled.div`
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
 `;
 
 export const ContentBox = styled.div`

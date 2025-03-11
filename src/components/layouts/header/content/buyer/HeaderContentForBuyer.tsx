@@ -13,42 +13,41 @@ const HeaderContentForBuyer: React.FC = () => {
   const { items } = useCartItems();
 
   return (
-    <>
-      <S.HeaderTopBox>
-        <HeaderLogoBox
-          isPointer={true}
+    <S.HeaderTopBox>
+      <HeaderLogoBox
+        isPointer={true}
+        onClick={() => {
+          navigate('/');
+        }}
+      ></HeaderLogoBox>
+      <S.HeaderNavBox>
+        <S.HeaderNavBar
+          navData={[
+            { name: '홈페이지', path: '/' },
+            { name: '카테고리별 상품', path: '/category' },
+            { name: '구매내역', path: '/history' },
+          ]}
+        />
+      </S.HeaderNavBox>
+      <S.HeaderMenuBox>
+        {location.pathname === '/purchase' ? (
+          <></>
+        ) : (
+          <S.CartButton onClick={toggleCart}>
+            <HiShoppingCart size={30} />
+            <S.LengthSpan>{items.length}</S.LengthSpan>
+          </S.CartButton>
+        )}
+        <S.SellerPageLink to={'/items'}>판매자 페이지</S.SellerPageLink>
+        <S.SignoutButton
           onClick={() => {
-            navigate('/');
+            if (confirm('로그아웃 하시겠습니까?')) logout();
           }}
-        ></HeaderLogoBox>
-        <S.HeaderNavBox>
-          <S.HeaderNavBar
-            navData={[
-              { name: '홈페이지', path: '/' },
-              { name: '카테고리별 상품', path: '/category' },
-              { name: '구매내역', path: '/history' },
-            ]}
-          />
-        </S.HeaderNavBox>
-        <S.HeaderMenuBox>
-          {location.pathname === '/purchase' ? (
-            <></>
-          ) : (
-            <S.CartButton onClick={toggleCart}>
-              <HiShoppingCart size={30} />
-              <S.LengthSpan>{items.length}</S.LengthSpan>
-            </S.CartButton>
-          )}
-          <S.SignoutButton
-            onClick={() => {
-              if (confirm('로그아웃 하시겠습니까?')) logout();
-            }}
-          >
-            로그아웃
-          </S.SignoutButton>
-        </S.HeaderMenuBox>
-      </S.HeaderTopBox>
-    </>
+        >
+          로그아웃
+        </S.SignoutButton>
+      </S.HeaderMenuBox>
+    </S.HeaderTopBox>
   );
 };
 

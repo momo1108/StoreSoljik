@@ -69,9 +69,7 @@ export const SigninIconBox = styled.div`
 
     &:hover {
       fill: ${(props) => props.theme.color.primaryHover};
-      box-shadow:
-        rgba(0, 0, 0, 0.03) 0px 6px 24px 0px,
-        rgba(0, 0, 0, 0.06) 0px 0px 0px 1px;
+      box-shadow: ${(props) => props.theme.color.borderShadow};
     }
   }
 `;

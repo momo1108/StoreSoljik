@@ -14,7 +14,13 @@ import {
 } from '@tanstack/react-query';
 import { FirestoreError, orderBy, where } from 'firebase/firestore';
 import { StorageError } from 'firebase/storage';
-import { MouseEventHandler, useEffect, useMemo, useState } from 'react';
+import {
+  MouseEventHandler,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from 'react';
 import { useInView } from 'react-intersection-observer';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
@@ -26,13 +32,8 @@ const useItems = () => {
 
   // console.log(userInfo);
 
-  const onClickRegistration: MouseEventHandler<HTMLButtonElement> = () =>
+  const handleClickRegistration: MouseEventHandler<HTMLButtonElement> = () =>
     navigate('/registration');
-
-  const navigateToUpdate = async (data: ProductSchema) => {
-    const copiedData = JSON.parse(JSON.stringify(data));
-    navigate('/update', { state: { data: copiedData } });
-  };
 
   const [pageSize] = useState<number>(10);
   const queryFnWrapper: ({
@@ -110,7 +111,7 @@ const useItems = () => {
       const copiedPreviousData = JSON.parse(JSON.stringify(previousData));
 
       // Optimistic Update: 아이템을 미리 제거합니다.
-      const result = queryClient.setQueryData(
+      queryClient.setQueryData(
         ['products', 'seller'],
         (oldData: {
           pages: FetchInfiniteQueryResult<ProductSchema>[];
@@ -158,9 +159,6 @@ const useItems = () => {
         },
       );
 
-      console.log('optimistic done!');
-      console.log(result);
-
       return { previousData: copiedPreviousData };
     },
     onError: (err, productId, context) => {
@@ -186,6 +184,25 @@ const useItems = () => {
     },
   });
 
+  const handleClickUpdate = useCallback(
+    (product: ProductSchema) => {
+      const copiedProduct = JSON.parse(JSON.stringify(product));
+      navigate('/update', { state: { data: copiedProduct } });
+    },
+    [navigate],
+  );
+
+  const handleClickDelete = useCallback(
+    (product: ProductSchema) => {
+      if (confirm(`"${product.productName}" 상품을 삭제하시겠습니까?`))
+        deleteItem.mutate({
+          id: product.id,
+          category: product.productCategory,
+        });
+    },
+    [deleteItem],
+  );
+
   const { ref, inView } = useInView({
     /* options */
     threshold: 0.5, // 요소가 화면에 50% 이상 보일 때 감지
@@ -198,15 +215,15 @@ const useItems = () => {
   }, [inView, fetchNextPage]);
 
   return {
-    onClickRegistration,
+    handleClickRegistration,
     ref,
     registeredData,
     status,
     error,
     isFetchingNextPage,
     isLoading,
-    navigateToUpdate,
-    deleteItem,
+    handleClickUpdate,
+    handleClickDelete,
   };
 };
 

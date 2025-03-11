@@ -26,6 +26,7 @@ const HeaderContentForSeller: React.FC = () => {
           />
         </S.HeaderNavBox>
         <S.HeaderMenuBox>
+          <S.BuyerPageLink to={'/'}>구매자 페이지</S.BuyerPageLink>
           <S.SignoutButton
             onClick={() => {
               if (confirm('로그아웃 하시겠습니까?')) logout();

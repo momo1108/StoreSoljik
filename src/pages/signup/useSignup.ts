@@ -22,7 +22,7 @@ const useSignup = () => {
     formState: { isSubmitting, errors },
   } = useForm<SignupFormDataType>();
 
-  const { authChannel } = useFirebaseAuth();
+  const { broadcastLogin } = useFirebaseAuth();
 
   const submitLogic: SubmitHandler<SignupFormDataType> = async (data) => {
     toast.promise(
@@ -30,9 +30,7 @@ const useSignup = () => {
       {
         loading: '회원가입입 요청을 처리중입니다...',
         success: () => {
-          authChannel!.postMessage({
-            type: 'LOGIN',
-          });
+          broadcastLogin();
           return '회원가입이 완료됐습니다.';
         },
         error: async (error) => {

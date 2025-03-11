@@ -19,6 +19,7 @@ import {
 import { DocumentData } from 'firebase/firestore';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useQueryClient } from '@tanstack/react-query';
 
 type AccountType = '구매자' | '판매자';
 
@@ -47,7 +48,7 @@ interface AuthContextProps {
   userInfo: UserInfo | null;
   loading: boolean;
   logout: () => void;
-  authChannel: BroadcastChannel | null;
+  broadcastLogin: () => void;
   loginInfoRef: MutableRefObject<LoginInfo>;
 }
 
@@ -55,7 +56,7 @@ const AuthContext = createContext<AuthContextProps>({
   userInfo: null,
   loading: true,
   logout: () => {},
-  authChannel: null,
+  broadcastLogin: () => {},
   loginInfoRef: {
     current: {
       email: '',
@@ -88,6 +89,7 @@ export const useFirebaseAuth = () => {
  * @returns 유저 정보와 세션 로딩 상태
  */
 const useProvideAuth = () => {
+  const queryClient = useQueryClient();
   let authChannel = new BroadcastChannel('auth');
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
@@ -109,6 +111,9 @@ const useProvideAuth = () => {
   });
   const sessionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const sessionAlarmRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Broadcast API 의 윈도우를 구분하기 위한 ID
+  const windowId = useRef<string>(`${Date.now()}_${Math.random()}`);
 
   /**
    * 세션 유지 알람의 "타이머"를 설정한다.
@@ -144,7 +149,7 @@ const useProvideAuth = () => {
       if (isSettingLocalStorage)
         localStorage.setItem(
           `sessionTimestamp:${uid}`,
-          (Date.now() + SESSION_INTERVAL + SESSION_WARNING_OFFSET).toString(),
+          (Date.now() + SESSION_INTERVAL).toString(),
         );
     },
     [],
@@ -199,8 +204,13 @@ const useProvideAuth = () => {
   };
 
   const logout = () => {
+    // 계정에 관련된 캐시들 초기화(items, history)
+    queryClient.clear();
+
+    // 세션 관련 초기화
     window.removeEventListener('storage', handleStorageChange);
-    localStorage.removeItem(`sessionTimestamp:${auth.currentUser!.uid}`);
+    if (auth.currentUser)
+      localStorage.removeItem(`sessionTimestamp:${auth.currentUser.uid}`);
     localStorage.removeItem('soljik_maintain_session');
     if (sessionTimeoutRef.current) {
       clearTimeout(sessionTimeoutRef.current);
@@ -212,7 +222,7 @@ const useProvideAuth = () => {
     }
     isSignedInRef.current = false;
     setUserInfo(null);
-    authChannel.postMessage({ type: 'LOGOUT' });
+    authChannel.postMessage({ type: 'LOGOUT', windowId });
     signOut(auth);
   };
 
@@ -223,6 +233,12 @@ const useProvideAuth = () => {
      * 깃헙과 구글에 같은 이메일 계정을 사용하는 경우, 깃헙으로 가입을 해도 구글 로그인을 시도하면 구글 계정으로 변환되는 이슈를 확인
      */
     if (user) {
+      const expiredDate = localStorage.getItem(`sessionTimestamp:${user.uid}`);
+      if (expiredDate && parseInt(expiredDate) <= Date.now()) {
+        logout();
+        return;
+      }
+
       if (!user.displayName) {
         let providerData = user.providerData[0];
         await updateProfile(user, {
@@ -280,6 +296,11 @@ const useProvideAuth = () => {
     const unsubscribeAuthChange = onAuthStateChanged(auth, handleUser);
 
     authChannel.onmessage = (event) => {
+      console.log(event);
+      console.log(event.data.windowId, windowId.current);
+      // 현재 탭에서 보낸 메세지인 경우
+      if (event.data.windowId === windowId) return;
+
       if (event.data.type === 'LOGIN') {
         console.log('🔄 다른 탭에서 로그인 감지');
         if (
@@ -309,11 +330,18 @@ const useProvideAuth = () => {
     };
   }, []);
 
+  const broadcastLogin = () => {
+    authChannel.postMessage({
+      type: 'LOGIN',
+      windowId: windowId.current,
+    });
+  };
+
   return {
     userInfo,
     loading,
     logout,
-    authChannel,
+    broadcastLogin,
     loginInfoRef,
   };
 };

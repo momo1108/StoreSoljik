@@ -28,7 +28,7 @@ const useSignin = () => {
     formState: { isSubmitting, errors },
   } = useForm<SigninFormDataType>();
 
-  const { authChannel, loginInfoRef } = useFirebaseAuth();
+  const { broadcastLogin, loginInfoRef } = useFirebaseAuth();
 
   const submitLogic: SubmitHandler<SigninFormDataType> = async (data) => {
     auth
@@ -39,7 +39,7 @@ const useSignin = () => {
         // 관련 메서드들을 세션 유틸로 분리?
         return signInWithEmailAndPassword(auth, data.email, data.password);
       })
-      .then((credential) => {
+      .then(() => {
         localStorage.setItem(
           'soljik_maintain_session',
           data.isMaintainChecked ? 'maintain' : '',
@@ -49,9 +49,7 @@ const useSignin = () => {
           password: data.password,
           isMaintainingSession: data.isMaintainChecked,
         };
-        authChannel!.postMessage({
-          type: 'LOGIN',
-        });
+        broadcastLogin();
       })
       .catch((error: unknown) => {
         if (error instanceof FirebaseError) {
@@ -84,9 +82,7 @@ const useSignin = () => {
     toast.promise(signinWithThirdParty(thirdParty), {
       loading: '로그인 요청을 처리중입니다...',
       success: () => {
-        authChannel!.postMessage({
-          type: 'LOGIN',
-        });
+        broadcastLogin();
         return '로그인이 완료됐습니다.';
       },
       error: (error) => {
