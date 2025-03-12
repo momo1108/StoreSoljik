@@ -222,7 +222,7 @@ const useProvideAuth = () => {
     }
     isSignedInRef.current = false;
     setUserInfo(null);
-    authChannel.postMessage({ type: 'LOGOUT', windowId });
+    authChannel.postMessage({ type: 'LOGOUT', windowId: windowId.current });
     signOut(auth);
   };
 
@@ -291,15 +291,19 @@ const useProvideAuth = () => {
     console.log('firebaseauth useeffect start');
     const isMaintaingSession = localStorage.getItem('soljik_maintain_session');
     loginInfoRef.current.isMaintainingSession = !!isMaintaingSession;
-    console.log(loginInfoRef.current);
     authChannel = new BroadcastChannel('auth'); // 개발 환경에서는 다시 초기화해야 정상 동작함
     const unsubscribeAuthChange = onAuthStateChanged(auth, handleUser);
 
     authChannel.onmessage = (event) => {
-      console.log(event);
-      console.log(event.data.windowId, windowId.current);
+      // console.log(event);
+      // console.log(
+      //   event.data.windowId,
+      //   windowId.current,
+      //   event.data.windowId === windowId.current,
+      // );
+
       // 현재 탭에서 보낸 메세지인 경우
-      if (event.data.windowId === windowId) return;
+      if (event.data.windowId === windowId.current) return;
 
       if (event.data.type === 'LOGIN') {
         console.log('🔄 다른 탭에서 로그인 감지');

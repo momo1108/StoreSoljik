@@ -31,24 +31,20 @@ const useSignin = () => {
   const { broadcastLogin, loginInfoRef } = useFirebaseAuth();
 
   const submitLogic: SubmitHandler<SigninFormDataType> = async (data) => {
+    console.log(data);
     auth
       .setPersistence(browserLocalPersistence)
-      .then(() => {
-        // 직접 로그인한 경우 로컬스토리지에 세션 유지 여부 정보를 저장한다.
-        // 이후에 만약 로그인된 상태에서 새로운 창으로 페이지에 접근하면 로컬스토리지에 저장된 정보를 보고 참조가 가능하다.
-        // 관련 메서드들을 세션 유틸로 분리?
-        return signInWithEmailAndPassword(auth, data.email, data.password);
-      })
       .then(() => {
         localStorage.setItem(
           'soljik_maintain_session',
           data.isMaintainChecked ? 'maintain' : '',
         );
-        loginInfoRef.current = {
-          email: data.email,
-          password: data.password,
-          isMaintainingSession: data.isMaintainChecked,
-        };
+        loginInfoRef.current.email = data.email;
+        loginInfoRef.current.password = data.password;
+        loginInfoRef.current.isMaintainingSession = data.isMaintainChecked;
+        return signInWithEmailAndPassword(auth, data.email, data.password);
+      })
+      .then(() => {
         broadcastLogin();
       })
       .catch((error: unknown) => {

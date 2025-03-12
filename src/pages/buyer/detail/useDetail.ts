@@ -1,12 +1,9 @@
-import { useCartItems } from '@/hooks/useCartItems';
-import { useCartUI } from '@/hooks/useCartUI';
-import useFirebaseListener from '@/hooks/useFirestoreListener';
 import { fetchProducts, getProductData } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
 import { getProperSizeImageUrl, preloadImages } from '@/utils/imageUtils';
 import { QueryKey, useQuery } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
-import { ChangeEventHandler, useEffect, useRef, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'sonner';
 
@@ -19,29 +16,6 @@ const useDetail = () => {
       navigate('/');
     }, 1000);
   }
-  const { isOpen, toggleCart } = useCartUI();
-  const { checkItemIsInCart, addItem } = useCartItems();
-
-  // 구매 수량 state (input 의 value 로 사용되므로 string 타입 사용)
-  const [cartItemQuantity, setCartItemQuantity] = useState<string>('1');
-  /**
-   * 구매 수량 input 태그의 onchange 이벤트 핸들러 함수.
-   * 값의 범위를 1 ~ 200 으로 제한합니다.
-   * @param event 이벤트 객체
-   */
-  const handleOnchangeQuantityInput: ChangeEventHandler<HTMLInputElement> = (
-    event,
-  ) => {
-    const parsedValue = parseInt(event.target.value);
-    if (isNaN(parsedValue)) setCartItemQuantity('1');
-    else {
-      let valueToSet = '1';
-      if (parsedValue < 1) valueToSet = '1';
-      else if (parsedValue > 200) valueToSet = '200';
-      else valueToSet = parsedValue.toString();
-      setCartItemQuantity(valueToSet);
-    }
-  };
 
   const fetchProductdata = async ({ queryKey }: { queryKey: QueryKey }) => {
     const [, productId] = queryKey;
@@ -114,12 +88,17 @@ const useDetail = () => {
   });
 
   useEffect(() => {
+    /**
+     * 현재 상품의 이미지를 불러온 후에에 추천 상품 리스트의 이미지들을 preload 한다.
+     */
     if (data && recommendData && recommendData.result.length) {
       const detailImageUrls: string[] = [];
       const preloadImageUrls: string[] = [];
 
       data.productImageUrlMapArray.forEach((imageMap) => {
-        detailImageUrls.push(imageMap['600px'], imageMap['600px_webp']);
+        detailImageUrls.push(
+          ...Object.values(getProperSizeImageUrl(imageMap, 600)),
+        );
       });
       recommendData.result.forEach((product) => {
         preloadImageUrls.push(
@@ -136,48 +115,14 @@ const useDetail = () => {
           preloadImages(preloadImageUrls);
         })
         .catch((error) => {
-          console.error(error);
+          console.dir(error);
         });
     }
   }, [data, recommendData]);
 
   // console.log(recommendData, recommendStatus, recommendError);
 
-  const isProductInCart: boolean = checkItemIsInCart(data);
-  const handleClickPurchase = () => {
-    if (data) {
-      if (!isProductInCart) addItem(data, parseInt(cartItemQuantity));
-      navigate('/purchase', {
-        state: {
-          prevRoute: window.location.pathname,
-        },
-      });
-    }
-  };
-
-  useEffect(() => {
-    // 여기서 추천상품 스크롤 초기화?
-    setCartItemQuantity('1');
-    if (isOpen) toggleCart();
-  }, [param.id]);
-
-  const { messagesDailyArray, sendMessage } = useFirebaseListener();
-  const chattingBoxRef = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (chattingBoxRef.current)
-      chattingBoxRef.current.scrollTop = chattingBoxRef.current.scrollHeight;
-  }, [messagesDailyArray]);
-  const [message, setMessage] = useState<string>('');
-  const handleKeydown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter') {
-      sendMessage(message);
-      setMessage('');
-    }
-  };
-
   return {
-    cartItemQuantity,
-    handleOnchangeQuantityInput,
     data,
     status,
     error,
@@ -185,13 +130,6 @@ const useDetail = () => {
     recommendData,
     recommendStatus,
     recommendError,
-    handleClickPurchase,
-    isProductInCart,
-    addItem,
-    message,
-    setMessage,
-    handleKeydown,
-    chattingBoxRef,
   };
 };
 
