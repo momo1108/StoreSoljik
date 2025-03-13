@@ -25,6 +25,7 @@ const useSignin = () => {
   const {
     register,
     handleSubmit,
+    getValues,
     formState: { isSubmitting, errors },
   } = useForm<SigninFormDataType>();
 
@@ -75,6 +76,7 @@ const useSignin = () => {
   const registerMaintainCheckbox = register('isMaintainChecked');
 
   const handleClickThirdParty = (thirdParty: ThirdPartyProvider) => {
+    loginInfoRef.current.isMaintainingSession = getValues('isMaintainChecked');
     toast.promise(signinWithThirdParty(thirdParty), {
       loading: '로그인 요청을 처리중입니다...',
       success: () => {

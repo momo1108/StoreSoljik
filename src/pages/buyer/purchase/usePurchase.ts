@@ -77,12 +77,11 @@ const usePurchase = () => {
         batchOrderId,
         orderStatus: OrderStatus.OrderCompleted,
       });
+      await queryClient.invalidateQueries({ queryKey: ['orders', 'buyer'] });
 
       toast.success(
         `"${paymentResultData.orderName}" 주문 건의 결제액 "${paymentResultData.totalAmount.toLocaleString()}원" 결제가 성공적으로 완료됐습니다.`,
       );
-
-      queryClient.invalidateQueries({ queryKey: ['orders'] });
 
       clearCart();
 
