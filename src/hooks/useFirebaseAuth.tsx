@@ -12,7 +12,6 @@ import { auth } from '@/firebase';
 import {
   User,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
   signOut,
   updateProfile,
 } from 'firebase/auth';
@@ -34,12 +33,6 @@ export interface UserInfo {
   nickname: string;
 }
 
-type LoginInfo = {
-  email: string;
-  password: string;
-  isMaintainingSession: boolean;
-};
-
 interface AuthProviderProps {
   children: ReactNode;
 }
@@ -48,21 +41,15 @@ interface AuthContextProps {
   userInfo: UserInfo | null;
   loading: boolean;
   logout: () => void;
-  broadcastLogin: () => void;
-  loginInfoRef: MutableRefObject<LoginInfo>;
+  isMaintainingSessionRef: MutableRefObject<boolean>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   userInfo: null,
   loading: true,
   logout: () => {},
-  broadcastLogin: () => {},
-  loginInfoRef: {
-    current: {
-      email: '',
-      password: '',
-      isMaintainingSession: false,
-    },
+  isMaintainingSessionRef: {
+    current: false,
   },
 });
 
@@ -90,30 +77,12 @@ export const useFirebaseAuth = () => {
  */
 const useProvideAuth = () => {
   const queryClient = useQueryClient();
-  let authChannel = new BroadcastChannel('auth');
   const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  /**
-   * 로그인 페이지를 여러탭에서 동시에 켜놓는 경우, 로그인한 탭이 로그인 후 다시 로그인페이지로 이동되는 이슈를 발견(하나의 탭만 사용하면 문제없음)
-   * 로그인한 탭에서 onAuthStateChanged 의 옵저버 메서드가 로그인된 user 객체로 실행된 후 null 객체로 다시 실행되는 것이 원인이라고 판단
-   * 다른 탭에서는 user 객체로만 옵저버 메서드가 실행됨
-   * 로그인 시에만 옵저버 메서드에 null 객체가 잘못전달되는것을 감지하기 위해 로그인, 로그아웃 시에만 변경할 isSignedIn 플래그를 사용한다
-   * state 는 비동기 업데이트이므로 useRef 를 사용해 동기 업데이트가 되도록 한다
-   * 옵저버 메서드에서 isSignedIn 플래그가 true 이면 null 객체가 와도 로그인된 상태로 판단하고 페이지를 이동하지 않도록 조치
-   * 이 플래그로 인해 로그아웃 시 다른 탭들이 자동으로 로그인페이지로 리다이렉트가 안됨. (직접 네비게이트 혹은 리로드?)
-   */
-  const isSignedInRef = useRef<boolean>(false);
-  const loginInfoRef = useRef<LoginInfo>({
-    email: '',
-    password: '',
-    isMaintainingSession: false,
-  });
+  const [loading, setLoading] = useState<boolean>(true); // 라우터에서 사용될 로딩 state
+  const isMaintainingSessionRef = useRef<boolean>(false);
   const sessionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const sessionAlarmRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Broadcast API 의 윈도우를 구분하기 위한 ID
-  const windowId = useRef<string>(`${Date.now()}_${Math.random()}`);
 
   /**
    * 세션 유지 알람의 "타이머"를 설정한다.
@@ -198,7 +167,7 @@ const useProvideAuth = () => {
     // console.log(event);
     const uid = auth.currentUser!.uid;
     if (event.key === `sessionTimestamp:${uid}`) {
-      console.log('🔄 다른 창에서 세션 유지 선택됨 → 3시간 타이머 재시작');
+      // console.log('🔄 다른 창에서 세션 유지 선택됨 → 3시간 타이머 재시작');
       setSessionTimer({ uid });
     }
   };
@@ -220,9 +189,7 @@ const useProvideAuth = () => {
       clearTimeout(sessionAlarmRef.current);
       sessionAlarmRef.current = null;
     }
-    isSignedInRef.current = false;
     setUserInfo(null);
-    authChannel.postMessage({ type: 'LOGOUT', windowId: windowId.current });
     signOut(auth);
   };
 
@@ -250,13 +217,9 @@ const useProvideAuth = () => {
       }
 
       const userInfo = formatUser(user, 'User');
-      if (
-        !loginInfoRef.current.isMaintainingSession &&
-        !isSignedInRef.current
-      ) {
+      if (!isMaintainingSessionRef.current) {
         startSessionTimer(userInfo.uid);
       }
-      isSignedInRef.current = true;
       setLoading(false);
       setUserInfo(userInfo);
 
@@ -267,56 +230,15 @@ const useProvideAuth = () => {
       }
     } else {
       setLoading(false);
-      if (!isSignedInRef.current) {
-        if (!['/signin', '/signup'].includes(location.pathname)) {
-          navigate('/signin');
-        }
-      } else {
-        /**
-         * 여러 탭을 동시에 켜고 현재 탭에서 로그인할 시 현재 탭에서만 handleUser 가 두번 실행됨.
-         * 첫번째는 유저 객체, 두번째는 null 이 전달됨.
-         * 현재 유저 객체를 null 로 방치하면 로그아웃 등의 프로세스에 문제가 생기므로 로그인 정보를 재활용해서
-         * 로그인 메서드를 재실행해 현재 유저를 업데이트한다.
-         */
-        signInWithEmailAndPassword(
-          auth,
-          loginInfoRef.current.email,
-          loginInfoRef.current.password,
-        );
-      }
+      setUserInfo(null);
     }
   };
 
   useEffect(() => {
     console.log('firebaseauth useeffect start');
     const isMaintaingSession = localStorage.getItem('soljik_maintain_session');
-    loginInfoRef.current.isMaintainingSession = !!isMaintaingSession;
-    authChannel = new BroadcastChannel('auth'); // 개발 환경에서는 다시 초기화해야 정상 동작함
+    isMaintainingSessionRef.current = !!isMaintaingSession;
     const unsubscribeAuthChange = onAuthStateChanged(auth, handleUser);
-
-    authChannel.onmessage = (event) => {
-      // console.log(event);
-      // console.log(
-      //   event.data.windowId,
-      //   windowId.current,
-      //   event.data.windowId === windowId.current,
-      // );
-
-      // 현재 탭에서 보낸 메세지인 경우
-      if (event.data.windowId === windowId.current) return;
-
-      if (event.data.type === 'LOGIN') {
-        console.log('🔄 다른 탭에서 로그인 감지');
-        if (
-          !auth?.currentUser &&
-          ['/signin', '/signup'].includes(location.pathname)
-        )
-          location.reload();
-      } else if (event.data.type === 'LOGOUT') {
-        console.log('🔄 다른 탭에서 로그아웃 감지');
-        logout();
-      }
-    };
 
     return () => {
       console.log('firebaseauth useeffect return');
@@ -330,23 +252,14 @@ const useProvideAuth = () => {
         sessionAlarmRef.current = null;
       }
       window.removeEventListener('storage', handleStorageChange);
-      authChannel.close();
     };
   }, []);
-
-  const broadcastLogin = () => {
-    authChannel.postMessage({
-      type: 'LOGIN',
-      windowId: windowId.current,
-    });
-  };
 
   return {
     userInfo,
     loading,
     logout,
-    broadcastLogin,
-    loginInfoRef,
+    isMaintainingSessionRef,
   };
 };
 

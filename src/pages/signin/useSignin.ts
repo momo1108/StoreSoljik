@@ -1,9 +1,6 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import {
-  browserLocalPersistence,
-  signInWithEmailAndPassword,
-} from 'firebase/auth';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/firebase';
 import { FirebaseError } from 'firebase/app';
 import { MouseEventHandler } from 'react';
@@ -29,25 +26,17 @@ const useSignin = () => {
     formState: { isSubmitting, errors },
   } = useForm<SigninFormDataType>();
 
-  const { broadcastLogin, loginInfoRef } = useFirebaseAuth();
+  const { isMaintainingSessionRef } = useFirebaseAuth();
 
   const submitLogic: SubmitHandler<SigninFormDataType> = async (data) => {
     console.log(data);
-    auth
-      .setPersistence(browserLocalPersistence)
-      .then(() => {
-        localStorage.setItem(
-          'soljik_maintain_session',
-          data.isMaintainChecked ? 'maintain' : '',
-        );
-        loginInfoRef.current.email = data.email;
-        loginInfoRef.current.password = data.password;
-        loginInfoRef.current.isMaintainingSession = data.isMaintainChecked;
-        return signInWithEmailAndPassword(auth, data.email, data.password);
-      })
-      .then(() => {
-        broadcastLogin();
-      })
+    localStorage.setItem(
+      'soljik_maintain_session',
+      data.isMaintainChecked ? 'maintain' : '',
+    );
+    isMaintainingSessionRef.current = data.isMaintainChecked;
+    signInWithEmailAndPassword(auth, data.email, data.password)
+      .then()
       .catch((error: unknown) => {
         if (error instanceof FirebaseError) {
           if (error.code === 'auth/invalid-credential') {
@@ -76,11 +65,10 @@ const useSignin = () => {
   const registerMaintainCheckbox = register('isMaintainChecked');
 
   const handleClickThirdParty = (thirdParty: ThirdPartyProvider) => {
-    loginInfoRef.current.isMaintainingSession = getValues('isMaintainChecked');
+    isMaintainingSessionRef.current = getValues('isMaintainChecked');
     toast.promise(signinWithThirdParty(thirdParty), {
       loading: '로그인 요청을 처리중입니다...',
       success: () => {
-        broadcastLogin();
         return '로그인이 완료됐습니다.';
       },
       error: (error) => {

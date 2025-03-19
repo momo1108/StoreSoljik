@@ -7,7 +7,6 @@ import { FirebaseError } from 'firebase/app';
 import { MouseEventHandler } from 'react';
 import { toast } from 'sonner';
 import { SignupFormDataType } from '@/types/FormType';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 
 const useSignup = () => {
   const navigate = useNavigate();
@@ -22,15 +21,12 @@ const useSignup = () => {
     formState: { isSubmitting, errors },
   } = useForm<SignupFormDataType>();
 
-  const { broadcastLogin } = useFirebaseAuth();
-
   const submitLogic: SubmitHandler<SignupFormDataType> = async (data) => {
     toast.promise(
       createUserWithEmailAndPassword(auth, data.email, data.password),
       {
         loading: '회원가입입 요청을 처리중입니다...',
         success: () => {
-          broadcastLogin();
           return '회원가입이 완료됐습니다.';
         },
         error: async (error) => {
