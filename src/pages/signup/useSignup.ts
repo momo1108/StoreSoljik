@@ -51,34 +51,6 @@ const useSignup = () => {
         },
       },
     );
-    try {
-      await createUserWithEmailAndPassword(auth, data.email, data.password);
-
-      toast.success('회원 가입 완료');
-      navigate('/');
-    } catch (error: unknown) {
-      if (error instanceof FirebaseError) {
-        if (error.code === 'auth/email-already-in-use') {
-          toast.error('이미 가입된 이메일입니다.');
-        } else {
-          if (error instanceof FirebaseError && auth.currentUser) {
-            await deleteUser(auth.currentUser);
-          }
-          toast.error('회원원가입에 실패했습니다. 다시 시도해주세요.', {
-            description: error.message,
-          });
-        }
-      } else if (error instanceof FirestoreError) {
-        if (auth.currentUser) {
-          await deleteUser(auth.currentUser);
-          toast.error(
-            '가입 정보 등록에 실패했습니다. 다시 회원가입을 시도해주세요.',
-          );
-        }
-      } else {
-        toast.error((error as Error).message);
-      }
-    }
   };
 
   const registerEmail = register('email', {
