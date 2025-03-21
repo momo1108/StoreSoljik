@@ -1,6 +1,9 @@
-- 써드파티 로그인 기능의 세션 유지 기능 구현(React hook form 의 getValues 메서드를 활용) O
+- 로그인 후 창 닫고 세션만료시간 지난 후 재접속시 로그아웃 되는지 확인 필요
+- useInfiniteQuery 의 pageParam 타입설정 관련 코드 리팩토링 필요
 - Detail 페이지 이미지 클릭 시 상세보기 구현
-- 상품 구매 후 바로 구매이력 들어가면 구매한 상품이 업데이트가 안됨
+- Detail 페이지에서 추천 상품을 클리해서 이동해도 추천 목록이 업데이트 되지 않는 이슈 발견 O (useQuery 의 select 옵션을 활용해 필터링하도록 수정)
+- 써드파티 로그인 기능의 세션 유지 기능 구현(React hook form 의 getValues 메서드를 활용) O
+- 상품 구매 후 바로 구매이력 들어가면 구매한 상품이 업데이트가 안됨 O (queryClient 의 invalidateQueries 메서드에 await 사용해서 해결)
 - Detail 페이지 렌더링 최적화 필요. O
     - 채팅창의 렌더링 별개 적용?
     - 수량 조정 시 전체가 리렌더링됨

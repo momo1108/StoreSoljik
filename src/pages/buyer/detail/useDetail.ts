@@ -43,12 +43,9 @@ const useDetail = () => {
       }
 
       const productData = await fetchProducts({
-        filters: [
-          where('productCategory', '==', productCategory),
-          where('id', '!=', param.id),
-        ],
+        filters: [where('productCategory', '==', productCategory)],
         sortOrders: [orderBy('createdAt', 'desc')],
-        pageSize: 5,
+        pageSize: 6,
       });
 
       if (productData)
@@ -85,6 +82,13 @@ const useDetail = () => {
   }>({
     queryKey: ['products', data?.productCategory, 'recommend'],
     queryFn: fetchProductRecommendList,
+    select: (queryResult) => {
+      const { category, result } = queryResult;
+      return {
+        category,
+        result: result.filter((product) => product.id !== param.id),
+      };
+    },
   });
 
   useEffect(() => {

@@ -9,10 +9,8 @@ const ProtectedRouteForSigning = () => {
     <Loading />
   ) : userInfo === null ? (
     <Outlet />
-  ) : userInfo.accountType === '구매자' ? (
-    <Navigate to='/' replace={true} />
   ) : (
-    <Navigate to='/items' replace={true} />
+    <Navigate to='/' replace={true} />
   );
 };
 

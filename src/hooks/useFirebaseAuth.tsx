@@ -6,7 +6,6 @@ import {
   ReactNode,
   useRef,
   useCallback,
-  MutableRefObject,
 } from 'react';
 import { auth } from '@/firebase';
 import {
@@ -16,7 +15,6 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { DocumentData } from 'firebase/firestore';
-import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -41,16 +39,12 @@ interface AuthContextProps {
   userInfo: UserInfo | null;
   loading: boolean;
   logout: () => void;
-  isMaintainingSessionRef: MutableRefObject<boolean>;
 }
 
 const AuthContext = createContext<AuthContextProps>({
   userInfo: null,
   loading: true,
   logout: () => {},
-  isMaintainingSessionRef: {
-    current: false,
-  },
 });
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
@@ -77,10 +71,8 @@ export const useFirebaseAuth = () => {
  */
 const useProvideAuth = () => {
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
   const [loading, setLoading] = useState<boolean>(true); // 라우터에서 사용될 로딩 state
-  const isMaintainingSessionRef = useRef<boolean>(false);
   const sessionTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const sessionAlarmRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -125,7 +117,8 @@ const useProvideAuth = () => {
   );
 
   /**
-   * toast 의 action 을 사용해 사용자의 세션 유지 여부를 입력받는 메서드. focus 가 활성화됐을때만 toast 를 띄우고 아닌 경우 {@link setSessionTimer} 에서 설정한 타임아웃을 통해
+   * toast 의 action 을 사용해 사용자의 세션 유지 여부를 입력받는 메서드.
+   * action 옵션을 활용해 유지 버튼을 클릭 시 {@link setSessionTimer} 세션 타이머를 초기화한한다.
    */
   const confirmSessionKeepAlive = (uid: string) => {
     console.log('⚠️ 세션 유지 여부 확인');
@@ -163,6 +156,12 @@ const useProvideAuth = () => {
     });
   };
 
+  /**
+   * LocalStorage 에서 변화가 발생하는 경우의 이벤트 핸들러
+   * 특정 유저의 uid 를 포함한 key 값을 사용한다.
+   * Key 형태 : "sessionTimestamp:uid"
+   * @param event LocalStorage 의 이벤트 객체
+   */
   const handleStorageChange = (event: StorageEvent) => {
     // console.log(event);
     const uid = auth.currentUser!.uid;
@@ -193,6 +192,10 @@ const useProvideAuth = () => {
     signOut(auth);
   };
 
+  const getIsMaintainingSession = () => {
+    return !!localStorage.getItem('soljik_maintain_session');
+  };
+
   const handleUser = async (user: User | null) => {
     console.log(user);
     /**
@@ -217,17 +220,13 @@ const useProvideAuth = () => {
       }
 
       const userInfo = formatUser(user, 'User');
-      if (!isMaintainingSessionRef.current) {
+      if (!getIsMaintainingSession()) {
         startSessionTimer(userInfo.uid);
       }
       setLoading(false);
       setUserInfo(userInfo);
 
       window.addEventListener('storage', handleStorageChange);
-
-      if (location.pathname === '/signup' || location.pathname === '/signin') {
-        navigate('/');
-      }
     } else {
       setLoading(false);
       setUserInfo(null);
@@ -236,8 +235,6 @@ const useProvideAuth = () => {
 
   useEffect(() => {
     console.log('firebaseauth useeffect start');
-    const isMaintaingSession = localStorage.getItem('soljik_maintain_session');
-    isMaintainingSessionRef.current = !!isMaintaingSession;
     const unsubscribeAuthChange = onAuthStateChanged(auth, handleUser);
 
     return () => {
@@ -259,7 +256,6 @@ const useProvideAuth = () => {
     userInfo,
     loading,
     logout,
-    isMaintainingSessionRef,
   };
 };
 

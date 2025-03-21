@@ -10,7 +10,6 @@ import {
   signinWithThirdParty,
   ThirdPartyProvider,
 } from '@/utils/firebaseUtils';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 
 const useSignin = () => {
   const navigate = useNavigate();
@@ -26,15 +25,10 @@ const useSignin = () => {
     formState: { isSubmitting, errors },
   } = useForm<SigninFormDataType>();
 
-  const { isMaintainingSessionRef } = useFirebaseAuth();
-
   const submitLogic: SubmitHandler<SigninFormDataType> = async (data) => {
-    console.log(data);
-    localStorage.setItem(
-      'soljik_maintain_session',
-      data.isMaintainChecked ? 'maintain' : '',
-    );
-    isMaintainingSessionRef.current = data.isMaintainChecked;
+    if (data.isMaintainChecked)
+      localStorage.setItem('soljik_maintain_session', 'maintain');
+
     signInWithEmailAndPassword(auth, data.email, data.password)
       .then()
       .catch((error: unknown) => {
@@ -65,7 +59,9 @@ const useSignin = () => {
   const registerMaintainCheckbox = register('isMaintainChecked');
 
   const handleClickThirdParty = (thirdParty: ThirdPartyProvider) => {
-    isMaintainingSessionRef.current = getValues('isMaintainChecked');
+    if (getValues('isMaintainChecked'))
+      localStorage.setItem('soljik_maintain_session', 'maintain');
+
     toast.promise(signinWithThirdParty(thirdParty), {
       loading: '로그인 요청을 처리중입니다...',
       success: () => {
