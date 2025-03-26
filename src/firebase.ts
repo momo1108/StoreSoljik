@@ -1,5 +1,5 @@
 import { initializeApp } from 'firebase/app';
-import { browserLocalPersistence, getAuth } from 'firebase/auth';
+import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
 import { getStorage } from 'firebase/storage';
 import dotenv from 'dotenv';
@@ -25,7 +25,6 @@ const firebaseConfig = {
   messagingSenderId: getEnv('VITE_messagingSenderId'),
   appId: getEnv('VITE_appId'),
   measurementId: getEnv('VITE_measurementId'),
-  persistence: [browserLocalPersistence],
 };
 
 const app = initializeApp(firebaseConfig);

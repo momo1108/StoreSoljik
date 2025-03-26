@@ -33,7 +33,7 @@ export default defineConfig({
       '/firebasestorage': {
         target: 'https://firebasestorage.googleapis.com',
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/firebase/, ''),
+        rewrite: (path) => path.replace(/^\/firebasestorage/, ''),
       },
     },
   },
