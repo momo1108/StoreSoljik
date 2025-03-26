@@ -26,22 +26,21 @@ const useSignin = () => {
   } = useForm<SigninFormDataType>();
 
   const submitLogic: SubmitHandler<SigninFormDataType> = async (data) => {
-    if (data.isMaintainChecked)
-      localStorage.setItem('soljik_maintain_session', 'maintain');
-
-    signInWithEmailAndPassword(auth, data.email, data.password)
-      .then()
-      .catch((error: unknown) => {
-        if (error instanceof FirebaseError) {
-          if (error.code === 'auth/invalid-credential') {
-            toast.error('잘못된 ID 혹은 비밀번호입니다.');
-          } else {
-            toast.error(error.message);
-          }
+    try {
+      if (data.isMaintainChecked)
+        localStorage.setItem('soljik_maintain_session', 'maintain');
+      await signInWithEmailAndPassword(auth, data.email, data.password);
+    } catch (error: unknown) {
+      if (error instanceof FirebaseError) {
+        if (error.code === 'auth/invalid-credential') {
+          toast.error('잘못된 ID 혹은 비밀번호입니다.');
         } else {
-          toast.error((error as Error).message);
+          toast.error(error.message);
         }
-      });
+      } else {
+        toast.error((error as Error).message);
+      }
+    }
   };
 
   const registerEmail = register('email', {

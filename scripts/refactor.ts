@@ -3,21 +3,15 @@ import { CartItem } from '@/hooks/useCartItems';
 import { getProductList, uploadProductImage } from '@/services/productService';
 import { OrderSchema, ProductSchema } from '@/types/FirebaseType';
 import { buildFirestoreQuery } from '@/utils/firebaseUtils';
-import {
-  b64toFile,
-  downloadFile,
-  imgToResizedDataUrl,
-} from '@/utils/imageUtils';
+import { imgToResizedBlob } from '@/utils/imageUtils';
 import {
   deleteField,
   doc,
   DocumentReference,
-  FieldValue,
   getDocs,
   runTransaction,
   updateDoc,
 } from 'firebase/firestore';
-import { readFileSync } from 'fs';
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
@@ -67,31 +61,50 @@ const resizeFirebaseImage = async () => {
         const sizeList = [0, 300, 600];
         const sizeNameList = ['original', '250px', '600px'];
 
+        const returnBlobCallback =
+          (
+            fileName: string,
+            fileType: string,
+            imageUrlMapKey: string,
+          ): BlobCallback =>
+          async (blob) => {
+            if (!blob) return;
+            else {
+              const newFile = new File([blob], fileName, {
+                type: fileType,
+                lastModified: new Date().getTime(),
+              });
+              productImageUrlMap[imageUrlMapKey] = await uploadProductImage(
+                `${product.id}/${newFile.name}`,
+                newFile,
+              );
+            }
+          };
+
         for (let sizeIndex = 0; sizeIndex < 3; sizeIndex++) {
           const size = sizeList[sizeIndex];
 
           if (image.width > size || image.height > size) {
-            let imageDataUrl = imgToResizedDataUrl(image, 'jpg', size);
-            const newFile = b64toFile(
-              imageDataUrl,
-              `${j}_${sizeNameList[sizeIndex]}.jpg`,
+            imgToResizedBlob(
+              image,
+              'jpg',
+              returnBlobCallback(
+                `${j}_${sizeNameList[sizeIndex]}.jpg`,
+                'jpg',
+                `${sizeNameList[sizeIndex]}`,
+              ),
+              size,
             );
-            productImageUrlMap[`${sizeNameList[sizeIndex]}`] =
-              await uploadProductImage(
-                `${product.id}/${newFile.name}`,
-                newFile,
-              );
-
-            let imageDataUrlWebp = imgToResizedDataUrl(image, 'webp', size);
-            const newFileWebp = b64toFile(
-              imageDataUrlWebp,
-              `${j}_${sizeNameList[sizeIndex]}.webp`,
+            imgToResizedBlob(
+              image,
+              'webp',
+              returnBlobCallback(
+                `${j}_${sizeNameList[sizeIndex]}.webp`,
+                'webp',
+                `${sizeNameList[sizeIndex]}_webp`,
+              ),
+              size,
             );
-            productImageUrlMap[`${sizeNameList[sizeIndex]}_webp`] =
-              await uploadProductImage(
-                `${product.id}/${newFileWebp.name}`,
-                newFileWebp,
-              );
           }
         }
 

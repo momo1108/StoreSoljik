@@ -26,9 +26,10 @@ const getImageMIMEType = (fileName: string) => {
   return imageMIMETypesMapper[extension as ImageFormat] || 'none';
 };
 
-export const imgToResizedDataUrl = (
+export const imgToResizedBlob = (
   image: HTMLImageElement,
   imageFormat: ImageFormat,
+  cb: BlobCallback,
   size: number = 0,
 ) => {
   var canvas = document.createElement('canvas');
@@ -56,39 +57,7 @@ export const imgToResizedDataUrl = (
   }
 
   canvasContext.drawImage(image, 0, 0, width, height);
-  return canvas.toDataURL(imageMIMETypesMapper[imageFormat]);
-};
-
-export const b64toFile = (b64Data: string, fileName: string) => {
-  const sliceSize = 512;
-
-  const byteCharacters = atob(
-    b64Data.toString().replace(/^data:image\/(png|jpeg|jpg|webp);base64,/, ''),
-  );
-  const byteArrays = [];
-
-  for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
-    const slice = byteCharacters.slice(offset, offset + sliceSize);
-
-    const byteNumbers = new Array(slice.length);
-    for (let i = 0; i < slice.length; i++) {
-      byteNumbers[i] = slice.charCodeAt(i);
-    }
-
-    const byteArray = new Uint8Array(byteNumbers);
-
-    byteArrays.push(byteArray);
-  }
-
-  const MIMEType = getImageMIMEType(fileName);
-
-  if (MIMEType === 'none') throw Error('File Is NOT Image!');
-
-  const file = new File(byteArrays, fileName, {
-    type: MIMEType,
-    lastModified: new Date().getTime(),
-  });
-  return file;
+  canvas.toBlob(cb, imageMIMETypesMapper[imageFormat]);
 };
 
 export const downloadFile = (file: File) => {
@@ -117,7 +86,7 @@ export const resizeImage = async (
         reader.onload = () => {
           let image = new Image();
           image.src = reader.result as string;
-          image.onload = function () {
+          image.onload = () => {
             const splitName = file.name.split('.');
             const ext = splitName[splitName.length - 1] as ImageFormat;
             const newExt = imageFormat === 'auto' ? ext : imageFormat;
@@ -134,59 +103,67 @@ export const resizeImage = async (
               '600px': null,
               '600px_webp': null,
             };
+
+            const returnBlobCallback =
+              (fileName: string, imageFileMapKey: string): BlobCallback =>
+              (blob) => {
+                if (!blob) reject(new Error('Failed to convert image format!'));
+                else {
+                  const newFile = new File([blob], fileName, {
+                    type: getImageMIMEType(fileName),
+                    lastModified: new Date().getTime(),
+                  });
+                  imageFileMap[imageFileMapKey] = newFile;
+                }
+              };
+
             if (withWebp) {
-              let imageDataUrl = imgToResizedDataUrl(image, 'webp');
-              const newFile = b64toFile(
-                imageDataUrl,
-                `${fileIndex}_original.webp`,
+              imgToResizedBlob(
+                image,
+                'webp',
+                returnBlobCallback(
+                  `${fileIndex}_original.webp`,
+                  'original_webp',
+                ),
               );
-              imageFileMap['original_webp'] = newFile;
             }
 
             // 사용되는 이미지들의 사이즈 : 500, 220, 240, 150, 52
             // 상품 레코드별로 이미지:{원본:링크, 250:링크, 600:링크} 형태로 저장해야할듯
             // 만약 리사이즈가 필요없는 사이즈의 경우, 원본의 링크를 그대로 넣기
             if (image.width > 600 || image.height > 600) {
-              let imageDataUrl600 = imgToResizedDataUrl(image, newExt, 600);
-              const newFile600 = b64toFile(
-                imageDataUrl600,
-                `${fileIndex}_600px.${newExt}`,
+              imgToResizedBlob(
+                image,
+                newExt,
+                returnBlobCallback(`${fileIndex}_600px.${newExt}`, '600px'),
+                600,
               );
-              imageFileMap['600px'] = newFile600;
 
               if (withWebp) {
-                let imageDataUrl600Webp = imgToResizedDataUrl(
+                imgToResizedBlob(
                   image,
                   'webp',
+                  returnBlobCallback(`${fileIndex}_600px.webp`, '600px_webp'),
                   600,
                 );
-                const newFile600Webp = b64toFile(
-                  imageDataUrl600Webp,
-                  `${fileIndex}_600px.webp`,
-                );
-                imageFileMap['600px_webp'] = newFile600Webp;
               }
             }
 
             if (image.width > 300 || image.height > 300) {
-              let imageDataUrl250 = imgToResizedDataUrl(image, newExt, 250);
-              const newFile250 = b64toFile(
-                imageDataUrl250,
-                `${fileIndex}_250px.${newExt}`,
+              imgToResizedBlob(
+                image,
+                newExt,
+                returnBlobCallback(`${fileIndex}_250px.${newExt}`, '250px'),
+                250,
               );
-              imageFileMap['250px'] = newFile250;
 
               if (withWebp) {
-                let imageDataUrl250Webp = imgToResizedDataUrl(
+                imgToResizedBlob(
                   image,
                   'webp',
+                  returnBlobCallback(`${fileIndex}_250px.webp`, '250px_webp'),
                   250,
                 );
-                const newFile250Webp = b64toFile(
-                  imageDataUrl250Webp,
-                  `${fileIndex}_250px.webp`,
-                );
-                imageFileMap['250px_webp'] = newFile250Webp;
               }
             }
             resolve(imageFileMap);
