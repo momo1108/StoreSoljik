@@ -115,7 +115,7 @@ const Signin: React.FC = () => {
           <S.SigninPicture
             imageUrlMap={{
               original: signinImgUrlPng,
-              webp: signinImgUrlWebp,
+              original_webp: signinImgUrlWebp,
             }}
             size={700}
             alt='메인페이지이미지'

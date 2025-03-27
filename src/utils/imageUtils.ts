@@ -184,27 +184,24 @@ export const getProperSizeImageUrl = (
   imageUrlMap: Record<string, string>,
   size: number,
 ) => {
-  const urls = {
-    original: '',
-    webp: '',
-  };
+  const isSmall = size <= 250;
+  const isMedium = size <= 600;
 
-  if (size <= 250) {
-    urls.original =
-      imageUrlMap['250px'] || imageUrlMap['600px'] || imageUrlMap.original;
-    urls.webp =
-      imageUrlMap['250px_webp'] ||
+  const original = isSmall
+    ? imageUrlMap['250px'] || imageUrlMap['600px'] || imageUrlMap.original
+    : isMedium
+      ? imageUrlMap['600px'] || imageUrlMap.original
+      : imageUrlMap.original;
+
+  const webp = isSmall
+    ? imageUrlMap['250px_webp'] ||
       imageUrlMap['600px_webp'] ||
-      imageUrlMap.original_webp;
-  } else if (size <= 600) {
-    urls.original = imageUrlMap['600px'] || imageUrlMap.original;
-    urls.webp = imageUrlMap['600px_webp'] || imageUrlMap.original_webp;
-  } else {
-    urls.original = imageUrlMap.original;
-    urls.webp = imageUrlMap.original_webp;
-  }
+      imageUrlMap.original_webp
+    : isMedium
+      ? imageUrlMap['600px_webp'] || imageUrlMap.original_webp
+      : imageUrlMap.original_webp;
 
-  return urls;
+  return { original, webp };
 };
 
 // export const preloadImages = (...src: string[]) => {
