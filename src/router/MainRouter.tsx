@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react';
 import ProtectedRouteForSigning from './ProtectedRouteForSigning';
 import Loading from '@/pages/loading/Loading';
 import ProtectedRouteForMember from './ProtectedRouteForMember';
+import NotFound from '@/pages/notfound/NotFound';
 
 const Signin = lazy(() => import('@/pages/signin/Signin'));
 const Signup = lazy(() => import('@/pages/signup/Signup'));
@@ -17,7 +18,6 @@ const Registration = lazy(
 );
 const Update = lazy(() => import('@/pages/seller/update/Update'));
 const Detail = lazy(() => import('@/pages/buyer/detail/Detail'));
-const NotFound = lazy(() => import('@/pages/notfound/NotFound'));
 
 const MainRouter = () => {
   return (

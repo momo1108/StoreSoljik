@@ -1,8 +1,8 @@
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { updateCategory } from '@/services/categoryService';
+import { deleteProductImages } from '@/services/imageService';
 import {
   deleteProductDocument,
-  deleteProductImages,
   fetchInfiniteProducts,
 } from '@/services/productService';
 import { PageParamType, ProductSchema } from '@/types/FirebaseType';

@@ -1,15 +1,15 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '@/firebase';
+import {
+  auth,
+  signinWithThirdParty,
+  ThirdPartyProvider,
+} from '@/firebase/auth';
 import { FirebaseError } from 'firebase/app';
 import { MouseEventHandler } from 'react';
 import { toast } from 'sonner';
 import { SigninFormDataType } from '@/types/FormType';
-import {
-  signinWithThirdParty,
-  ThirdPartyProvider,
-} from '@/utils/firebaseUtils';
 
 const useSignin = () => {
   const navigate = useNavigate();

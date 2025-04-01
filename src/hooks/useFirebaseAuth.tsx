@@ -7,7 +7,7 @@ import {
   useRef,
   useCallback,
 } from 'react';
-import { auth } from '@/firebase';
+import { auth } from '@/firebase/auth';
 import {
   User,
   onAuthStateChanged,

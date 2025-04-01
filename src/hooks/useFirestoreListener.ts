@@ -10,7 +10,7 @@ import {
 import { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { useFirebaseAuth } from './useFirebaseAuth';
-import { db } from '@/firebase';
+import { db } from '@/firebase/firestore';
 import { fetchOrders } from '@/services/orderService';
 import { OrderStatus } from '@/types/FirebaseType';
 import { getIsoDate, getKoreanIsoDatetime } from '@/utils/utils';

@@ -8,8 +8,6 @@ import { StorageError } from 'firebase/storage';
 import {
   createProductData,
   deleteProductDocument,
-  deleteProductImages,
-  uploadProductImage,
 } from '@/services/productService';
 import {
   createCategory,
@@ -22,6 +20,10 @@ import { createProductRegisterObject } from '@/utils/createRegisterObject';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getKoreanIsoDatetime } from '@/utils/utils';
 import { resizeImage } from '@/utils/imageUtils';
+import {
+  deleteProductImages,
+  uploadProductImage,
+} from '@/services/imageService';
 
 const useRegistration = () => {
   const navigate = useNavigate();

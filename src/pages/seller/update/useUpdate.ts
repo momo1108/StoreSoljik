@@ -4,11 +4,7 @@ import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import { FirestoreError } from 'firebase/firestore';
 import { StorageError } from 'firebase/storage';
-import {
-  deleteProductImages,
-  updateProductData,
-  uploadProductImage,
-} from '@/services/productService';
+import { updateProductData } from '@/services/productService';
 import { toast } from 'sonner';
 import { ProductFormData } from '@/types/FormType';
 import { ProductSchema } from '@/types/FirebaseType';
@@ -16,6 +12,10 @@ import { createProductRegisterObject } from '@/utils/createRegisterObject';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getKoreanIsoDatetime } from '@/utils/utils';
 import { resizeImage } from '@/utils/imageUtils';
+import {
+  deleteProductImages,
+  uploadProductImage,
+} from '@/services/imageService';
 
 const useUpdate = () => {
   const navigate = useNavigate();

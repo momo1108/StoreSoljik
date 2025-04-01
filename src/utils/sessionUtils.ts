@@ -1,4 +1,4 @@
-import { auth } from '@/firebase';
+import { auth } from '@/firebase/auth';
 import { onIdTokenChanged } from 'firebase/auth';
 
 export const setSessionMaintenance = (

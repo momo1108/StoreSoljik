@@ -1,11 +1,5 @@
-import { auth } from '@/firebase';
-import {
-  FacebookAuthProvider,
-  GithubAuthProvider,
-  GoogleAuthProvider,
-  signInWithPopup,
-  TwitterAuthProvider,
-} from 'firebase/auth';
+import { getFirestore } from 'firebase/firestore';
+import { app } from './app';
 import {
   collection,
   Firestore,
@@ -14,6 +8,8 @@ import {
   Query,
   QueryConstraint,
 } from 'firebase/firestore';
+
+export const db = getFirestore(app);
 
 /**
  * Firestore 에 여러 조건을 적용한 쿼리를 생성하는 함수
@@ -46,27 +42,4 @@ export const buildFirestoreQuery = ({
 
     return query(collection(db, collectionName), ...constraintArray);
   }
-};
-
-export type ThirdPartyProvider =
-  | 'google'
-  | 'twitter'
-  | 'x'
-  | 'facebook'
-  | 'meta'
-  | 'github';
-
-export const signinWithThirdParty = async (provider: ThirdPartyProvider) => {
-  let Provider, ProviderInstance;
-
-  if (provider === 'google') Provider = GoogleAuthProvider;
-  else if (provider === 'twitter' || provider === 'x')
-    Provider = TwitterAuthProvider;
-  else if (provider === 'facebook' || provider === 'meta')
-    Provider = FacebookAuthProvider;
-  else Provider = GithubAuthProvider;
-
-  ProviderInstance = new Provider();
-
-  await signInWithPopup(auth, ProviderInstance);
 };

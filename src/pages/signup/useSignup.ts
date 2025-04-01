@@ -1,7 +1,7 @@
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword, deleteUser } from 'firebase/auth';
-import { auth } from '@/firebase';
+import { auth } from '@/firebase/auth';
 import { FirestoreError } from 'firebase/firestore';
 import { FirebaseError } from 'firebase/app';
 import { MouseEventHandler } from 'react';

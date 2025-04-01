@@ -13,11 +13,12 @@ export default defineConfig({
       output: {
         manualChunks: {
           react: ['react', 'react-dom'],
-          firebase: ['firebase/app'],
+          'firebase-app': ['firebase/app'],
           'firebase-auth': ['firebase/auth'],
           'firebase-firestore': ['firebase/firestore'],
           'firebase-storage': ['firebase/storage'],
-          ui: ['react-icons', 'react-slick', 'sonner'],
+          carousel: ['react-slick'],
+          notification: ['sonner'],
         },
       },
     },
