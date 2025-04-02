@@ -1,7 +1,7 @@
 import usePostcode from '@/hooks/usePostcode';
 import { DaumPostcodeResult } from '@/types/DaumPostcodeType';
 import { PurchaseFormData } from '@/types/FormType';
-import { ChangeEventHandler, MouseEventHandler, useState } from 'react';
+import { ChangeEventHandler, MouseEventHandler, useRef, useState } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useCartItems } from '@/hooks/useCartItems';
 import { useFirebaseAuth, UserInfo } from '@/hooks/useFirebaseAuth';
@@ -30,26 +30,20 @@ const usePurchase = () => {
   const { openPostcodeSearch } = usePostcode();
   const { totalPrice, items, clearCart } = useCartItems();
   const { userInfo } = useFirebaseAuth();
-  const [isReadyToCheckout, setIsReadyToCheckout] = useState<boolean>(false);
+  const isReadyToCheckoutRef = useRef<boolean>(false);
   const navigate = useNavigate();
   const { state } = useLocation();
   const queryClient = useQueryClient();
 
-  const handlePurchaseCheckbox: ChangeEventHandler<HTMLInputElement> = (
-    event,
-  ) => {
-    setIsReadyToCheckout(event.target.checked);
-  };
-
   const submitLogic: SubmitHandler<PurchaseFormData> = async (data) => {
-    if (!isReadyToCheckout) {
+    if (!isReadyToCheckoutRef.current) {
       toast.warning(
         '구매 품목과 결제 금액을 확인하고 구매하기 버튼 위의 체크박스를 체크해주세요.',
       );
       return;
     }
 
-    refetchProductQuantityArray();
+    await refetchProductQuantityArray();
 
     let batchOrderId = '';
 
@@ -164,14 +158,14 @@ const usePurchase = () => {
   });
 
   return {
-    registerObject,
+    register,
     isSubmitting,
     errors,
     handleSubmit,
     submitLogic,
+    setValue,
     handleClickPostcode,
-    isReadyToCheckout,
-    handlePurchaseCheckbox,
+    isReadyToCheckoutRef,
     productQuantityArray,
     productQuantityArrayStatus,
     productQuantityArrayError,

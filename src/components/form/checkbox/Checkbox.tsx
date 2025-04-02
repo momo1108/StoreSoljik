@@ -7,6 +7,7 @@ type CheckboxProps = ClassName &
   InputHTMLAttributes<HTMLInputElement> & {
     description?: string;
     reactHookForm?: UseFormRegisterReturn<string>;
+    ref?: React.RefObject<HTMLInputElement>;
   };
 
 const Checkbox: React.FC<CheckboxProps> = ({
@@ -16,6 +17,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
   className = '',
   onChange = () => {},
   reactHookForm,
+  ref,
 }) => {
   return (
     <S.CheckboxContainer className={className}>
@@ -25,6 +27,7 @@ const Checkbox: React.FC<CheckboxProps> = ({
           name={name}
           type='checkbox'
           onChange={onChange}
+          ref={ref}
           {...reactHookForm}
         />
         {description ? (

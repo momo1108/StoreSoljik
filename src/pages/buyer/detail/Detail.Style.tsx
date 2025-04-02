@@ -190,7 +190,7 @@ export const InfoBodyWrapper = styled.div`
   gap: 25px;
 `;
 
-export const InfoContentBox = styled.div`
+export const InfoDescriptionBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -220,7 +220,7 @@ export const DescriptionP = styled.p`
   line-height: ${(props) => props.theme.lineHeight.base};
 `;
 
-export const InfoFormBox = styled.div`
+export const InfoPricingBox = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;
