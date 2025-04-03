@@ -1,6 +1,6 @@
 import * as S from './Cart.Style';
 import { FiMinus, FiPlus, FiX } from 'react-icons/fi';
-import { useCartItems } from '@/hooks/useCartItems';
+import { useCartItemsActions, useCartItemsState } from '@/hooks/useCartItems';
 import { useCartUI } from '@/hooks/useCartUI';
 import HR from '../hr/HR';
 import React from 'react';
@@ -13,7 +13,8 @@ import Picture from '../picture/Picture';
 
 const Cart = () => {
   const { isOpen, toggleCart } = useCartUI();
-  const { items, totalPrice, updateItem, removeItem } = useCartItems();
+  const { items, totalPrice } = useCartItemsState();
+  const { updateItem, removeItem } = useCartItemsActions();
   const navigate = useNavigate();
   const { state } = useLocation();
 

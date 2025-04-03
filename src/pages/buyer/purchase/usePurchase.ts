@@ -1,13 +1,10 @@
-import usePostcode from '@/hooks/usePostcode';
-import { DaumPostcodeResult } from '@/types/DaumPostcodeType';
 import { PurchaseFormData } from '@/types/FormType';
-import { ChangeEventHandler, MouseEventHandler, useRef, useState } from 'react';
+import { useRef } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useCartItems } from '@/hooks/useCartItems';
+import { useCartItemsActions } from '@/hooks/useCartItems';
 import { useFirebaseAuth, UserInfo } from '@/hooks/useFirebaseAuth';
 import { toast } from 'sonner';
 import { confirmPayment, processPayment } from '@/services/paymentService';
-import { createPurchaseRegisterObject } from '@/utils/createRegisterObject';
 import {
   fetchProducts,
   purchaseProducts,
@@ -27,8 +24,7 @@ const usePurchase = () => {
     formState: { isSubmitting, errors },
     setValue,
   } = useForm<PurchaseFormData>();
-  const { openPostcodeSearch } = usePostcode();
-  const { totalPrice, items, clearCart } = useCartItems();
+  const { itemsRef, clearCart } = useCartItemsActions();
   const { userInfo } = useFirebaseAuth();
   const isReadyToCheckoutRef = useRef<boolean>(false);
   const navigate = useNavigate();
@@ -49,18 +45,21 @@ const usePurchase = () => {
 
     try {
       batchOrderId = await purchaseProducts(
-        items,
+        itemsRef.current,
         userInfo as UserInfo,
-        `${items[0].productName}${items.length > 1 ? ` 외 ${items.length - 1}건` : ''}`,
+        `${itemsRef.current[0].productName}${itemsRef.current.length > 1 ? ` 외 ${itemsRef.current.length - 1}건` : ''}`,
       );
 
       /**
        * Toss Payments 로직
        */
       const confirmData = await processPayment({
-        totalPrice,
+        totalPrice: itemsRef.current.reduce(
+          (prev, cur) => prev + cur.productPrice * cur.productQuantity,
+          0,
+        ),
         orderId: uuidv4(),
-        items,
+        items: itemsRef.current,
         email: data.buyerEmail,
         name: data.buyerName,
         phoneNumber: data.buyerPhoneNumber,
@@ -83,60 +82,23 @@ const usePurchase = () => {
         navigate(state?.prevRoute, { state: state?.prevState || null });
       else navigate('/');
     } catch (error: unknown) {
-      console.log(error);
+      const purchaseError = error as Error & { code: string };
+      console.dir(purchaseError);
       if (batchOrderId) await rollbackBatchOrder({ batchOrderId });
-      toast.error('구매 도중 에러가 발생했습니다.', {
-        description: (error as Error).message,
-      });
-    }
-  };
 
-  const setPostcodeAddress = (data: DaumPostcodeResult) => {
-    // 각 주소의 노출 규칙에 따라 주소를 조합한다.
-    // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-    let addr = ''; // 주소 변수
-    let extraAddr = ''; // 참고항목 변수
-
-    //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
-    if (data.userSelectedType === 'R') {
-      // 사용자가 도로명 주소를 선택했을 경우
-      addr = data.roadAddress;
-    } else {
-      // 사용자가 지번 주소를 선택했을 경우(J)
-      addr = data.jibunAddress;
-    }
-
-    if (data.userSelectedType === 'R') {
-      // 법정동명이 있을 경우 추가한다. (법정리는 제외)
-      // 법정동의 경우 마지막 문자가 "동/로/가"로 끝난다.
-      if (data.bname !== '' && /[동|로|가]$/g.test(data.bname)) {
-        extraAddr += data.bname;
-      }
-      // 건물명이 있고, 공동주택일 경우 추가한다.
-      if (data.buildingName !== '' && data.apartment === 'Y') {
-        extraAddr +=
-          extraAddr !== '' ? ', ' + data.buildingName : data.buildingName;
-      }
-      // 표시할 참고항목이 있을 경우, 괄호까지 추가한 최종 문자열을 만든다.
-      if (extraAddr !== '') {
-        extraAddr = ' (' + extraAddr + ')';
+      if (purchaseError.code === 'PAY_PROCESS_CANCELED') {
+        toast.warning('구매 프로세스를 취소하셨습니다.');
+      } else {
+        toast.error('구매 도중 에러가 발생했습니다.', {
+          description: purchaseError.message,
+        });
       }
     }
-
-    setValue('buyerPostcode', data.zonecode, { shouldValidate: true });
-    setValue('buyerAddress1', addr, { shouldValidate: true });
   };
-
-  const handleClickPostcode: MouseEventHandler<HTMLButtonElement> = () => {
-    openPostcodeSearch(setPostcodeAddress);
-  };
-
-  const registerObject = createPurchaseRegisterObject(register);
 
   const {
     data: productQuantityArray,
     status: productQuantityArrayStatus,
-    error: productQuantityArrayError,
     refetch: refetchProductQuantityArray,
   } = useQuery({
     queryKey: ['products', 'quantity'],
@@ -146,7 +108,7 @@ const usePurchase = () => {
           where(
             'id',
             'in',
-            items.map((item) => item.id),
+            itemsRef.current.map((item) => item.id),
           ),
         ],
         sortOrders: [orderBy('createdAt', 'desc')],
@@ -159,16 +121,14 @@ const usePurchase = () => {
 
   return {
     register,
-    isSubmitting,
     errors,
     handleSubmit,
     submitLogic,
     setValue,
-    handleClickPostcode,
     isReadyToCheckoutRef,
+    isSubmitting,
     productQuantityArray,
     productQuantityArrayStatus,
-    productQuantityArrayError,
   };
 };
 

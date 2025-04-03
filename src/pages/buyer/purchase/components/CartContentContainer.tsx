@@ -6,7 +6,7 @@ import { H4 } from '@/components/ui/header/Header.Style';
 import { FiMinus, FiPlus } from 'react-icons/fi';
 import { RiDeleteBin5Line } from 'react-icons/ri';
 import HR from '@/components/ui/hr/HR';
-import { useCartItems } from '@/hooks/useCartItems';
+import { useCartItemsActions, useCartItemsState } from '@/hooks/useCartItems';
 import Picture from '@/components/ui/picture/Picture';
 
 type CartContentContainerProps = {
@@ -16,7 +16,8 @@ type CartContentContainerProps = {
 
 const CartContentContainer: React.FC<CartContentContainerProps> = memo(
   ({ productQuantityArray, productQuantityArrayStatus }) => {
-    const { items, updateItem, totalPrice, removeItem } = useCartItems();
+    const { items, totalPrice } = useCartItemsState();
+    const { updateItem, removeItem } = useCartItemsActions();
 
     return (
       <>

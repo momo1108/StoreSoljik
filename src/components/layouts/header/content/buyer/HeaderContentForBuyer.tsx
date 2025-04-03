@@ -4,13 +4,13 @@ import { useNavigate } from 'react-router-dom';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { HiShoppingCart } from 'react-icons/hi2';
 import { useCartUI } from '@/hooks/useCartUI';
-import { useCartItems } from '@/hooks/useCartItems';
+import { useCartItemsState } from '@/hooks/useCartItems';
 
 const HeaderContentForBuyer: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useFirebaseAuth();
   const { toggleCart } = useCartUI();
-  const { items } = useCartItems();
+  const { items } = useCartItemsState();
 
   return (
     <S.HeaderTopBox>

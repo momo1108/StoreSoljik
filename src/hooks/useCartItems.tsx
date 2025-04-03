@@ -5,9 +5,11 @@ import {
   useMemo,
   ReactNode,
   useEffect,
+  useCallback,
 } from 'react';
 import { useFirebaseAuth } from './useFirebaseAuth';
 import { ProductSchema } from '@/types/FirebaseType';
+import { useStateWithRef } from './useStateWithRef';
 
 export interface CartItem {
   id: string;
@@ -19,30 +21,44 @@ export interface CartItem {
   // 추가적인 상품 정보...
 }
 
-interface CartItemsContextType {
+type CartItemsStateContextType = {
   items: CartItem[];
+  checkItemIsInCart: (product: ProductSchema | undefined) => boolean;
   cartSize: number;
   totalPrice: number;
-  addItem: (product: ProductSchema, productQuantity: number) => void;
-  updateItem: (
-    product: ProductSchema,
-    productQuantity: number,
-    maxQuantity?: number,
-  ) => void;
+};
+
+type CartItemsActionsContextType = {
+  itemsRef: React.MutableRefObject<CartItem[]>;
+  addItem: (product: ProductSchema, quantity: number) => void;
+  updateItem: (product: ProductSchema, quantity: number, max?: number) => void;
   removeItem: (product: ProductSchema) => void;
-  checkItemIsInCart: (product: ProductSchema | undefined) => boolean;
   clearCart: () => void;
-}
+};
 
-const CartItemsContext = createContext<CartItemsContextType | undefined>(
-  undefined,
-);
+// CartItemsStateContext.ts
+export const CartItemsStateContext = createContext<
+  CartItemsStateContextType | undefined
+>(undefined);
 
-export const useCartItems = () => {
-  const context = useContext(CartItemsContext);
+// CartItemsActionsContext.ts
+export const CartItemsActionsContext = createContext<
+  CartItemsActionsContextType | undefined
+>(undefined);
+
+export const useCartItemsState = () => {
+  const context = useContext(CartItemsStateContext);
+  if (!context) {
+    throw new Error('useCartItemsState must be used within CartItemsProvider');
+  }
+  return context;
+};
+
+export const useCartItemsActions = () => {
+  const context = useContext(CartItemsActionsContext);
   if (!context) {
     throw new Error(
-      'useCartItems 는 CartItemsProvider 내부에서만 사용이 가능합니다.',
+      'useCartItemsActions must be used within CartItemsProvider',
     );
   }
   return context;
@@ -58,7 +74,7 @@ interface CartItemsProviderProps {
  */
 export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
   const { userInfo } = useFirebaseAuth();
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems, itemsRef] = useStateWithRef<CartItem[]>([]);
   const [ready, setReady] = useState<boolean>(false);
 
   useEffect(() => {
@@ -85,9 +101,15 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
     } else setReady(true);
   }, [items, ready]);
 
-  const totalPrice = items.reduce(
-    (accPrice, item) => accPrice + item.productPrice * item.productQuantity,
-    0,
+  const cartSize = useMemo(() => items.length, [items]);
+
+  const totalPrice = useMemo(
+    () =>
+      items.reduce(
+        (accPrice, item) => accPrice + item.productPrice * item.productQuantity,
+        0,
+      ),
+    [items],
   );
 
   const loadCartInfo = () => {
@@ -136,30 +158,36 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
     setItems((prevItems) => prevItems.filter((item) => item.id !== product.id));
   };
 
-  const checkItemIsInCart = (product: ProductSchema | undefined) =>
-    product ? !!items.find((item) => item.id === product.id) : false;
+  const checkItemIsInCart = useCallback(
+    (product: ProductSchema | undefined) =>
+      product ? !!items.find((item) => item.id === product.id) : false,
+    [items],
+  );
 
   const clearCart = () => {
     setItems([]);
   };
 
-  const value = useMemo(
-    () => ({
-      items,
-      cartSize: items.length,
-      totalPrice,
+  const stateValue = useMemo(() => {
+    return { items, cartSize, totalPrice, checkItemIsInCart };
+  }, [items]);
+
+  const actionsValue = useMemo(() => {
+    return {
+      itemsRef,
       addItem,
       updateItem,
       removeItem,
-      checkItemIsInCart,
+
       clearCart,
-    }),
-    [items],
-  );
+    };
+  }, []);
 
   return (
-    <CartItemsContext.Provider value={value}>
-      {children}
-    </CartItemsContext.Provider>
+    <CartItemsActionsContext.Provider value={actionsValue}>
+      <CartItemsStateContext.Provider value={stateValue}>
+        {children}
+      </CartItemsStateContext.Provider>
+    </CartItemsActionsContext.Provider>
   );
 };

@@ -6,11 +6,12 @@ import { FaCheck } from 'react-icons/fa';
 import { ChangeEventHandler, useEffect, useState } from 'react';
 import { ProductSchema } from '@/types/FirebaseType';
 import { useCartUI } from '@/hooks/useCartUI';
-import { useCartItems } from '@/hooks/useCartItems';
+import { useCartItemsActions, useCartItemsState } from '@/hooks/useCartItems';
 
 const InfoPricingBox: React.FC<{ data: ProductSchema }> = ({ data }) => {
   const { isOpen, toggleCart } = useCartUI();
-  const { checkItemIsInCart, addItem } = useCartItems();
+  const { checkItemIsInCart } = useCartItemsState();
+  const { addItem } = useCartItemsActions();
   const navigate = useNavigate();
   const param = useParams();
 
