@@ -39,6 +39,11 @@ const usePurchase = () => {
       return;
     }
 
+    if (itemsRef.current.length === 0) {
+      toast.warning('장바구니에 등록된 상품이 없습니다.');
+      return;
+    }
+
     await refetchProductQuantityArray();
 
     let batchOrderId = '';

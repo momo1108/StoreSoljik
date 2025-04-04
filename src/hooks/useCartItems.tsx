@@ -49,7 +49,9 @@ export const CartItemsActionsContext = createContext<
 export const useCartItemsState = () => {
   const context = useContext(CartItemsStateContext);
   if (!context) {
-    throw new Error('useCartItemsState must be used within CartItemsProvider');
+    throw new Error(
+      'useCartItemsState 는 CartItemsProvider 내부에서만 사용이 가능합니다.',
+    );
   }
   return context;
 };
@@ -58,7 +60,7 @@ export const useCartItemsActions = () => {
   const context = useContext(CartItemsActionsContext);
   if (!context) {
     throw new Error(
-      'useCartItemsActions must be used within CartItemsProvider',
+      'useCartItemsActions 는 CartItemsProvider 내부에서만 사용이 가능합니다.',
     );
   }
   return context;
@@ -170,7 +172,7 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
 
   const stateValue = useMemo(() => {
     return { items, cartSize, totalPrice, checkItemIsInCart };
-  }, [items]);
+  }, [items, cartSize, totalPrice, checkItemIsInCart]);
 
   const actionsValue = useMemo(() => {
     return {
@@ -178,16 +180,15 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
       addItem,
       updateItem,
       removeItem,
-
       clearCart,
     };
   }, []);
 
   return (
-    <CartItemsActionsContext.Provider value={actionsValue}>
-      <CartItemsStateContext.Provider value={stateValue}>
+    <CartItemsStateContext.Provider value={stateValue}>
+      <CartItemsActionsContext.Provider value={actionsValue}>
         {children}
-      </CartItemsStateContext.Provider>
-    </CartItemsActionsContext.Provider>
+      </CartItemsActionsContext.Provider>
+    </CartItemsStateContext.Provider>
   );
 };

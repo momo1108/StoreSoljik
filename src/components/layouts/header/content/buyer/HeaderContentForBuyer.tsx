@@ -3,14 +3,25 @@ import HeaderLogoBox from '../../logo/HeaderLogoBox';
 import { useNavigate } from 'react-router-dom';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { HiShoppingCart } from 'react-icons/hi2';
-import { useCartUI } from '@/hooks/useCartUI';
+import { useCartUIActions } from '@/hooks/useCartUI';
 import { useCartItemsState } from '@/hooks/useCartItems';
 
+const CartButton: React.FC = () => {
+  const { toggleCart } = useCartUIActions();
+  const { items } = useCartItemsState();
+
+  return location.pathname === '/purchase' ? (
+    <></>
+  ) : (
+    <S.CartButton onClick={toggleCart}>
+      <HiShoppingCart size={30} />
+      <S.LengthSpan>{items.length}</S.LengthSpan>
+    </S.CartButton>
+  );
+};
 const HeaderContentForBuyer: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useFirebaseAuth();
-  const { toggleCart } = useCartUI();
-  const { items } = useCartItemsState();
 
   return (
     <S.HeaderTopBox>
@@ -30,14 +41,7 @@ const HeaderContentForBuyer: React.FC = () => {
         />
       </S.HeaderNavBox>
       <S.HeaderMenuBox>
-        {location.pathname === '/purchase' ? (
-          <></>
-        ) : (
-          <S.CartButton onClick={toggleCart}>
-            <HiShoppingCart size={30} />
-            <S.LengthSpan>{items.length}</S.LengthSpan>
-          </S.CartButton>
-        )}
+        <CartButton />
         <S.SellerPageLink to={'/items'}>판매자 페이지</S.SellerPageLink>
         <S.SignoutButton
           onClick={() => {

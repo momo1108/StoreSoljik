@@ -1,7 +1,6 @@
 import * as S from './Cart.Style';
 import { FiMinus, FiPlus, FiX } from 'react-icons/fi';
 import { useCartItemsActions, useCartItemsState } from '@/hooks/useCartItems';
-import { useCartUI } from '@/hooks/useCartUI';
 import HR from '../hr/HR';
 import React from 'react';
 import { H4 } from '../header/Header.Style';
@@ -10,9 +9,11 @@ import { RiDeleteBin5Line } from 'react-icons/ri';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { ProductSchema } from '@/types/FirebaseType';
 import Picture from '../picture/Picture';
+import { useCartUIActions, useCartUIState } from '@/hooks/useCartUI';
 
 const Cart = () => {
-  const { isOpen, toggleCart } = useCartUI();
+  const { isOpen } = useCartUIState();
+  const { toggleCart } = useCartUIActions();
   const { items, totalPrice } = useCartItemsState();
   const { updateItem, removeItem } = useCartItemsActions();
   const navigate = useNavigate();
