@@ -100,11 +100,6 @@ const Signin: React.FC = () => {
                   handleClickThirdParty('x');
                 }}
               />
-              <FaFacebook
-                onClick={() => {
-                  handleClickThirdParty('facebook');
-                }}
-              />
               <FaGithub
                 onClick={() => {
                   handleClickThirdParty('github');

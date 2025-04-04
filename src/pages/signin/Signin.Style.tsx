@@ -57,12 +57,12 @@ export const SignButton = styled(Button)`
 export const SigninIconBox = styled.div`
   display: flex;
   justify-content: center;
-  gap: 16px;
+  gap: 24px;
 
   svg {
-    width: 36px;
-    height: 36px;
-    padding: 4px;
+    width: 48px;
+    height: 48px;
+    padding: 6px;
     fill: ${(props) => props.theme.color.primary};
     border-radius: ${(props) => props.theme.color.radius};
     cursor: pointer;
