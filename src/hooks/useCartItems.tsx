@@ -5,45 +5,62 @@ import {
   useMemo,
   ReactNode,
   useEffect,
+  useCallback,
 } from 'react';
 import { useFirebaseAuth } from './useFirebaseAuth';
 import { ProductSchema } from '@/types/FirebaseType';
+import { useStateWithRef } from './useStateWithRef';
 
 export interface CartItem {
   id: string;
   sellerId: string;
-  sellerEmail: string;
   productName: string;
   productPrice: number;
   productQuantity: number;
-  productImageUrlArray: string[];
+  productImageUrlMapArray: Record<string, string>[];
   // 추가적인 상품 정보...
 }
 
-interface CartItemsContextType {
+type CartItemsStateContextType = {
   items: CartItem[];
+  checkItemIsInCart: (product: ProductSchema | undefined) => boolean;
   cartSize: number;
   totalPrice: number;
-  addItem: (product: ProductSchema, productQuantity: number) => void;
-  updateItem: (
-    product: ProductSchema,
-    productQuantity: number,
-    maxQuantity?: number,
-  ) => void;
+};
+
+type CartItemsActionsContextType = {
+  addItem: (product: ProductSchema, quantity: number) => void;
+  updateItem: (product: ProductSchema, quantity: number, max?: number) => void;
   removeItem: (product: ProductSchema) => void;
-  checkItemIsInCart: (product: ProductSchema | undefined) => boolean;
   clearCart: () => void;
-}
+  getItemsRef: () => React.MutableRefObject<CartItem[]>;
+};
 
-const CartItemsContext = createContext<CartItemsContextType | undefined>(
-  undefined,
-);
+// CartItemsStateContext.ts
+export const CartItemsStateContext = createContext<
+  CartItemsStateContextType | undefined
+>(undefined);
 
-export const useCartItems = () => {
-  const context = useContext(CartItemsContext);
+// CartItemsActionsContext.ts
+export const CartItemsActionsContext = createContext<
+  CartItemsActionsContextType | undefined
+>(undefined);
+
+export const useCartItemsState = () => {
+  const context = useContext(CartItemsStateContext);
   if (!context) {
     throw new Error(
-      'useCartItems 는 CartItemsProvider 내부에서만 사용이 가능합니다.',
+      'useCartItemsState 는 CartItemsProvider 내부에서만 사용이 가능합니다.',
+    );
+  }
+  return context;
+};
+
+export const useCartItemsActions = () => {
+  const context = useContext(CartItemsActionsContext);
+  if (!context) {
+    throw new Error(
+      'useCartItemsActions 는 CartItemsProvider 내부에서만 사용이 가능합니다.',
     );
   }
   return context;
@@ -59,8 +76,15 @@ interface CartItemsProviderProps {
  */
 export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
   const { userInfo } = useFirebaseAuth();
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems, itemsRef] = useStateWithRef<CartItem[]>([]);
   const [ready, setReady] = useState<boolean>(false);
+
+  const loadCartInfo = useCallback(() => {
+    if (userInfo) {
+      const savedCartItems = localStorage.getItem(`cartItems_${userInfo.uid}`);
+      if (savedCartItems) setItems(JSON.parse(savedCartItems) as CartItem[]);
+    }
+  }, [userInfo]);
 
   useEffect(() => {
     loadCartInfo();
@@ -86,82 +110,100 @@ export const CartItemsProvider = ({ children }: CartItemsProviderProps) => {
     } else setReady(true);
   }, [items, ready]);
 
-  const totalPrice = items.reduce(
-    (accPrice, item) => accPrice + item.productPrice * item.productQuantity,
-    0,
-  );
+  const cartSize = useMemo(() => items.length, [items]);
 
-  const loadCartInfo = () => {
-    const savedCartItems = localStorage.getItem(`cartItems_${userInfo?.uid}`);
-    if (savedCartItems) setItems(JSON.parse(savedCartItems) as CartItem[]);
-  };
-
-  const addItem = (product: ProductSchema, productQuantity: number) => {
-    loadCartInfo();
-
-    setItems((prevItems) => [
-      ...prevItems,
-      {
-        id: product.id,
-        sellerId: product.sellerId,
-        sellerEmail: product.sellerEmail,
-        productName: product.productName,
-        productPrice: product.productPrice,
-        productQuantity,
-        productImageUrlArray: product.productImageUrlArray,
-      },
-    ]);
-  };
-
-  const updateItem = (
-    product: ProductSchema,
-    productQuantity: number,
-    maxQuantity: number = 200,
-  ) => {
-    loadCartInfo();
-
-    if (isNaN(productQuantity)) return;
-
-    if (productQuantity < 1) productQuantity = 1;
-    else if (productQuantity > maxQuantity) productQuantity = maxQuantity;
-
-    setItems((prevItems) =>
-      prevItems.map(
-        (item): CartItem =>
-          item.id === product.id ? { ...item, productQuantity } : item,
+  const totalPrice = useMemo(
+    () =>
+      items.reduce(
+        (accPrice, item) => accPrice + item.productPrice * item.productQuantity,
+        0,
       ),
-    );
-  };
-
-  const removeItem = (product: ProductSchema) => {
-    loadCartInfo();
-    setItems((prevItems) => prevItems.filter((item) => item.id !== product.id));
-  };
-
-  const checkItemIsInCart = (product: ProductSchema | undefined) =>
-    product ? !!items.find((item) => item.id === product.id) : false;
-
-  const clearCart = () => {
-    setItems([]);
-  };
-
-  const value = useMemo(
-    () => ({
-      items,
-      cartSize: items.length,
-      totalPrice,
-      addItem,
-      updateItem,
-      removeItem,
-      checkItemIsInCart,
-      clearCart,
-    }),
     [items],
   );
 
+  const checkItemIsInCart = useCallback(
+    (product: ProductSchema | undefined) =>
+      product ? !!items.find((item) => item.id === product.id) : false,
+    [items],
+  );
+
+  const addItem = useCallback(
+    (product: ProductSchema, productQuantity: number) => {
+      loadCartInfo();
+
+      setItems((prevItems) => [
+        ...prevItems,
+        {
+          id: product.id,
+          sellerId: product.sellerId,
+          productName: product.productName,
+          productPrice: product.productPrice,
+          productQuantity,
+          productImageUrlMapArray: product.productImageUrlMapArray,
+        },
+      ]);
+    },
+    [loadCartInfo],
+  );
+
+  const updateItem = useCallback(
+    (
+      product: ProductSchema,
+      productQuantity: number,
+      maxQuantity: number = 200,
+    ) => {
+      loadCartInfo();
+
+      if (isNaN(productQuantity)) return;
+
+      if (productQuantity < 1) productQuantity = 1;
+      else if (productQuantity > maxQuantity) productQuantity = maxQuantity;
+
+      setItems((prevItems) =>
+        prevItems.map(
+          (item): CartItem =>
+            item.id === product.id ? { ...item, productQuantity } : item,
+        ),
+      );
+    },
+    [loadCartInfo],
+  );
+
+  const removeItem = useCallback(
+    (product: ProductSchema) => {
+      loadCartInfo();
+      setItems((prevItems) =>
+        prevItems.filter((item) => item.id !== product.id),
+      );
+    },
+    [loadCartInfo],
+  );
+
+  const clearCart = useCallback(() => {
+    setItems([]);
+  }, []);
+
+  const getItemsRef = useCallback(() => itemsRef, [itemsRef]);
+
+  const stateValue = useMemo(() => {
+    return { items, cartSize, totalPrice, checkItemIsInCart };
+  }, [items, cartSize, totalPrice, checkItemIsInCart]);
+
+  const actionsValue = useMemo(() => {
+    return {
+      addItem,
+      updateItem,
+      removeItem,
+      clearCart,
+      getItemsRef,
+    };
+  }, [addItem, updateItem, removeItem, clearCart, getItemsRef]);
+
   return (
-    <CartItemsContext.Provider value={value}>
-      {children}
-    </CartItemsContext.Provider>
+    <CartItemsStateContext.Provider value={stateValue}>
+      <CartItemsActionsContext.Provider value={actionsValue}>
+        {children}
+      </CartItemsActionsContext.Provider>
+    </CartItemsStateContext.Provider>
   );
 };

@@ -93,9 +93,7 @@ export const RegistrationContentItemBox = styled.div`
   gap: 20px;
   padding: 25px 40px 35px 40px;
   border-radius: 20px;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
 `;
 
 export const RegistrationContentImageBox = styled(RegistrationContentItemBox)`

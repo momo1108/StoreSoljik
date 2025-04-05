@@ -9,21 +9,7 @@ export const CardContainer = styled.div`
   border-radius: ${(props) => props.theme.color.radius};
   align-items: center;
   gap: 25px;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
-`;
-
-export const CardImageBox = styled.div<{ $src: string }>`
-  width: 150px;
-  height: 150px;
-  flex-shrink: 0;
-  background-color: #efefef;
-  background-image: url(${(props) => props.$src});
-  background-repeat: no-repeat;
-  background-size: cover;
-  background-position: center;
-  border-radius: ${(props) => props.theme.color.radius};
+  box-shadow: ${(props) => props.theme.color.borderShadow};
 `;
 
 export const CardContentBox = styled.div`

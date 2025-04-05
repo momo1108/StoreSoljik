@@ -30,9 +30,7 @@ export const ImageContainer = styled.div`
 
 export const CarouselWrapper = styled.div`
   border-radius: 6px;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
   overflow: hidden;
 `;
 
@@ -42,9 +40,7 @@ export const ChattingContainer = styled.div`
   gap: 15px;
   padding: 15px 20px;
   border-radius: 6px;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
 
   & > h4 {
     border-bottom: 1px solid ${({ theme }) => theme.color.brighterGray};
@@ -68,9 +64,7 @@ export const ChattingBox = styled.div`
   padding: 10px;
   gap: 10px;
   overflow: auto;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
 
   h4 {
     margin: auto 0;
@@ -98,9 +92,7 @@ export const ChattingBox = styled.div`
     position: relative;
     margin-top: 30px;
     padding: 6px 12px;
-    box-shadow:
-      rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-      rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+    box-shadow: ${(props) => props.theme.color.borderShadow};
     border-radius: 6px;
 
     &.hideHeader {
@@ -178,9 +170,7 @@ export const InfoContainer = styled.div`
   overflow: hidden;
   padding: 15px 20px;
   border-radius: 6px;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
 `;
 
 // 카테고리 정보
@@ -200,7 +190,7 @@ export const InfoBodyWrapper = styled.div`
   gap: 25px;
 `;
 
-export const InfoContentBox = styled.div`
+export const InfoDescriptionBox = styled.div`
   display: flex;
   flex-direction: column;
   align-items: start;
@@ -230,7 +220,7 @@ export const DescriptionP = styled.p`
   line-height: ${(props) => props.theme.lineHeight.base};
 `;
 
-export const InfoFormBox = styled.div`
+export const InfoPricingBox = styled.div`
   display: flex;
   flex-direction: column;
   width: 100%;

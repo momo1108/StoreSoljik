@@ -60,8 +60,8 @@ function App() {
     >
       <GlobalStyle />
       <BrowserRouter>
-        <AuthProvider>
-          <QueryClientProvider client={queryClient}>
+        <QueryClientProvider client={queryClient}>
+          <AuthProvider>
             <ModalProvider>
               <MainRouter />
             </ModalProvider>
@@ -76,8 +76,8 @@ function App() {
                 closeButton: true,
               }}
             />
-          </QueryClientProvider>
-        </AuthProvider>
+          </AuthProvider>
+        </QueryClientProvider>
       </BrowserRouter>
     </ThemeProvider>
   );

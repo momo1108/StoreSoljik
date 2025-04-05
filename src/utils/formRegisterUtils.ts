@@ -14,9 +14,9 @@ import { UseFormRegister } from 'react-hook-form';
 export const createSignupRegisterObject = (
   register: UseFormRegister<SignupFormDataType>,
 ) => ({
-  registerAccountType: register('accountType', {
-    required: '계정 종류 선택은 필수입니다.',
-  }),
+  // registerAccountType: register('accountType', {
+  //   required: '계정 종류 선택은 필수입니다.',
+  // }),
 
   registerEmail: register('email', {
     required: '아이디는 필수 입력입니다.',
@@ -41,23 +41,23 @@ export const createSignupRegisterObject = (
     required: '패스워드는 필수 입력입니다.',
   }),
 
-  registerNickname: register('nickname', {
-    required: '닉네임은 필수 입력입니다.',
-    pattern: {
-      value: /^[0-9a-zA-Z가-힣\x20]*$/,
-      message: '한글/영어/숫자만 사용해주세요.',
-    },
-    validate: (value: string) =>
-      !!value.trim() || '공백이 아닌 내용을 입력해주세요.',
-    minLength: {
-      value: 2,
-      message: '닉네임은 2자 이상이어야 합니다.',
-    },
-    maxLength: {
-      value: 10,
-      message: '닉네임은 10자 이내여야 합니다.',
-    },
-  }),
+  // registerNickname: register('nickname', {
+  //   required: '닉네임은 필수 입력입니다.',
+  //   pattern: {
+  //     value: /^[0-9a-zA-Z가-힣\x20]*$/,
+  //     message: '한글/영어/숫자만 사용해주세요.',
+  //   },
+  //   validate: (value: string) =>
+  //     !!value.trim() || '공백이 아닌 내용을 입력해주세요.',
+  //   minLength: {
+  //     value: 2,
+  //     message: '닉네임은 2자 이상이어야 합니다.',
+  //   },
+  //   maxLength: {
+  //     value: 10,
+  //     message: '닉네임은 10자 이내여야 합니다.',
+  //   },
+  // }),
 });
 
 /**

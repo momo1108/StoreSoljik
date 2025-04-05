@@ -8,13 +8,11 @@
   <p align="center">
     1인 개발 커머스 프로젝트 입니다.
     <br />
-    <img src="src/assets/images/main_screenshot.png" width="600" alt="main_screenshot">
+    <img src="src/assets/images/signin_page.png" width="600" alt="signin_page">
     <br />
-    <a href="https://github.com/othneildrew/Best-README-Template" >데모 사이트</a>
+    <a href="https://store-soljik.vercel.app/signin" >데모 사이트</a>
     <br />
-    테스트 판매자 계정 : momo1108@daum.net / 1q2w3e4r!@
-    <br />
-    테스트 구매자 계정 : test@test.com / 1q2w3e4r!@
+    테스트 계정 : test@test.com / 1q2w3e4r!@
     <br />
     Contact : banghyechan@gmail.com
   </p>
@@ -68,27 +66,49 @@
 <br />
 
 ## 프로젝트 소개
-세상에는 수많은 종류의 커머스들이 존재합니다. 그러나, 리뷰에 관해서는 신뢰성이 보장되지 않는다는 공통점이 존재합니다. 이 프로젝트는 그러한 불만을 해소하기 위해 만들어졌습니다.
+세상에는 수많은 종류의 커머스들이 존재합니다. 그러나, 리뷰에 관해서는 신뢰성이 보장되지 않는 플랫폼이 대다수입니다. 이 프로젝트는 그러한 불만을 해소하기 위해 만들어졌습니다.
 
 **어떻게?**
 
-> - 기존의 서비스들과 동일하게 리뷰와 평점 기능을 사용합니다.
-> - 상품마다 실시간 소통이 가능한 채팅 기능을 통해, 실제 구매자와 궁금한 점들을 소통할 수 있습니다.
+상품마다 실시간 소통이 가능한 채팅 기능을 통해, 다른 회원 혹은 실제 구매자와 궁금한 점들을 소통할 수 있습니다.
 
-이 프로젝트의 목적은 단순한 기능개발 뿐 아니라, 최적화와 관련된 스킬을 익히는 것을 목적으로 합니다.
+상품의 실 구매자는 채팅창에 출력되는 뱃지를 통해 확인할 수 있습니다.
+
+<br />
+
+### 구현 기능(페이지 단위)
+1. 로그인 페이지(자체 로그인 / 소셜 로그인 가능)
+2. 회원가입 페이지
+3. 구매자 페이지
+  - 홈(인기 상품 / 카테고리 별 최신 상품)
+  - 카테고리 별 상품 조회(카테고리를 통한 상품 필터링, 등록일 / 가격 기준 정렬)
+  - 구매내역
+4. 판매자 페이지
+  - 판매 상품 관리(판매자가 등록한 상품 목록 확인 / CRUD 리다이렉트)
+  - 주문 상태 관리(판매 상품 관련 주문 확인 / 주문 상태 변경)
+  - 판매 상품 등록/업데이트
 
 <br />
 
-### 구현 기능
-1. 회원가입 / 로그인 / 로그아웃
-2. 판매자 판매상품 CRUD
-3. 구매자 상품 조회, 구매
+<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
+<br />
 
+## 최적화
+관련 내용은 gitbook 링크로 리다이렉트 됩니다.
 
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+1. <a href="https://store-soljik.vercel.app/signin" >이미지 최적화</a>
+2. <a href="https://store-soljik.vercel.app/signin" >Lazy Loading / Code Splitting</a>
+3. <a href="https://store-soljik.vercel.app/signin" >렌더링 최적화</a>
 
 <br />
+
+## 트러블 슈팅
+관련 내용은 gitbook 링크로 리다이렉트 됩니다.
+
+1. <a href="https://store-soljik.vercel.app/signin" >BaaS(Firebase) 환경에서의 세션 관리</a>
+2. <a href="https://store-soljik.vercel.app/signin" >Firebase 저장소의 CORS 에러 해결</a>
+3. <a href="https://store-soljik.vercel.app/signin" >다음 우편번호 API 적용하기</a>
+
 <br />
 
 <picture><img src="src/assets/images/hr.png" alt="hr"></picture>
@@ -103,10 +123,7 @@
 <br />
 
 ### 선정 이유
-<details>
-  <summary><b>Front-End</b></summary>
-<br>
-
+#### Front-End
 [![TypeScript][TypeScript]][TypeScript-url]
 - 타입 안정성 확보
 - 컴파일 타임에 에러 발견
@@ -133,15 +150,11 @@
   3. 성능 최적화 : **TailwindCSS**(정적 CSS 클래스를 활용한 빠른 스타일 해석, 사용할 CSS만 번들링하여 크기 최소화) vs *Styled-Component*(스타일의 객체 단위 모듈화)
 - 개발 속도나 성능을 고려하면 TailwindCSS 가 좋겠으나, 많이 사용되지만 한번도 사용해보지 않은 **Styled-Components** 의 사용법을 익혀보기로 결정.
 
+<br />
 
-</details>
-
-<details>
-  <summary><b>Back-End</b></summary>
-<br>
-
+#### Back-End
 [![Firebase][Firebase]][Firebase-url]
-- NoSQL 기반으로 프로젝트의 기능 변동에 따른 변경이 자유로움
+- NoSQL 기반으로 프로젝트의 기능 변동에 따른 DB 스키마 변경이 자유로움
 - 대용량 데이터셋의 빠른 처리 속도
 - 다양한 기능의 product 제공
   - 인증 서비스(Firebase Authentication)
@@ -149,14 +162,8 @@
   - 컨텐츠(이미지, 오디오, 비디오 등) 저장소(Clouc Storage)
 
 <br />
-<br />
 
-</details>
-
-<details>
-  <summary><b>Deploy</b></summary>
-<br>
-
+#### Deploy
 [![Vercel][Vercel]][Vercel-url]
 - Git 기반의 워크 플로우를 지원하여 Git Repo 기반으로 쉽고 빠른 배포가 가능
 
@@ -164,23 +171,15 @@
 - Native ESM 기반의 빠른 개발 서버 지원
   - 모든 모듈 파일을 번들링하는 과정 대신 수정된 모듈만 dynamic import 를 통해 불러옴
   - HTTP 헤더를 활용해 소스코드와 디펜던시를 캐싱하여 페이지 로딩 최적화
- CD 적용
 
-</details>
+<br />
 
-<details>
-  <summary><b>CI/CD</b></summary>
-<br>
-
+#### CI / CD
 [![Github][Github]][Github-url]
 - 브랜치 전략에 기반한 CI 적용
 
 [![GithubActions][GithubActions]][GithubActions-url]
 - Vercel 과의 연동을 통한 CD 적용
-
-</details>
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <br />
 
@@ -198,63 +197,35 @@
 
 <br />
 
-<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
-<br />
-
 ## 프로젝트 폴더 구조
 ```
-📁 public
 📁 src
- ├──📁 assets
+ ├──📁 assets       // 이미지, 폰트 파일 등 프로젝트 내부에서 사용될 파일들을 저장합니다.
  │   ├──📁 fonts
  │   └──📁 images
- ├──📁 components
+ ├──📁 components   // 기능별로 코드를 세분화하여 컴포넌트로 저장합니다.
  │   ├──📁 ui
  │   └──📁 form
  │   └──📁 layouts
- ├──📁 pages
- ├──📁 router
- ├──📁 hooks
- ├──📁 utils
- ├──📁 services
- ├──📁 style
+ ├──📁 pages        // 각 페이지의 컴포넌트, 하위 컴포넌트 폴더를 저장하고 관리합니다.
+ ├──📁 router       // 페이지 라우팅 관련 파일을 저장합니다.
+ ├──📁 hooks        // 전역적으로 사용되는 커스텀 hook 들을 저장합니다.
+ ├──📁 utils        // 모든 유틸리티 기능들을 저장합니다.
+ ├──📁 services     // 외부 API와 상호작용하는 모든 코드들을 저장합니다.
+ ├──📁 style        // styled componets 에 사용할 글로벌 스타일이나 테마를 저장합니다.
  │   ├──📄 GlobalStyle.Styled.ts
  │   └──📄 theme.ts
- ├──📁 tests
+ ├──📁 tests        // 모든 테스트 코드들을 저장합니다.
  ├──📄 App.tsx
  └──📄 main.tsx
-📄 config 파일들
-📄 README.md
 ```
 
-<details>
-  <summary><b>구조 설명</b></summary>
-<br>
-
-|디렉토리명|역할|
-|:---|:---|
-|**assets**|프로젝트의 이미지, 폰트 파일 등 코드와 관련없는 파일들을 저장합니다.|
-|**components**|기능별로 코드를 세분화하여 컴포넌트로 저장합니다.<br><br>1. 버튼, 모달, 카드 등의 사용자 인터페이스 요소가 포함된 ui 폴더<br>2. input, checkbox, date picker 등 form과 관련된 제어를 하기 위한 form 폴더<br>3. 사이드바나 내비게이션 바, 컨테이너 등 레이아웃을 기반으로 하는 layouts 폴더|
-|**pages**|각 페이지의 폴더가 위치하며, 각 페이지의 루트 파일(index.tsx)과 해당 페이지에 속하는 모든 파일(ex. Login.Styled.ts, LoginForm.tsx 컴포넌트, useLogin.ts 훅)을 저장하여 페이지별 코드와 전역 코드를 분리합니다.<br>페이지 관련 코드를 한 곳에 모두 모아놓기 때문에, 이해하기가 쉬워집니다.|
-|**router**|페이지 라우팅 관련 파일을 저장합니다.|
-|**hooks**|여러 페이지에서 사용되는 전역 hook 들을 저장합니다. 특정 페이지에서만 사용되는 hook 은 해당 페이지 폴더에 저장합니다.|
-|**utils**|모든 유틸리티 기능들을 저장합니다.|
-|**services**|외부 API와 상호작용하는 모든 코드들을 저장합니다.(ex. Firebase 에서 상품 목록 불러오기 등의 비즈니스 로직 코드)|
-|**style**|styled componets 에 사용할 글로벌 스타일이나 테마를 저장합니다.|
-|**tests**|모든 테스트 코드들을 저장합니다.|
-
-</details>
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-<br />
-
-<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
 ## 코드 컨벤션
 ### 파일 이름
 - Components, Styled Components : 파스칼 케이스
-  - Styled Components 의 경우 컴포넌트명 뒤에 `.Styled` 를 붙인다.
+  - Styled Components 의 경우 컴포넌트명 뒤에 `.Styled` 를 붙입니다.
   - ex) `ProductList.tsx`, `PrudctList.Styled.ts`
 - Context : 파스칼케이스 + Context 형태
   - ex) `ProductContext.ts`
@@ -262,7 +233,7 @@
   - ex) `useMyHook.ts`
 
 ### 변수명
-기본적으로 카멜 케이스를 사용한다. 특정 타입은 prefix 혹은 postfix 를 적용한다.
+기본적으로 카멜 케이스를 사용합니다. 특정 타입은 prefix 혹은 postfix 를 적용합니다.
 
 |분류|Prefix/Postfix|예시|
 |:-:|:-:|:-:|
@@ -272,7 +243,7 @@
 |object|Obj(postfix)|basketObj|
 
 ### 함수명
-기본적으로 카멜 케이스를 사용한다. 특정 함수(이벤트 핸들러, CRUD)들의 경우 prefix 를 적용한다.
+기본적으로 카멜 케이스를 사용합니다. 특정 함수(이벤트 핸들러, CRUD)들의 경우 prefix 를 적용합니다.
 
 |분류|Prefix|예시|
 |:-:|:-:|:-:|
@@ -283,9 +254,9 @@
 |Delete|delete|deleteProduct()|
 
 ### Styled-Components
-이름은 파스칼 케이스로 작성하며, 컴포넌트의 최상위 태그명을 따라 postfix 를 붙여서 네이밍을 한다.
+이름은 파스칼 케이스로 작성하며, 컴포넌트의 최상위 태그명을 따라 postfix 를 붙여서 네이밍을 합니다.
 
-레이아웃이나 UI 컴포넌트 중 html 태그에 기반한 컴포넌트를 작성할 경우, 최상위 태그의 이름에 `Styled` 라는 prefix 를 붙여서 실제 사용할 컴포넌트와 구분한다.(ex. `StyledHeader`, `StyledButton`)
+레이아웃이나 UI 컴포넌트 중 html 태그에 기반한 컴포넌트를 작성할 경우, 최상위 태그의 이름에 `Styled` 라는 prefix 를 붙여서 실제 사용할 컴포넌트와 구분합니다.(ex. `StyledHeader`, `StyledButton`)
 
 |최상위 태그|Postfix|예시|
 |:-:|:-:|:-:|
@@ -296,7 +267,7 @@
 |main||StyledMain|
 |footer||StyledFooter|
 
-Styled-Components 를 사용할 땐 S dot 네이밍을 사용한다.
+Styled-Components 를 사용할 땐 S dot 네이밍을 사용합니다.
 
 ```jsx
 import * as S from 'Product.Styled'
@@ -307,14 +278,8 @@ import * as S from 'Product.Styled'
 
 <br />
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-<br />
-
-<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
-<br />
-
 ## 커밋 컨벤션
-커밋은 가능한 하나의 문제 단위로 쪼개서 작성하여 알아보기 쉽게 합니다. 커밋의 목적별로 Prefix 를 사용하며, 종류는 다음과 같습니다.
+커밋은 가능한 하나의 문제 단위로 쪼개서 작성하여 알아보기 쉽게합니다. 커밋의 목적별로 Prefix 를 사용하며, 종류는 다음과 같습니다.
 
 |Prefix|분류|예시|
 |:-|:-:|:-:|
@@ -326,10 +291,6 @@ import * as S from 'Product.Styled'
 |**assets:**|이미지, 폰트 업데이트|assets: 로그인 페이지 배경 이미지 업데이트|
 |**test:**|테스트 코드 관련|test: Product CRUD API 테스트|
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-<br />
-
-<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
 <br />
 
 ## Eslint
@@ -346,23 +307,6 @@ import * as S from 'Product.Styled'
 }
 ```
 
-### 의존성
-```json
-{
-  "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "^7.13.1",
-    "@typescript-eslint/parser": "^7.13.1",
-    "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-plugin-prettier": "^5.1.3",
-    "eslint-plugin-react": "^7.34.3",
-    "eslint-plugin-react-hooks": "^4.6.2",
-    "eslint-plugin-react-refresh": "^0.4.7",
-    "prettier": "^3.3.2",
-  }
-}
-```
-
 ## Prettier
 기본 설정 + 홑따옴표 사용
 
@@ -374,32 +318,8 @@ import * as S from 'Product.Styled'
 }
 ```
 
-## 관련 VSCode 설정
-```json
-{
-  "editor.codeActionsOnSave": {
-    "source.fixAll.eslint": "always"
-  },
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true
-}
-```
-
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 <br />
-
-<picture><img src="src/assets/images/hr.png" alt="hr"></picture>
-<br />
-
-## 트러블 슈팅
-### Firebase 연동
-1. Firestore 에서의 데이터 filtering, ordering
-2. Firebase authentication 서비스 적용
-
-### React Query 적용
-1. Optimistic Update 의 오작동 개선
-2. 여러 필터링 조건에 따른 infiniteQuery 설정
-
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

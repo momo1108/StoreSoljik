@@ -70,6 +70,10 @@ export const CategoryButton = styled(Button)`
 export const ProductCardList = styled.ul`
   display: flex;
   gap: 20px;
+
+  img {
+    border-radius: 0;
+  }
 `;
 
 export const ErrorBox = styled.div`

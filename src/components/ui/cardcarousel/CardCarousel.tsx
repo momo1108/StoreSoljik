@@ -4,6 +4,7 @@ import { H3, H4 } from '../header/Header.Style';
 import Button from '../button/Button';
 import { Link } from 'react-router-dom';
 import { ProductSchema } from '@/types/FirebaseType';
+import Picture from '../picture/Picture';
 
 export const defaultSetiing = {
   dots: true,
@@ -31,7 +32,11 @@ const CardCarousel: React.FC<CarouselProps> = ({
         {(data as ProductSchema[]).map((product, index) => (
           <div key={`carousel_${index}`}>
             <S.CarouselCardItemBox>
-              <S.CardImageBox $src={product.productImageUrlArray[0]} />
+              <Picture
+                imageUrlMap={product.productImageUrlMapArray[0]}
+                size={240}
+              />
+              {/* <S.CardImageBox $src={product.productImageUrlArray[0]} /> */}
               <S.CardContentBox>
                 <S.CardHeaderBox>
                   <S.HeaderTagBox>

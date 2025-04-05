@@ -1,4 +1,4 @@
-import { db } from '@/firebase';
+import { db } from '@/firebase/firestore';
 import { collection, doc, getDoc, getDocs, setDoc } from 'firebase/firestore';
 
 export const createCategory = async (name: string) => {

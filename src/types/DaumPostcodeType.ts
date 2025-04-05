@@ -4,16 +4,10 @@ declare global {
   }
 }
 
-interface PostcodeConstructor {
-  new (options: { oncomplete: (data: DaumPostcodeResult) => void }): IPostcode;
-}
-
-interface IPostcode {
-  open: () => void;
-}
-
 interface IDaum {
-  Postcode: PostcodeConstructor;
+  Postcode: new (options: {
+    oncomplete: (data: DaumPostcodeResult) => void;
+  }) => { open: () => void };
 }
 
 export type DaumPostcodeResult = {
@@ -24,7 +18,8 @@ export type DaumPostcodeResult = {
   zonecode: string;
   address: string;
   addressEnglish: string;
-  addressType: string;
+  addressType: 'R' | 'J';
+  apartment: 'Y' | 'N';
   bcode: string;
   bname: string;
   bnameEnglish: string;
@@ -37,11 +32,9 @@ export type DaumPostcodeResult = {
   sigungu: string;
   sigunguEnglish: string;
   sigunguCode: string;
-  userLanguageType: string;
   query: string;
   buildingName: string;
   buildingCode: string;
-  apartment: string;
   jibunAddress: string;
   jibunAddressEnglish: string;
   roadAddress: string;
@@ -50,8 +43,9 @@ export type DaumPostcodeResult = {
   autoRoadAddressEnglish: string;
   autoJibunAddress: string;
   autoJibunAddressEnglish: string;
-  userSelectedType: string;
-  noSelected: string;
+  userLanguageType: 'K' | 'E';
+  userSelectedType: 'R' | 'J';
+  noSelected: 'Y' | 'N';
   hname: string;
   roadnameCode: string;
   roadname: string;
