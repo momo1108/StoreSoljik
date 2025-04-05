@@ -21,6 +21,7 @@ const CartContentContainer: React.FC<CartContentContainerProps> = memo(
 
     return (
       <>
+        <S.ContainerHeaderBox>장바구니 정보</S.ContainerHeaderBox>
         <S.ContentBox>
           {items.map((item, index) => (
             <React.Fragment key={item.id}>

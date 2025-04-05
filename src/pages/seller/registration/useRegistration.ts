@@ -16,7 +16,7 @@ import {
 } from '@/services/categoryService';
 import { toast } from 'sonner';
 import { ProductFormData } from '@/types/FormType';
-import { createProductRegisterObject } from '@/utils/createRegisterObject';
+import { createProductRegisterObject } from '@/utils/formRegisterUtils';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { getKoreanIsoDatetime } from '@/utils/utils';
 import { resizeImage } from '@/utils/imageUtils';

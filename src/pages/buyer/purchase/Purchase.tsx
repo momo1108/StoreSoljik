@@ -15,10 +15,10 @@ const PurchaseContainer: React.FC = () => {
     handleSubmit,
     submitLogic,
     setValue,
-    isReadyToCheckoutRef,
     isSubmitting,
     productQuantityArray,
     productQuantityArrayStatus,
+    handleChangeCheckbox,
   } = usePurchase();
 
   return (
@@ -31,7 +31,6 @@ const PurchaseContainer: React.FC = () => {
         setValue={setValue}
       />
       <S.CartContainer>
-        <S.ContainerHeaderBox>장바구니 정보</S.ContainerHeaderBox>
         <CartContentContainer
           productQuantityArray={productQuantityArray}
           productQuantityArrayStatus={productQuantityArrayStatus}
@@ -41,9 +40,7 @@ const PurchaseContainer: React.FC = () => {
           <Checkbox
             id='purchaseCheckbox'
             description='구매 품목과 결제 금액을 확인했습니다.'
-            onChange={(e) => {
-              isReadyToCheckoutRef.current = e.target.checked;
-            }}
+            onChange={handleChangeCheckbox}
           />
           <S.CheckoutButton
             type='submit'

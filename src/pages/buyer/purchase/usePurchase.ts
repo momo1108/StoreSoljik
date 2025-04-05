@@ -1,5 +1,5 @@
 import { PurchaseFormData } from '@/types/FormType';
-import { useRef } from 'react';
+import { useCallback, useRef } from 'react';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useCartItemsActions } from '@/hooks/useCartItems';
 import { useFirebaseAuth, UserInfo } from '@/hooks/useFirebaseAuth';
@@ -124,6 +124,13 @@ const usePurchase = () => {
     refetchOnMount: 'always',
   });
 
+  const handleChangeCheckbox = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      isReadyToCheckoutRef.current = e.target.checked;
+    },
+    [],
+  );
+
   return {
     register,
     errors,
@@ -134,6 +141,7 @@ const usePurchase = () => {
     isSubmitting,
     productQuantityArray,
     productQuantityArrayStatus,
+    handleChangeCheckbox,
   };
 };
 

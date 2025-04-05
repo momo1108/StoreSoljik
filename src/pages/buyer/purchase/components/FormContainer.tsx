@@ -2,7 +2,7 @@ import usePostcode from '@/hooks/usePostcode';
 import * as S from '../Purchase.Style';
 import Button from '@/components/ui/button/Button';
 import { PurchaseFormData } from '@/types/FormType';
-import { createPurchaseRegisterObject } from '@/utils/createRegisterObject';
+import { createPurchaseRegisterObject } from '@/utils/formRegisterUtils';
 import React, { memo, MouseEventHandler } from 'react';
 import {
   FieldErrors,

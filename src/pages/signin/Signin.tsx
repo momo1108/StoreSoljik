@@ -8,7 +8,7 @@ import signinImgUrlPng from '@/assets/images/signup.png';
 import signinImgUrlWebp from '@/assets/images/signup.webp';
 import HR from '@/components/ui/hr/HR';
 import { useTheme } from 'styled-components';
-import { FaFacebook, FaGithub, FaGoogle } from 'react-icons/fa';
+import { FaGithub, FaGoogle } from 'react-icons/fa';
 import { FaXTwitter } from 'react-icons/fa6';
 
 const Signin: React.FC = () => {
