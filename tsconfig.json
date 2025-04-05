@@ -6,6 +6,13 @@
     },
     {
       "path": "./tsconfig.node.json"
+    },
+    { "path": "./tsconfig.scripts.json" }
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
     }
-  ]
+  }
 }

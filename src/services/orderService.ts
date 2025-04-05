@@ -1,11 +1,10 @@
-import { db } from '@/firebase';
+import { buildFirestoreQuery, db } from '@/firebase/firestore';
 import { OrderSchema, OrderStatus } from '@/types/FirebaseType';
 import {
   FetchInfiniteQueryParams,
   FetchInfiniteQueryResult,
   FetchQueryParams,
 } from '@/types/ReactQueryType';
-import { buildFirestoreQuery } from '@/utils/firebaseUtils';
 import {
   collection,
   doc,

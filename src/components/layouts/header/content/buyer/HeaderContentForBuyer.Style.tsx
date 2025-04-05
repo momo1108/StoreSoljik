@@ -1,6 +1,7 @@
 import Button from '@/components/ui/button/Button';
 import NavBar from '@/components/ui/navbar/NavBar';
 import media from '@/style/media';
+import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 
 export const HeaderTopBox = styled.div`
@@ -12,6 +13,7 @@ export const HeaderTopBox = styled.div`
   ${media.xsmall`gap: 8px;`}
   ${media.xxsmall`gap: 8px;`}
   padding: 10px 0 10px 0;
+  font-weight: bold;
 `;
 
 export const HeaderNavBox = styled.nav`
@@ -62,7 +64,7 @@ export const HeaderMenuBox = styled.div`
 export const CartButton = styled.button`
   position: relative;
   display: flex;
-  padding: 0;
+  padding: 0 8px;
   border: none;
   cursor: pointer;
   background: none;
@@ -74,17 +76,24 @@ export const CartButton = styled.button`
 export const LengthSpan = styled.span`
   position: absolute;
   top: -11px;
-  right: 0px;
+  right: 8px;
   padding: 0 4px;
   min-width: 16px;
   height: 16px;
   line-height: 16px;
   text-align: center;
   font-size: ${({ theme }) => theme.fontSize.sm};
-  font-weight: bold;
   color: ${({ theme }) => theme.color.background};
   background-color: ${({ theme }) => theme.color.foreground};
   border-radius: 8px;
+`;
+
+export const SellerPageLink = styled(Link)`
+  padding: 8px;
+  border-radius: 8px;
+  &:hover {
+    background: ${(props) => props.theme.color.brightestGray};
+  }
 `;
 
 export const SignoutButton = styled(Button)`

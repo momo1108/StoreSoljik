@@ -24,5 +24,9 @@ dist-ssr
 *.sln
 *.sw?
 
-Todo.md
+# Todo.md
 .env*
+auth_info_thirdparty.txt
+
+# bundle analyzer
+stats.html

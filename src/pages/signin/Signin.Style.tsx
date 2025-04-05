@@ -1,5 +1,6 @@
 import Checkbox from '@/components/form/checkbox/Checkbox';
 import Button from '@/components/ui/button/Button';
+import Picture from '@/components/ui/picture/Picture';
 import media from '@/style/media';
 import styled from 'styled-components';
 
@@ -23,7 +24,7 @@ export const SigninFormContainer = styled.form`
   gap: 22px;
   box-sizing: border-box;
   width: 500px;
-  padding: 40px 50px;
+  padding: 40px;
 
   & > h2,
   & > h3,
@@ -56,17 +57,28 @@ export const SignButton = styled(Button)`
 export const SigninIconBox = styled.div`
   display: flex;
   justify-content: center;
-  gap: 8px;
+  gap: 24px;
+
+  svg {
+    width: 48px;
+    height: 48px;
+    padding: 6px;
+    fill: ${(props) => props.theme.color.primary};
+    border-radius: ${(props) => props.theme.color.radius};
+    cursor: pointer;
+
+    &:hover {
+      fill: ${(props) => props.theme.color.primaryHover};
+      box-shadow: ${(props) => props.theme.color.borderShadow};
+    }
+  }
 `;
 
-export const SigninImageBox = styled.div`
+export const SigninPicture = styled(Picture)`
   background: #eee;
-  width: 700px;
-  height: 700px;
-  border: 1px solid ${(props) => props.theme.color.foreground};
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 
-  & > img {
-    width: 100%;
+  img {
+    border: 1px solid ${(props) => props.theme.color.foreground};
+    box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   }
 `;

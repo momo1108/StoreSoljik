@@ -1,4 +1,4 @@
-import { db, storage } from '@/firebase';
+import { buildFirestoreQuery, db } from '@/firebase/firestore';
 import { CartItem } from '@/hooks/useCartItems';
 import { UserInfo } from '@/hooks/useFirebaseAuth';
 import { OrderSchema, OrderStatus, ProductSchema } from '@/types/FirebaseType';
@@ -8,7 +8,6 @@ import {
   FetchInfiniteQueryResult,
   FetchQueryParams,
 } from '@/types/ReactQueryType';
-import { buildFirestoreQuery } from '@/utils/firebaseUtils';
 import { getKoreanIsoDatetime } from '@/utils/utils';
 import {
   collection,
@@ -24,23 +23,6 @@ import {
   startAt,
   where,
 } from 'firebase/firestore';
-import {
-  deleteObject,
-  getDownloadURL,
-  listAll,
-  ref,
-  uploadBytes,
-} from 'firebase/storage';
-
-// const updateBatch = async () => {
-//   let productsQuery = query(collection(db, 'product'));
-//   const productDocuments = await getDocs(productsQuery);
-//   const batch = writeBatch(db);
-//   productDocuments.docs.map((doc) =>
-//     batch.update(doc.ref, { productSalesrate: '0' }),
-//   );
-//   await batch.commit();
-// };
 
 /*
 ############################################################
@@ -58,14 +40,14 @@ type CreateProductDataParam = {
   id: string;
   userInfo: UserInfo;
   formData: ProductFormData;
-  productImageUrlArray: string[];
+  productImageUrlMapArray: Record<string, string>[];
   isoTime: string;
 };
 type UpdateProductDataParam = {
   originalProductData: ProductSchema;
   userInfo: UserInfo;
   formData: ProductFormData;
-  productImageUrlArray: string[];
+  productImageUrlMapArray: Record<string, string>[];
   isoTime: string;
 };
 
@@ -73,21 +55,19 @@ export const createProductData = async ({
   id,
   userInfo,
   formData,
-  productImageUrlArray,
+  productImageUrlMapArray,
   isoTime,
 }: CreateProductDataParam) => {
   const documentData: ProductSchema = {
     id,
     sellerId: userInfo.uid,
-    sellerEmail: userInfo.email,
-    sellerNickname: userInfo.nickname,
     productName: formData.productName,
     productDescription: formData.productDescription,
     productPrice: parseInt(formData.productPrice),
     productQuantity: parseInt(formData.productQuantity),
     productSalesrate: 0,
     productCategory: formData.productCategory,
-    productImageUrlArray: productImageUrlArray,
+    productImageUrlMapArray,
     createdAt: isoTime,
     updatedAt: isoTime,
   };
@@ -102,12 +82,13 @@ export const getProductData = async (productId: string) => {
   } else return undefined;
 };
 
-export const getProductList = async (sellerId: string) => {
+// fetchProducts 와 겹치는 메서드.
+export const getProductList = async (sellerId: string = 'all') => {
   const productListDocument = await getDocs(
     buildFirestoreQuery({
       db,
       collectionName: 'product',
-      filters: [where('sellerId', '==', sellerId)],
+      filters: sellerId === 'all' ? [] : [where('sellerId', '==', sellerId)],
       sortOrders: [orderBy('createdAt', 'desc')],
     }),
   );
@@ -119,17 +100,10 @@ export const getProductList = async (sellerId: string) => {
   } else return undefined;
 };
 
-export const uploadProductImage = async (path: string, imageFile: File) => {
-  const imageRef = ref(storage, path);
-  await uploadBytes(imageRef, imageFile);
-  const imageDownloadUrl = await getDownloadURL(imageRef);
-  return imageDownloadUrl;
-};
-
 export const updateProductData = async ({
   originalProductData,
   formData,
-  productImageUrlArray,
+  productImageUrlMapArray,
   isoTime,
 }: UpdateProductDataParam) => {
   const documentData: ProductSchema = {
@@ -139,22 +113,11 @@ export const updateProductData = async ({
     productPrice: parseInt(formData.productPrice),
     productQuantity: parseInt(formData.productQuantity),
     productCategory: formData.productCategory,
-    productImageUrlArray,
+    productImageUrlMapArray,
     updatedAt: isoTime,
   };
 
   await setDoc(doc(db, 'product', originalProductData.id), documentData);
-};
-
-export const deleteProductImages = async (id: string) => {
-  // 판매 상품 경로의 이미지 폴더의 ref 를 불러옵니다.
-  const listRef = ref(storage, id);
-
-  // 폴더 내부의 파일 ref 를 모두 불러와서 각각에 대해 삭제 작업을 수행합니다.
-  const folderRef = await listAll(listRef);
-  for (const imageRef of folderRef.items) {
-    await deleteObject(imageRef);
-  }
 };
 
 export const deleteProductDocument = async (id: string) => {
@@ -167,7 +130,7 @@ export const purchaseProducts = async (
   buyerInfo: UserInfo,
   orderName: string,
 ) => {
-  let batchOrderId = `${buyerInfo.email}_${getKoreanIsoDatetime()}`;
+  let batchOrderId = `${buyerInfo.uid}_${getKoreanIsoDatetime()}`;
 
   await runTransaction(db, async (transaction) => {
     const productRefs = cartItemsArray.map((product) =>

@@ -2,6 +2,7 @@ import media from '@/style/media';
 import styled from 'styled-components';
 import NavBar from '@/components/ui/navbar/NavBar';
 import Button from '@/components/ui/button/Button';
+import { Link } from 'react-router-dom';
 
 export const HeaderTopBox = styled.div`
   display: flex;
@@ -12,6 +13,7 @@ export const HeaderTopBox = styled.div`
   ${media.xsmall`gap: 8px;`}
   ${media.xxsmall`gap: 8px;`}
   padding: 10px 0 10px 0;
+  font-weight: bold;
 `;
 
 export const HeaderNavBox = styled.nav`
@@ -55,6 +57,15 @@ export const HeaderMenuBox = styled.div`
   display: flex;
   align-items: center;
   flex-basis: fit-content;
+  gap: 32px;
+`;
+
+export const BuyerPageLink = styled(Link)`
+  padding: 8px;
+  border-radius: 8px;
+  &:hover {
+    background: ${(props) => props.theme.color.brightestGray};
+  }
 `;
 
 export const SignoutButton = styled(Button)`

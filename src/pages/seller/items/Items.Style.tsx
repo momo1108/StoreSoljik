@@ -45,6 +45,19 @@ export const ErrorBox = styled.div`
   font-weight: bold;
 `;
 
+export const EmptyBox = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 350px;
+  justify-content: center;
+  align-items: center;
+  color: ${(props) => props.theme.color.gray};
+  font-size: ${(props) => props.theme.fontSize.xl};
+  font-weight: bold;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
+`;
+
 export const SpinnerBox = styled.div`
   display: flex;
   width: 100%;

@@ -1,3 +1,5 @@
+import { getFirestore } from 'firebase/firestore';
+import { app } from './app';
 import {
   collection,
   Firestore,
@@ -6,6 +8,8 @@ import {
   Query,
   QueryConstraint,
 } from 'firebase/firestore';
+
+export const db = getFirestore(app);
 
 /**
  * Firestore 에 여러 조건을 적용한 쿼리를 생성하는 함수

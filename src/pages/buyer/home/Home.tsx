@@ -35,7 +35,7 @@ const Home: React.FC = () => {
             ) : (
               <S.HotItemCarouselWrapper>
                 <CardCarousel
-                  data={hotProductsArray?.slice(0, 5) || []}
+                  data={hotProductsArray || []}
                   settings={{
                     ...defaultSetiing,
                     autoplay: true,
@@ -131,14 +131,12 @@ const Home: React.FC = () => {
                     </Link>
                   </S.CategoryHeaderBox>
                   <S.ProductCardList>
-                    {categoryQuery.data?.result
-                      .slice(0, 4)
-                      .map((product, index) => (
-                        <VerticalCard
-                          key={`${categoryQuery.data?.category || `category_${index}`}_${index}`}
-                          data={product}
-                        />
-                      )) || (
+                    {categoryQuery.data?.result.map((product, index) => (
+                      <VerticalCard
+                        key={`${categoryQuery.data?.category || `category_${index}`}_${index}`}
+                        data={product}
+                      />
+                    )) || (
                       <>
                         <S.VerticalCardSkeleton />
                         <S.VerticalCardSkeleton />

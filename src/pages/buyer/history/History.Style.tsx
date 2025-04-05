@@ -71,26 +71,12 @@ export const OrderStatusListElement = styled.li`
 export const OrderListContainer = styled.div`
   display: flex;
   flex-direction: column;
+  align-items: start;
   gap: 16px;
 `;
 
-export const OrderListMenu = styled.ul`
-  display: flex;
-  gap: 8px;
-  width: 100%;
-`;
-
-export const OrderListMenuButton = styled(Button)`
-  padding: 8px 16px;
-  min-width: 80px;
-  gap: 4px;
-
-  .countSpan {
-    font-size: ${(props) => props.theme.fontSize.sm};
-  }
-`;
-
 export const OrderListInfoContainer = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
   gap: 32px;
@@ -121,6 +107,11 @@ export const OrderDateP = styled.p`
 export const OrderInfoContentBox = styled.div`
   display: flex;
   gap: 12px;
+
+  picture {
+    box-shadow: ${(props) => props.theme.color.borderShadow};
+    border-radius: ${(props) => props.theme.color.radius};
+  }
 `;
 
 export const OrderImage = styled.img`
@@ -129,9 +120,7 @@ export const OrderImage = styled.img`
   object-fit: cover;
   flex-shrink: 0;
   border-radius: 8px;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
 `;
 
 export const OrderContentBox = styled.div`
@@ -224,9 +213,7 @@ export const OrderDetailListItemBox = styled.div`
 export const CarouselWrapperBox = styled.div`
   border-radius: 8%;
   overflow: hidden;
-  box-shadow:
-    rgba(0, 0, 0, 0.05) 0px 6px 24px 0px,
-    rgba(0, 0, 0, 0.08) 0px 0px 0px 1px;
+  box-shadow: ${(props) => props.theme.color.borderShadow};
   flex-shrink: 0;
 `;
 

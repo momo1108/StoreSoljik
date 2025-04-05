@@ -1,6 +1,7 @@
 import { getValidCategories } from '@/services/categoryService';
 import { fetchProducts } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
+import { getProperSizeImageUrl, preloadImages } from '@/utils/imageUtils';
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { orderBy, where } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
@@ -34,27 +35,32 @@ const useHome = () => {
     error: hotProductsError,
   } = useQuery<ProductSchema[]>({
     queryKey: ['products', 'hot'],
-    queryFn: async () =>
-      await fetchProducts({
+    queryFn: async () => {
+      const result = await fetchProducts({
         sortOrders: [
           orderBy('productSalesrate', 'desc'),
           orderBy('createdAt', 'desc'),
         ],
-        pageSize: 8,
-      }),
+        pageSize: 5,
+      });
+      return result;
+    },
   });
 
   const recentProductsQueryPerCategory = useQueries({
     queries: categories.map((category) => ({
       queryKey: ['products', category, 'recent'],
-      queryFn: async () => ({
-        category,
-        result: await fetchProducts({
+      queryFn: async () => {
+        const result = await fetchProducts({
           filters: [where('productCategory', '==', category)],
           sortOrders: [orderBy('createdAt', 'desc')],
-          pageSize: 8,
-        }),
-      }),
+          pageSize: 4,
+        });
+        return {
+          category,
+          result,
+        };
+      },
     })),
     combine: (results) => {
       return results.map((categoryQuery) => ({
@@ -64,6 +70,54 @@ const useHome = () => {
       }));
     },
   });
+
+  useEffect(() => {
+    if (
+      hotProductsArray &&
+      recentProductsQueryPerCategory.every(
+        (query) => query.status === 'success',
+      )
+    ) {
+      const homeImageUrls: string[] = [];
+      const preloadImageUrls: string[] = [];
+      hotProductsArray.forEach((product) => {
+        const homeImageMap = getProperSizeImageUrl(
+          product.productImageUrlMapArray[0],
+          250,
+        );
+        homeImageUrls.push(homeImageMap.original, homeImageMap.webp);
+
+        const preloadImageMap = getProperSizeImageUrl(
+          product.productImageUrlMapArray[0],
+          600,
+        );
+        preloadImageUrls.push(preloadImageMap.original, preloadImageMap.webp);
+      });
+      recentProductsQueryPerCategory.forEach((query) => {
+        query.data?.result.forEach((product) => {
+          const homeImageMap = getProperSizeImageUrl(
+            product.productImageUrlMapArray[0],
+            250,
+          );
+          homeImageUrls.push(homeImageMap.original, homeImageMap.webp);
+
+          const preloadImageMap = getProperSizeImageUrl(
+            product.productImageUrlMapArray[0],
+            600,
+          );
+          preloadImageUrls.push(preloadImageMap.original, preloadImageMap.webp);
+        });
+      });
+
+      preloadImages(homeImageUrls)
+        .then(() => {
+          preloadImages(preloadImageUrls);
+        })
+        .catch((error: Error) => {
+          console.error(error);
+        });
+    }
+  }, [hotProductsArray, recentProductsQueryPerCategory]);
 
   return {
     hotProductsArray,

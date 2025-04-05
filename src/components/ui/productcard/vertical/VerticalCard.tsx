@@ -15,13 +15,13 @@ const VerticalCard: React.FC<VerticalCardProps> = ({ data, className }) => {
     id,
     productName,
     productDescription,
-    productImageUrlArray,
+    productImageUrlMapArray,
     productPrice,
     createdAt,
   } = data;
   return (
     <S.CardContainer className={className}>
-      <Carousel data={productImageUrlArray} />
+      <Carousel data={productImageUrlMapArray} />
       <S.CardContentBox>
         <S.CardContentTitleBox>
           <H4 className='hideTextOverflow'>{productName}</H4>

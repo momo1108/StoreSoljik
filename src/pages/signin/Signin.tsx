@@ -4,9 +4,12 @@ import * as S from './Signin.Style';
 import useSignin from './useSignin';
 import Spinner from '@/components/ui/spinner/Spinner';
 import Input from '@/components/form/input/Input';
-import signinImgUrl from '@/assets/images/signup.png';
+import signinImgUrlPng from '@/assets/images/signup.png';
+import signinImgUrlWebp from '@/assets/images/signup.webp';
 import HR from '@/components/ui/hr/HR';
 import { useTheme } from 'styled-components';
+import { FaGithub, FaGoogle } from 'react-icons/fa';
+import { FaXTwitter } from 'react-icons/fa6';
 
 const Signin: React.FC = () => {
   const {
@@ -18,6 +21,7 @@ const Signin: React.FC = () => {
     registerEmail,
     registerPassword,
     registerMaintainCheckbox,
+    handleClickThirdParty,
   } = useSignin();
   const theme = useTheme();
 
@@ -85,11 +89,32 @@ const Signin: React.FC = () => {
             </S.SignButton>
             <HR color={theme.color.border} />
             <h3>소셜 로그인</h3>
-            <S.SigninIconBox>gd</S.SigninIconBox>
+            <S.SigninIconBox>
+              <FaGoogle
+                onClick={() => {
+                  handleClickThirdParty('google');
+                }}
+              />
+              <FaXTwitter
+                onClick={() => {
+                  handleClickThirdParty('x');
+                }}
+              />
+              <FaGithub
+                onClick={() => {
+                  handleClickThirdParty('github');
+                }}
+              />
+            </S.SigninIconBox>
           </S.SigninFormContainer>
-          <S.SigninImageBox>
-            <img src={signinImgUrl} alt='' />
-          </S.SigninImageBox>
+          <S.SigninPicture
+            imageUrlMap={{
+              original: signinImgUrlPng,
+              original_webp: signinImgUrlWebp,
+            }}
+            size={700}
+            alt='메인페이지이미지'
+          />
         </S.SigninContainer>
       </Main>
     </>

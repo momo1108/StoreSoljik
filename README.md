@@ -8,7 +8,7 @@
   <p align="center">
     1인 개발 커머스 프로젝트 입니다.
     <br />
-    <img src="src/assets/images/main_screenshot.png" width="600" alt="main_screenshot">
+    <img src="src/assets/images/signin_page.png" width="600" alt="signin_page">
     <br />
     <a href="https://github.com/othneildrew/Best-README-Template" >데모 사이트</a>
     <br />

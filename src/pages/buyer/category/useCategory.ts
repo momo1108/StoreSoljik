@@ -1,6 +1,8 @@
 import { getValidCategories } from '@/services/categoryService';
 import {
   fetchInfiniteProducts,
+  ProductDirection,
+  ProductField,
   ProductFilter,
 } from '@/services/productService';
 import { ProductSchema } from '@/types/FirebaseType';
@@ -31,19 +33,22 @@ const useCategory = () => {
       });
   }, [setValidcategories]);
 
-  const [filterOptions, setFilterOptions] = useState<ProductFilter>({
-    category: state?.category || '전체',
-    field: 'createdAt',
-    direction: 'desc',
-  });
+  const [categoryOption, setCategoryOption] = useState<string>(
+    state?.category || '전체',
+  );
+
+  const [fieldOption, setFieldOption] = useState<ProductField>('createdAt');
+
+  const [directionOption, setDirectionOption] =
+    useState<ProductDirection>('desc');
 
   // queryKey를 카테고리와 정렬 기준에 따라 동적으로 생성합니다.
   const queryKey = [
     'products',
     'buyer',
-    filterOptions.category,
-    filterOptions.field,
-    filterOptions.direction,
+    categoryOption,
+    fieldOption,
+    directionOption,
   ];
 
   const [pageSize] = useState<number>(8);
@@ -101,7 +106,14 @@ const useCategory = () => {
   } = useInfiniteQuery<FetchInfiniteQueryResult<ProductSchema>>({
     queryKey,
     queryFn: (({ pageParam }) =>
-      fetchProductsWrapper({ pageParam, filterOptions })) as QueryFunction<
+      fetchProductsWrapper({
+        pageParam,
+        filterOptions: {
+          category: categoryOption,
+          field: fieldOption,
+          direction: directionOption,
+        },
+      })) as QueryFunction<
       FetchInfiniteQueryResult<ProductSchema>,
       QueryKey,
       unknown
@@ -126,8 +138,12 @@ const useCategory = () => {
 
   return {
     categories: validCategories,
-    filterOptions,
-    setFilterOptions,
+    categoryOption,
+    setCategoryOption,
+    fieldOption,
+    setFieldOption,
+    directionOption,
+    setDirectionOption,
     data,
     status,
     error,
