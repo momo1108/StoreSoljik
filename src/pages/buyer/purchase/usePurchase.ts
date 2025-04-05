@@ -24,7 +24,7 @@ const usePurchase = () => {
     formState: { isSubmitting, errors },
     setValue,
   } = useForm<PurchaseFormData>();
-  const { itemsRef, clearCart } = useCartItemsActions();
+  const { getItemsRef, clearCart } = useCartItemsActions();
   const { userInfo } = useFirebaseAuth();
   const isReadyToCheckoutRef = useRef<boolean>(false);
   const navigate = useNavigate();
@@ -39,7 +39,7 @@ const usePurchase = () => {
       return;
     }
 
-    if (itemsRef.current.length === 0) {
+    if (getItemsRef().current.length === 0) {
       toast.warning('장바구니에 등록된 상품이 없습니다.');
       return;
     }
@@ -50,21 +50,21 @@ const usePurchase = () => {
 
     try {
       batchOrderId = await purchaseProducts(
-        itemsRef.current,
+        getItemsRef().current,
         userInfo as UserInfo,
-        `${itemsRef.current[0].productName}${itemsRef.current.length > 1 ? ` 외 ${itemsRef.current.length - 1}건` : ''}`,
+        `${getItemsRef().current[0].productName}${getItemsRef().current.length > 1 ? ` 외 ${getItemsRef().current.length - 1}건` : ''}`,
       );
 
       /**
        * Toss Payments 로직
        */
       const confirmData = await processPayment({
-        totalPrice: itemsRef.current.reduce(
+        totalPrice: getItemsRef().current.reduce(
           (prev, cur) => prev + cur.productPrice * cur.productQuantity,
           0,
         ),
         orderId: uuidv4(),
-        items: itemsRef.current,
+        items: getItemsRef().current,
         email: data.buyerEmail,
         name: data.buyerName,
         phoneNumber: data.buyerPhoneNumber,
@@ -113,7 +113,7 @@ const usePurchase = () => {
           where(
             'id',
             'in',
-            itemsRef.current.map((item) => item.id),
+            getItemsRef().current.map((item) => item.id),
           ),
         ],
         sortOrders: [orderBy('createdAt', 'desc')],
