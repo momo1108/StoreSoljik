@@ -96,18 +96,18 @@
 ## 최적화
 관련 내용은 gitbook 링크로 리다이렉트 됩니다.
 
-1. <a href="https://store-soljik.vercel.app/signin" >이미지 최적화</a>
-2. <a href="https://store-soljik.vercel.app/signin" >Lazy Loading / Code Splitting</a>
-3. <a href="https://store-soljik.vercel.app/signin" >렌더링 최적화</a>
+1. <a href="https://iwannabethehashs-organization.gitbook.io/project-soljik-devlog/optimization/editor" >이미지 최적화</a>
+2. <a href="https://iwannabethehashs-organization.gitbook.io/project-soljik-devlog/optimization/markdown" >Lazy Loading / Code Splitting</a>
+3. <a href="https://iwannabethehashs-organization.gitbook.io/project-soljik-devlog/optimization/images-and-media" >렌더링 최적화</a>
 
 <br />
 
 ## 트러블 슈팅
 관련 내용은 gitbook 링크로 리다이렉트 됩니다.
 
-1. <a href="https://store-soljik.vercel.app/signin" >BaaS(Firebase) 환경에서의 세션 관리</a>
-2. <a href="https://store-soljik.vercel.app/signin" >Firebase 저장소의 CORS 에러 해결</a>
-3. <a href="https://store-soljik.vercel.app/signin" >다음 우편번호 API 적용하기</a>
+1. <a href="https://iwannabethehashs-organization.gitbook.io/project-soljik-devlog/trouble-shooting/firebase-session" >BaaS(Firebase) 환경에서의 세션 관리</a>
+2. <a href="https://iwannabethehashs-organization.gitbook.io/project-soljik-devlog/trouble-shooting/firebase-cors" >Firebase 저장소의 CORS 에러 해결</a>
+3. <a href="https://iwannabethehashs-organization.gitbook.io/project-soljik-devlog/trouble-shooting/api" >다음 우편번호 API 적용하기</a>
 
 <br />
 
@@ -122,8 +122,7 @@
 
 <br />
 
-### 선정 이유
-#### Front-End
+### Front-End
 [![TypeScript][TypeScript]][TypeScript-url]
 - 타입 안정성 확보
 - 컴파일 타임에 에러 발견
@@ -152,7 +151,7 @@
 
 <br />
 
-#### Back-End
+### Back-End
 [![Firebase][Firebase]][Firebase-url]
 - NoSQL 기반으로 프로젝트의 기능 변동에 따른 DB 스키마 변경이 자유로움
 - 대용량 데이터셋의 빠른 처리 속도
@@ -163,7 +162,7 @@
 
 <br />
 
-#### Deploy
+### Deploy
 [![Vercel][Vercel]][Vercel-url]
 - Git 기반의 워크 플로우를 지원하여 Git Repo 기반으로 쉽고 빠른 배포가 가능
 
@@ -174,7 +173,7 @@
 
 <br />
 
-#### CI / CD
+### CI / CD
 [![Github][Github]][Github-url]
 - 브랜치 전략에 기반한 CI 적용
 
