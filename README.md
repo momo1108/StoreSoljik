@@ -110,69 +110,11 @@
 
 ## 프로젝트 기술 스택
 
-프로젝트의 아키텍처와 기술 스택 선정 이유를 간략하게 설명합니다.
-
 <img src="src/assets/images/project_architecture.png" alt="Logo">
 
 <br />
 
-### Front-End
-[![TypeScript][TypeScript]][TypeScript-url]
-- 타입 안정성 확보
-- 컴파일 타임에 에러 발견
-
-<br />
-
-[![React][React.js]][React-url]
-- SPA 프로젝트 구현
-- 컴포넌트 구조를 활용해 유지보수성, 재사용성 확보
-- 거대한 커뮤니티와 확장성
-  - [![ReactQuery][ReactQuery]][ReactQuery-url]
-    - useInfiniteQuery : 대용량 데이터셋의 로딩 최적화
-    - Optimistic Update : 활용한 빠른 UI 업데이트
-  - [![ReactHookForm][ReactHookForm]][ReactHookForm-url]
-    - Uncontrolled Component 기반으로 리렌더 최소화를 통한 성능 향상
-    - 자체 validation 기능 제공
-
-<br />
-
-[![StyledComponent][StyledComponent]][StyledComponent-url]
-- **TailwindCSS vs Styled-Component**
-  1. 소규모 프로젝트 개발 속도 : **TailwindCSS**(utility 클래스 기반의 빠른 전역 스타일링) vs *Styled-Component*(컴포넌트 단위의 스타일링으로 재사용성 확보)
-  2. 전역 theme, 커스텀 component 스타일 설정: **TailwindCSS**(`tailwind.config.js` 파일에 테마 지정, `global.css` 파일에 어노테이션 활용해 설정 가능) vs **Styled-Component**(객체 형태의 전역 theme, props 를 활용한 동적 스타일링 가능)
-  3. 성능 최적화 : **TailwindCSS**(정적 CSS 클래스를 활용한 빠른 스타일 해석, 사용할 CSS만 번들링하여 크기 최소화) vs *Styled-Component*(스타일의 객체 단위 모듈화)
-- 개발 속도나 성능을 고려하면 TailwindCSS 가 좋겠으나, 많이 사용되지만 한번도 사용해보지 않은 **Styled-Components** 의 사용법을 익혀보기로 결정.
-
-<br />
-
-### Back-End
-[![Firebase][Firebase]][Firebase-url]
-- NoSQL 기반으로 프로젝트의 기능 변동에 따른 DB 스키마 변경이 자유로움
-- 대용량 데이터셋의 빠른 처리 속도
-- 다양한 기능의 product 제공
-  - 인증 서비스(Firebase Authentication)
-  - NoSQL DB(FireStore)
-  - 컨텐츠(이미지, 오디오, 비디오 등) 저장소(Clouc Storage)
-
-<br />
-
-### Deploy
-[![Vercel][Vercel]][Vercel-url]
-- Git 기반의 워크 플로우를 지원하여 Git Repo 기반으로 쉽고 빠른 배포가 가능
-
-[![Vite][Vite]][Vite-url]
-- Native ESM 기반의 빠른 개발 서버 지원
-  - 모든 모듈 파일을 번들링하는 과정 대신 수정된 모듈만 dynamic import 를 통해 불러옴
-  - HTTP 헤더를 활용해 소스코드와 디펜던시를 캐싱하여 페이지 로딩 최적화
-
-<br />
-
-### CI / CD
-[![Github][Github]][Github-url]
-- 브랜치 전략에 기반한 CI 적용
-
-[![GithubActions][GithubActions]][GithubActions-url]
-- Vercel 과의 연동을 통한 CD 적용
+<a href="https://iwannabethehashs-organization.gitbook.io/project-soljik-devlog/intro/publish-your-docs" >기술 스택 선정 기준</a>
 
 <br />
 
